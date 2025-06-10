@@ -55,7 +55,8 @@ public class TerapiaDAO {
         } catch (SQLException e) {
             System.err.println("Errore durante la ricerca della terapia per IDPaziente: " + e.getMessage());
         }
-        // Se non viene trovato nessun utente o si verifica un errore, ritorna un Optional vuoto
+
+        // Se non viene trovato nessun utente o si verifica un errore, ritorna una lista vuota
         return terapie;
     }
 
