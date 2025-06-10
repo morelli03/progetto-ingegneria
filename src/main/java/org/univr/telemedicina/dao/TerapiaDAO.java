@@ -65,7 +65,7 @@ public class TerapiaDAO {
      *
      * (assegnaTerapia ed esitoAssegnaTerapia in Specifica / Modifica Terapia SD)
      *
-     * @param terapia L'oggetto Terapia da salvare
+     * @param terapia L'oggetto Terapia da salvare nel database.
      */
     public void assignTherapy(Terapia terapia) {
         String sql = "INSERT INTO Terapie (IDPaziente, IDMedico, NomeFarmaco, Quantita, FrequenzaGiornaliera, Indicazioni, DataInizio, DataFine) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
