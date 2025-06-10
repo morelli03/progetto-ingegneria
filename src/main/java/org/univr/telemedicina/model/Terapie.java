@@ -1,7 +1,6 @@
 package org.univr.telemedicina.model;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.sql.Date;
 
 public class Terapie {
     private int IDTerapia;
@@ -11,66 +10,75 @@ public class Terapie {
     private String Quantita;
     private int FrequenzaGiornaliera;
     private String Indicazioni;
-    private LocalDate DataInizio;
-    private LocalDate DataFine;
+    private Date DataInizio;
+    private Date DataFine;
 
-    public Terapie() {} //costruttore vuoto per poter aggiungere un utente senza parametri
 
-    public Terapie(int IDUtente, String email, String hashedPassword, String nome, String cognome, String ruolo) { //costruttore con parametri
-        this.IDUtente = IDUtente;
-        this.email = email;
-        this.hashedPassword = hashedPassword;
-        this.nome = nome;
-        this.cognome = cognome;
-        this.Ruolo = ruolo;
+    public Terapie(int IDTerapia, int IDPaziente, int IDMedico, String NomeFarmaco, String Quantita, int FrequenzaGiornaliera, String Indicazioni, Date DataInizio, Date DataFine) {
+        this.IDTerapia = IDTerapia;
+        this.IDPaziente = IDPaziente;
+        this.IDMedico = IDMedico;
+        this.NomeFarmaco = NomeFarmaco;
+        this.Quantita = Quantita;
+        this.FrequenzaGiornaliera = FrequenzaGiornaliera;
+        this.Indicazioni = Indicazioni;
+        this.DataInizio = DataInizio;
+        this.DataFine = DataFine;
     }
 
     //metodi getter e setter
-    public int getIDUtente() {
-        return IDUtente;
+    public int getIDTerapia() {
+        return IDTerapia;
     }
-
-    public void setIDUtente(int IDUtente) {
-        this.IDUtente = IDUtente;
+    public void setIDTerapia(int IDTerapia) {
+        this.IDTerapia = IDTerapia;
     }
-
-    public String getEmail() {
-        return email;
+    public int getIDPaziente() {
+        return IDPaziente;
     }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setIDPaziente(int IDPaziente) {
+        this.IDPaziente = IDPaziente;
     }
-
-    public String getHashedPassword() {
-        return hashedPassword;
+    public int getIDMedico() {
+        return IDMedico;
     }
-
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
+    public void setIDMedico(int IDMedico) {
+        this.IDMedico = IDMedico;
     }
-
-    public String getNome() {
-        return nome;
+    public String getNomeFarmaco() {
+        return NomeFarmaco;
     }
-
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setNomeFarmaco(String nomeFarmaco) {
+        NomeFarmaco = nomeFarmaco;
     }
-
-    public String getCognome() {
-        return cognome;
+    public String getQuantita() {
+        return Quantita;
     }
-
-    public void setCognome(String cognome) {
-        this.cognome = cognome;
+    public void setQuantita(String quantita) {
+        Quantita = quantita;
     }
-
-    public String getRuolo() {
-        return Ruolo;
+    public int getFrequenzaGiornaliera() {
+        return FrequenzaGiornaliera;
     }
-
-    public void setRuolo(String ruolo) {
-        this.Ruolo = ruolo;
+    public void setFrequenzaGiornaliera(int frequenzaGiornaliera) {
+        FrequenzaGiornaliera = frequenzaGiornaliera;
+    }
+    public String getIndicazioni() {
+        return Indicazioni;
+    }
+    public void setIndicazioni(String indicazioni) {
+        Indicazioni = indicazioni;
+    }
+    public Date getDataInizio() {
+        return DataInizio;
+    }
+    public void setDataInizio(Date dataInizio) {
+        DataInizio = dataInizio;
+    }
+    public Date getDataFine() {
+        return DataFine;
+    }
+    public void setDataFine(Date dataFine) {
+        DataFine = dataFine;
     }
 }

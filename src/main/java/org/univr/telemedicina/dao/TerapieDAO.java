@@ -8,12 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class TerapieDAO {
-    /**
-     *
-     *
-     * @param email L'email da cercare.
-     * @return Un Optional contenente l'Utente se trovato, altrimenti un Optional vuoto.
-     */
     public Optional<Utente> findByEmail(String email) {
         // Query per selezionare l'utente con una specifica email
         String sql = "SELECT * FROM Utenti WHERE Email = ?";
@@ -31,11 +25,6 @@ public class TerapieDAO {
                     // ...crea un oggetto Utente e popola utente con la riga trovata
                     Utente utente = new Utente(
                             rs.getInt("IDUtente"),
-                            rs.getString("Email"),
-                            rs.getString("HashedPassword"),
-                            rs.getString("Nome"),
-                            rs.getString("Cognome"),
-                            rs.getString("Ruolo")
                     );
                     // Ritorna l'utente trovato, avvolto in un Optional
                     return Optional.of(utente);
