@@ -2,7 +2,7 @@ package org.univr.telemedicina.model;
 
 import java.sql.Date;
 
-public class Terapie {
+public class Terapia {
     private int IDTerapia;
     private int IDPaziente;
     private int IDMedico;
@@ -14,7 +14,7 @@ public class Terapie {
     private Date DataFine;
 
 
-    public Terapie(int IDTerapia, int IDPaziente, int IDMedico, String NomeFarmaco, String Quantita, int FrequenzaGiornaliera, String Indicazioni, Date DataInizio, Date DataFine) {
+    public Terapia(int IDTerapia, int IDPaziente, int IDMedico, String NomeFarmaco, String Quantita, int FrequenzaGiornaliera, String Indicazioni, Date DataInizio, Date DataFine) {
         this.IDTerapia = IDTerapia;
         this.IDPaziente = IDPaziente;
         this.IDMedico = IDMedico;
