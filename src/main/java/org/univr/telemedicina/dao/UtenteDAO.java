@@ -37,7 +37,8 @@ public class UtenteDAO {
                             rs.getString("HashedPassword"),
                             rs.getString("Nome"),
                             rs.getString("Cognome"),
-                            rs.getString("Ruolo")
+                            rs.getString("Ruolo"),
+                            rs.getDate("DataNascita") // Assicurati che il campo DataUtente sia presente nella tabella Utenti
                     );
                     // Ritorna l'utente trovato, avvolto in un Optional
                     return Optional.of(utente);
@@ -52,18 +53,21 @@ public class UtenteDAO {
 
     /**
      * Trova un utente associato al medico basandosi sul suo id.        OTTIENI LISTA PAZIENTI
-     * Restituisce un Optional per gestire in modo pulito il caso in cui l'utente non esista.
+     * Restituisce una lista di pazienti associati a un medico specifico.
      *
-     * @param IDUtente L'IDUtente da cercare.
+     * @param IDUtente L'ID del medico di riferimento.
      * @return Un Optional contenente l'Utente se trovato, altrimenti un Optional vuoto.
-     */
-                                                 //id medico
+     */                                     //id medico
     public List<Utente> listPatientsByMedId(int IDUtente) {
         //fai un hashset di pazienti
         List<Utente> pazienti = new ArrayList<>();
 
 
-        String sql = "SELECT * FROM Pazienti WHERE IDMedicoRiferimento = ?";
+        //String sql = "SELECT * FROM Pazienti WHERE IDMedicoRiferimento = ?";
+        String sql = "SELECT u.* " +
+                     "FROM Pazienti p " +
+                     "JOIN Utenti u ON p.IDPaziente = u.IDUtente " +
+                     "WHERE p.IDMedicoRiferimento = ?";
 
         // try-with-resources per garantire la chiusura automatica delle risorse (Connection, PreparedStatement, ResultSet)
         try (Connection conn = DatabaseManager.getConnection();
@@ -76,29 +80,35 @@ public class UtenteDAO {
                 // Se c'è un risultato...
                 while (rs.next()) {
                     // ...crea un oggetto Utente e popola i suoi campi con i dati dal ResultSet
-                    Utente paziente = new Utente();
-                    paziente.setIDUtente(rs.getInt("IDPaziente"));
+                    // Cambio la funzionalità di IDUtente, non viene più base64, invece mi prendo direttamente tutte le info con la lista
+                    Utente paziente = new Utente(
+                            rs.getInt("IDUtente"),
+                            rs.getString("Email"),
+                            rs.getString("HashedPassword"),
+                            rs.getString("Nome"),
+                            rs.getString("Cognome"),
+                            rs.getString("Ruolo"),
+                            rs.getDate("DataNascita")
+                    );
+
                     // Ritorna l'utente trovato, avvolto in un Optional
                     pazienti.add(paziente);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Errore durante la ricerca dell'utente per email: " + e.getMessage());
+            System.err.println("Errore durante la ricerca dell'utente per medico: " + e.getMessage());
         }
         // Se non viene trovato nessun utente o si verifica un errore, ritorna un Optional vuoto
         return pazienti;
     }
 
-    //      STRUTTURA HASH ID UTENTE
-    // {Riccardo Morelli 13-12-2003 riccardomorelli2003@gmail.com}   -   {UmljY2FyZG8gTW9yZWxsaSAxMy0xMi0yMDAzIHJpY2NhcmRvbW9yZWxsaTIwMDNAZ21haWwuY29t}
-
     /**
      * Salva un nuovo utente nel database.
      *
-     * @param utente L'oggetto Utente da salvare (IMPORTANTE implementare creazione ID).
+     * @param utente L'oggetto Utente da salvare (IMPORTANTE implementare creazione ID - UUID).
      */
     public void create(Utente utente) {
-        String sql = "INSERT INTO Utenti(Email, HashedPassword, Nome, Cognome, Ruolo) VALUES(?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Utenti(Email, HashedPassword, Nome, Cognome, Ruolo, DataNascita) VALUES(?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -108,6 +118,7 @@ public class UtenteDAO {
             pstmt.setString(3, utente.getNome());
             pstmt.setString(4, utente.getCognome());
             pstmt.setString(5, utente.getRuolo());
+            pstmt.setDate(6, utente.getDataNascita());
 
             pstmt.executeUpdate();
 
