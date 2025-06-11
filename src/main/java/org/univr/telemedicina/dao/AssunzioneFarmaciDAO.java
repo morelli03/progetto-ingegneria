@@ -13,7 +13,7 @@ import java.time.LocalDate;
  * Deve aggiungere una assunzione da parte di una paziente, e legge tutte assunzioni di farmaci per paziente,
  * e assunzioni di un determinato giorno.
  */
-public class AssunzioniFarmaciDAO {
+public class AssunzioneFarmaciDAO {
 
     /**
      * Legge tute le assunzioni di farmaci per un paziente specifico.
