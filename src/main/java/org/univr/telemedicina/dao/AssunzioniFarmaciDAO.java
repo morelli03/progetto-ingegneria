@@ -22,7 +22,10 @@ public class AssunzioniFarmaciDAO {
      * @return Una List contenente le AssunzioniFarmaci per il paziente specificato.
      */
     public List<AssunzioneFarmaci> leggiAssunzioniFarmaci(int IDPaziente){
+
+        // Lista per memorizzare le assunzioni di farmaci
         List<AssunzioneFarmaci> assunzioni = new ArrayList<>();
+
         String sql = "SELECT * FROM AssunzioniFarmaci WHERE IDPaziente = ?";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -38,7 +41,7 @@ public class AssunzioniFarmaciDAO {
                             rs.getInt("IDAssunzione"),
                             rs.getInt("IDTerapia"),
                             rs.getInt("IDPaziente"),
-                            rs.getTimestamp("TimestampAssunzione"),
+                            rs.getObject("TimestampAssunzione", LocalDateTime.class),
                             rs.getString("QuantitaAssunta")
                     );
                     assunzioni.add(as);
@@ -51,7 +54,6 @@ public class AssunzioniFarmaciDAO {
         return assunzioni;
     }
 
-
      /**
       * Legge le assunzioni di farmaci in un giorno per un paziente specifico.
       * @param IDPaziente L'ID del paziente
@@ -59,13 +61,14 @@ public class AssunzioniFarmaciDAO {
       * @return Una List contenente le AssunzioniFarmaci per il paziente specificato.
       */
      public List<AssunzioneFarmaci> leggiAssunzioniGiorno(int IDPaziente, LocalDate data){
-
          List<AssunzioneFarmaci> assunzioni = new ArrayList<>();
+
+         // Query SQL per leggere le assunzioni di farmaci in un giorno specifico
          String sql =   "SELECT * FROM AssunzioniFarmaci WHERE IDPaziente = ? " +
                         "AND TimestampAssunzione >= ?" +
                         " AND TimestampAssunzione < ?";
 
-         // 1. Definisci l'intervallo di tempo per l'intera giornata
+         // Definisce l'intervallo di tempo per l'intera giornata
          LocalDateTime inizioGiorno = data.atStartOfDay(); // Es. 2025-06-11T00:00:00
          LocalDateTime inizioGiornoSuccessivo = data.plusDays(1).atStartOfDay(); // Es. 2025-06-12T00:00:00
 
@@ -84,7 +87,7 @@ public class AssunzioniFarmaciDAO {
                              rs.getInt("IDAssunzione"),
                              rs.getInt("IDTerapia"),
                              rs.getInt("IDPaziente"),
-                             rs.getTimestamp("TimestampAssunzione"),
+                             rs.getObject("TimestampAssunzione", LocalDateTime.class),
                              rs.getString("QuantitaAssunta")
                      );
                      assunzioni.add(as);
@@ -96,4 +99,9 @@ public class AssunzioniFarmaciDAO {
          // Se non viene trovata nessuna assunzione o si verifica un errore, ritorna un Optional vuoto
          return assunzioni;
      }
+
+    /**
+     * Aggiunge una nuova assunzione di farmaci per un paziente.
+     * @param assunzione L'oggetto AssunzioneFarmaci da aggiungere
+     */
 }

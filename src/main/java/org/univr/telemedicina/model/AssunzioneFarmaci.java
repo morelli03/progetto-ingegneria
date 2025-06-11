@@ -1,15 +1,15 @@
 package org.univr.telemedicina.model;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class AssunzioneFarmaci {
     private int IDAssunzione;
     private int IDTerapia;
     private int IDPaziente;
-    private Timestamp TimestampAssunzione;
+    private LocalDateTime TimestampAssunzione;
     private String QuantitaAssunta;
 
-    public AssunzioneFarmaci(int IDAssunzione, int IDTerapia, int IDPaziente, Timestamp TimestampAssunzione, String QuantitaAssunta) {
+    public AssunzioneFarmaci(int IDAssunzione, int IDTerapia, int IDPaziente, LocalDateTime TimestampAssunzione, String QuantitaAssunta) {
         this.IDAssunzione = IDAssunzione;
         this.IDTerapia = IDTerapia;
         this.IDPaziente = IDPaziente;
@@ -39,10 +39,10 @@ public class AssunzioneFarmaci {
         this.IDPaziente = IDPaziente;
     }
 
-    public Date getTimestampAssunzione() {
+    public LocalDateTime getTimestampAssunzione() {
         return TimestampAssunzione;
     }
-    public void setTimestampAssunzione(Timestamp TimestampAssunzione) {
+    public void setTimestampAssunzione(LocalDateTime TimestampAssunzione) {
         this.TimestampAssunzione = TimestampAssunzione;
     }
 
