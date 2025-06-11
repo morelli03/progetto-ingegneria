@@ -4,7 +4,6 @@ import org.univr.telemedicina.model.AssunzioneFarmaci;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
@@ -104,4 +103,23 @@ public class AssunzioniFarmaciDAO {
      * Aggiunge una nuova assunzione di farmaci per un paziente.
      * @param assunzione L'oggetto AssunzioneFarmaci da aggiungere
      */
+    public void aggiungiAssunzione(AssunzioneFarmaci assunzione) {
+        String sql = "INSERT INTO AssunzioniFarmaci(IDTerapia, IDPaziente, TimestampAssunzione, QuantitaAssunta) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // Imposta i parametri della query
+            pstmt.setInt(1, assunzione.getIDTerapia());
+            pstmt.setInt(2, assunzione.getIDPaziente());
+            pstmt.setObject(3, assunzione.getTimestampAssunzione());
+            pstmt.setString(4, assunzione.getQuantitaAssunta());
+
+            // Esegue l'inserimento
+            pstmt.executeUpdate();
+
+        } catch (SQLException e){
+            System.err.println("Errore durante l'aggiunta di assunzione di farmaci: " + e.getMessage());
+        }
+    }
 }

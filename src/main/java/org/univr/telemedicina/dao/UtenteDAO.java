@@ -126,9 +126,4 @@ public class UtenteDAO {
             System.err.println("Errore durante la creazione dell'utente: " + e.getMessage());
         }
     }
-
-    // Aggiungi qui altri metodi se necessario, come:
-    // public Optional<Utente> findById(int id) { ... }
-    // public void update(Utente utente) { ... }
-    // public void delete(int id) { ... }
 }

@@ -9,8 +9,18 @@ public class AssunzioneFarmaci {
     private LocalDateTime TimestampAssunzione;
     private String QuantitaAssunta;
 
+
+    //costruttore per quando si legge
     public AssunzioneFarmaci(int IDAssunzione, int IDTerapia, int IDPaziente, LocalDateTime TimestampAssunzione, String QuantitaAssunta) {
         this.IDAssunzione = IDAssunzione;
+        this.IDTerapia = IDTerapia;
+        this.IDPaziente = IDPaziente;
+        this.TimestampAssunzione = TimestampAssunzione;
+        this.QuantitaAssunta = QuantitaAssunta;
+    }
+
+    //costruttore per quando si inserisce, non c'è IDAssunzione perché è auto-incrementato nel database
+    public AssunzioneFarmaci(int IDTerapia, int IDPaziente, LocalDateTime TimestampAssunzione, String QuantitaAssunta) {
         this.IDTerapia = IDTerapia;
         this.IDPaziente = IDPaziente;
         this.TimestampAssunzione = TimestampAssunzione;
