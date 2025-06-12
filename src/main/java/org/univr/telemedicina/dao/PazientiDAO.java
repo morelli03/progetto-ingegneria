@@ -1,0 +1,82 @@
+package org.univr.telemedicina.dao;
+
+import org.univr.telemedicina.model.Paziente;
+import org.univr.telemedicina.model.Utente;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Classe DAO per trovare tutti i pazienti associati ad un medico e creare l'associazione utente-paziente.
+ * Quando si crea un utente paziente, viene associato un medico di riferimento. non viceversa.
+ */
+public class PazientiDAO {
+    /**
+     * Crea l'associazione tra un Utente e il ruolo di Paziente.
+     * Questo metodo va chiamato DOPO aver creato un Utente con successo e dopo aver creato l'oggetto paziente
+     * con l'IDPaziente preso dalla creazione dell'utente.
+     * Va popolato anche IDMedicoRiferimento con l'ID del medico di riferimento.(viene passato quando si crea l'admin crea l'utente)
+     * @param paziente oggetto paziente
+     */
+    public void create(Paziente paziente) {
+        String sql = "INSERT INTO Pazienti(IDPaziente, IDMedicoRiferimento) VALUES (?, ?)";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, paziente.getIDPaziente());
+            pstmt.setInt(2, paziente.getIDMedicoRiferimento());
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println("Errore durante la creazione del paziente: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Restituisce una lista di pazienti associati a un medico specifico.
+     * @param IDMedico L'ID del medico di riferimento.
+     * @return Una lista di Pazienti associati al medico specificato.
+     */
+    public List<Utente> findPazientiByMedId(int IDMedico) {
+        List<Utente> pazienti = new ArrayList<>();
+
+        // Query JOIN per ottenere gli utenti associati a un medico
+        String sql = "SELECT u.* FROM Utenti u " +
+                "JOIN Pazienti p ON u.IDUtente = p.IDPaziente " +
+                "WHERE p.IDMedicoRiferimento = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // Imposta il parametro della query (?) per evitare SQL Injection
+            pstmt.setInt(1, IDMedico);
+
+            try(ResultSet rs = pstmt.executeQuery()){
+                // Se c'è un risultato...
+                while (rs.next()) {
+                    // ...crea un oggetto Utente e popola i suoi campi con i dati dal ResultSet
+                    Utente paziente = new Utente(
+                            rs.getInt("IDUtente"),
+                            rs.getString("Email"),
+                            rs.getString("HashedPassword"),
+                            rs.getString("Nome"),
+                            rs.getString("Cognome"),
+                            rs.getString("Ruolo"),
+                            rs.getDate("DataNascita")
+                    );
+
+                    // Aggiungi il paziente alla lista
+                    pazienti.add(paziente);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante la ricerca dei pazienti per IDMedico: " + e.getMessage());
+        }
+        return pazienti;
+    }
+}

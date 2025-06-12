@@ -1,12 +1,12 @@
 package org.univr.telemedicina.model;
 
-public class Pazienti {
+public class Paziente {
     private int IDPaziente;
     private int IDMedicoRiferimento;
 
-    public Pazienti(){} //costruttore vuoto
+    public Paziente(){} //costruttore vuoto
 
-    public Pazienti(int IDPaziente, int IDMedicoRiferimento) {
+    public Paziente(int IDPaziente, int IDMedicoRiferimento) {
         this.IDPaziente = IDPaziente;
         this.IDMedicoRiferimento = IDMedicoRiferimento;
     }
