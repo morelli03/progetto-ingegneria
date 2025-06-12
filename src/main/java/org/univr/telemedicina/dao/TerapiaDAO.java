@@ -80,8 +80,8 @@ public class TerapiaDAO {
             pstmt.setString(5, terapia.getQuantita());
             pstmt.setInt(6, terapia.getFrequenzaGiornaliera());
             pstmt.setString(7, terapia.getIndicazioni());
-            pstmt.setDate(8, new java.sql.Date(terapia.getDataInizio().getTime()));
-            pstmt.setDate(9, new java.sql.Date(terapia.getDataFine().getTime()));
+            pstmt.setDate(8, terapia.getDataInizio());
+            pstmt.setDate(9, terapia.getDataFine());
 
             pstmt.executeUpdate();
 
