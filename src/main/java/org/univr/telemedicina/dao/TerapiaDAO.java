@@ -73,15 +73,15 @@ public class TerapiaDAO {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, terapia.getIDTerapia());
-            pstmt.setInt(2, terapia.getIDPaziente());
-            pstmt.setInt(3, terapia.getIDMedico());
-            pstmt.setString(4, terapia.getNomeFarmaco());
-            pstmt.setString(5, terapia.getQuantita());
-            pstmt.setInt(6, terapia.getFrequenzaGiornaliera());
-            pstmt.setString(7, terapia.getIndicazioni());
-            pstmt.setDate(8, terapia.getDataInizio());
-            pstmt.setDate(9, terapia.getDataFine());
+            //rimosso IDTerapia perché è auto-incrementato nel database
+            pstmt.setInt(1, terapia.getIDPaziente()); // reimpostato indexes
+            pstmt.setInt(2, terapia.getIDMedico());
+            pstmt.setString(3, terapia.getNomeFarmaco());
+            pstmt.setString(4, terapia.getQuantita());
+            pstmt.setInt(5, terapia.getFrequenzaGiornaliera());
+            pstmt.setString(6, terapia.getIndicazioni());
+            pstmt.setDate(7, terapia.getDataInizio());
+            pstmt.setDate(8, terapia.getDataFine());
 
             pstmt.executeUpdate();
 
