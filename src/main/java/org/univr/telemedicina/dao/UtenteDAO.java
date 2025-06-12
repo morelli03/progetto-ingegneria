@@ -3,8 +3,8 @@ package org.univr.telemedicina.dao;
 import org.univr.telemedicina.model.Utente;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+//import java.util.ArrayList;
+//import java.util.List;
 import java.util.Optional;
 
 public class UtenteDAO {
@@ -52,62 +52,14 @@ public class UtenteDAO {
     }
 
     /**
-     * Trova un utente associato al medico basandosi sul suo id.        OTTIENI LISTA PAZIENTI
-     * Restituisce una lista di pazienti associati a un medico specifico.
+     * Salva un nuovo utente nel database. Genera l'IDUtente automaticamente e lo salva nell'oggetto Utente.ù
+     * Se si vuole creare un paziente, dopo aver creato l'utente, si deve creare un oggetto paziente, inserire l'id generato
+     * in IDPaziente e aggiungere l'id del medico di riferimento in IDMedicoRiferimento. Poi chiamare il metodo create di PazientiDAO.
      *
-     * @param IDUtente L'ID del medico di riferimento.
-     * @return Un Optional contenente l'Utente se trovato, altrimenti un Optional vuoto.
-     */                                     //id medico
-    public List<Utente> listPatientsByMedId(int IDUtente) {
-        //fai un hashset di pazienti
-        List<Utente> pazienti = new ArrayList<>();
-
-
-        //String sql = "SELECT * FROM Pazienti WHERE IDMedicoRiferimento = ?";
-        String sql = "SELECT u.* " +
-                     "FROM Pazienti p " +
-                     "JOIN Utenti u ON p.IDPaziente = u.IDUtente " +
-                     "WHERE p.IDMedicoRiferimento = ?";
-
-        // try-with-resources per garantire la chiusura automatica delle risorse (Connection, PreparedStatement, ResultSet)
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            // Imposta il parametro della query (?) per evitare SQL Injection
-            pstmt.setInt(1, IDUtente);
-
-            try (ResultSet rs = pstmt.executeQuery()) {
-                // Se c'è un risultato...
-                while (rs.next()) {
-                    // ...crea un oggetto Utente e popola i suoi campi con i dati dal ResultSet
-                    // Cambio la funzionalità di IDUtente, non viene più base64, invece mi prendo direttamente tutte le info con la lista
-                    Utente paziente = new Utente(
-                            rs.getInt("IDUtente"),
-                            rs.getString("Email"),
-                            rs.getString("HashedPassword"),
-                            rs.getString("Nome"),
-                            rs.getString("Cognome"),
-                            rs.getString("Ruolo"),
-                            rs.getDate("DataNascita")
-                    );
-
-                    // Ritorna l'utente trovato, avvolto in un Optional
-                    pazienti.add(paziente);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Errore durante la ricerca dell'utente per medico: " + e.getMessage());
-        }
-        // Se non viene trovato nessun utente o si verifica un errore, ritorna un Optional vuoto
-        return pazienti;
-    }
-
-    /**
-     * Salva un nuovo utente nel database.
-     *
-     * @param utente L'oggetto Utente da salvare (IMPORTANTE implementare creazione ID - UUID).
+     * @param utente L'oggetto Utente da salvare con IDUtente a 0
+     * @return utente con IDUtente aggiornato dopo l'inserimento.
      */
-    public void create(Utente utente) {
+    public Utente create(Utente utente) {
         String sql = "INSERT INTO Utenti(Email, HashedPassword, Nome, Cognome, Ruolo, DataNascita) VALUES(?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -120,10 +72,20 @@ public class UtenteDAO {
             pstmt.setString(5, utente.getRuolo());
             pstmt.setDate(6, utente.getDataNascita());
 
-            pstmt.executeUpdate();
+            int affectedRows = pstmt.executeUpdate();
+
+            //controllo se ho scritto per generare l'IDUtente
+            if(affectedRows > 0){
+                try(ResultSet generatedKeys = pstmt.getGeneratedKeys()){
+                    if(generatedKeys.next()){
+                        utente.setIDUtente(generatedKeys.getInt(1)); // Imposta l'ID generato nell'oggetto Utente
+                    }
+                }
+            }
 
         } catch (SQLException e) {
             System.err.println("Errore durante la creazione dell'utente: " + e.getMessage());
         }
+        return utente;
     }
 }
