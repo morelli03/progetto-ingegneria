@@ -1,30 +1,37 @@
 package org.univr.telemedicina.model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-public class LogOperazioni {
+public class LogOperazione {
     private int IDLog;
     private int IDMedicoOperante;
+    private int IDPazienteInteressato;
     private String TipoOperazione;
     private String DescrizioneOperazione;
     private LocalDateTime Timestamp;
 
     //costruttore per lettura
-    public LogOperazioni(int IDLog, int IDMedicoOperante, String TipoOperazione, String DescrizioneOperazione, LocalDateTime Timestamp) {
+    public LogOperazione(int IDLog, int IDMedicoOperante, int IDPazienteInteressato, String TipoOperazione, String DescrizioneOperazione, LocalDateTime Timestamp) {
         this.IDLog = IDLog;
         this.IDMedicoOperante = IDMedicoOperante;
+        this.IDPazienteInteressato = IDPazienteInteressato;
         this.TipoOperazione = TipoOperazione;
         this.DescrizioneOperazione = DescrizioneOperazione;
         this.Timestamp = Timestamp;
     }
 
     //costruttore per inserimento, non c'è IDLog perché è auto-incrementato nel database
-    public LogOperazioni(int IDMedicoOperante, String TipoOperazione, String DescrizioneOperazione, LocalDateTime Timestamp) {
+    public LogOperazione(int IDMedicoOperante, String TipoOperazione, String DescrizioneOperazione, LocalDateTime Timestamp) {
         this.IDMedicoOperante = IDMedicoOperante;
         this.TipoOperazione = TipoOperazione;
         this.DescrizioneOperazione = DescrizioneOperazione;
         this.Timestamp = Timestamp;
     }
+
+    //costruttore vuoto
+    public LogOperazione(){}
 
     //metodi getter e setter
     public int getIDLog() {
@@ -39,6 +46,13 @@ public class LogOperazioni {
     }
     public void setIDMedicoOperante(int IDMedicoOperante) {
         this.IDMedicoOperante = IDMedicoOperante;
+    }
+
+    public int getIDPazienteInteressato() {
+        return IDPazienteInteressato;
+    }
+    public void setIDPazienteInteressato(int IDPazienteInteressato) {
+        this.IDPazienteInteressato = IDPazienteInteressato;
     }
 
     public String getTipoOperazione() {
