@@ -1,7 +1,5 @@
 package org.univr.telemedicina.model;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 public class LogOperazione {
