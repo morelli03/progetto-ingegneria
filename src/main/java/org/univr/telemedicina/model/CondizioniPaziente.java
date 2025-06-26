@@ -1,6 +1,5 @@
 package org.univr.telemedicina.model;
 
-import java.sql.DatabaseMetaData;
 import java.sql.Date;
 
 public class CondizioniPaziente {
