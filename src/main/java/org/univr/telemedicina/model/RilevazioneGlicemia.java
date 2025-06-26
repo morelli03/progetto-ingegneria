@@ -64,4 +64,5 @@ public class RilevazioneGlicemia {
         this.note = note;
     }
 }
+//fine
 

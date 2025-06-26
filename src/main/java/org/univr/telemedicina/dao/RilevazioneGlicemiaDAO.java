@@ -82,7 +82,6 @@ public class RilevazioneGlicemiaDAO {
         }
         return rilevazioni;
     }
-
-
 }
+// fine
 
