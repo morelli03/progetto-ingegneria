@@ -8,18 +8,20 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class CondizioniPazienteDAO {
     /**
      * Usato per trovare le condizioni di un paziente basandosi sul suo IDPaziente.
      *
      * @param IDPaziente L'IDPaziente da cercare.
-     * @return Un Optional contenente le CondizioniPaziente se trovate, altrimenti un Optional vuoto.
+     * @return Una lista contenente le CondizioniPaziente se trovate, altrimenti una lista vuoto.
      */
-    public Optional<CondizioniPaziente> findByIDPatId(int IDPaziente) {
-        // Query per selezionare l'utente con una specifica email
-        String sql = "SELECT * FROM CondizioniPaziente WHERE IDPaziente = ?";
+    public List<CondizioniPaziente> listByIDPatId(int IDPaziente) {
+        //
+        List<CondizioniPaziente> condizioni = new ArrayList<>();
+
+
+        String sql = "SELECT * FROM Terapie WHERE IDPaziente = ?";
 
         // try-with-resources per garantire la chiusura automatica delle risorse (Connection, PreparedStatement, ResultSet)
         try (Connection conn = DatabaseManager.getConnection();
@@ -30,9 +32,9 @@ public class CondizioniPazienteDAO {
 
             try (ResultSet rs = pstmt.executeQuery()) {
                 // Se c'è un risultato...
-                if (rs.next()) {
-                    // ...crea un oggetto Utente e popola utente con la riga trovata
-                    CondizioniPaziente condizioni = new CondizioniPaziente(
+                while (rs.next()) {
+                    // ...crea un oggetto CondizioniPaziente e popola i suoi campi con i dati dal ResultSet
+                    CondizioniPaziente condizione = new CondizioniPaziente(
                             rs.getInt("IDCondizione"),
                             rs.getInt("IDPaziente"),
                             rs.getString("Tipo"),
@@ -40,44 +42,41 @@ public class CondizioniPazienteDAO {
                             rs.getString("Periodo"),
                             rs.getDate("DataRegistrazione")
                     );
-                    // Ritorna l'utente trovato, avvolto in un Optional
-                    return Optional.of(condizioni);
+
+                    // Aggiungi la condiziona alla lista
+                    condizioni.add(condizione);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Errore durante la ricerca del paziente per IDPaziente: " + e.getMessage());
+            System.err.println("Errore durante la ricerca delle condizioni per IDPaziente: " + e.getMessage());
         }
-        // Se non viene trovato nessun utente o si verifica un errore, ritorna un Optional vuoto
-        return Optional.empty();
+
+        // Se non viene trovato nessuna condizione o si verifica un errore, ritorna una lista vuota
+        return condizioni;
     }
 
     /**
-     * Salva un nuovo utente nel database.
+     * Salva una nuova condizione nel database
      *
-     * @param utente L'oggetto Utente da salvare (IMPORTANTE implementare creazione ID - UUID).
+     * @param condizione L'oggetto CondizioniPaziente da salvare
      */
-    public void create(Utente utente) {
-        String sql = "INSERT INTO Utenti(Email, HashedPassword, Nome, Cognome, Ruolo, DataNascita) VALUES(?, ?, ?, ?, ?, ?)";
+    public void create(CondizioniPaziente condizione) {
+        String sql = "INSERT INTO CondizioniPaziente(IDCondizione, IDPaziente, Tipo, Descrizione, Periodo, DataRegistrazione) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, utente.getEmail());
-            pstmt.setString(2, utente.getHashedPassword());
-            pstmt.setString(3, utente.getNome());
-            pstmt.setString(4, utente.getCognome());
-            pstmt.setString(5, utente.getRuolo());
-            pstmt.setDate(6, utente.getDataNascita());
+            pstmt.setInt(1, condizione.getIDCondizione());
+            pstmt.setInt(2, condizione.getIDPaziente());
+            pstmt.setString(3, condizione.getTipo());
+            pstmt.setString(4, condizione.getDescrizione());
+            pstmt.setString(5, condizione.getPeriodo());
+            pstmt.setDate(6, condizione.getDataRegistrazione());
 
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("Errore durante la creazione dell'utente: " + e.getMessage());
+            System.err.println("Errore durante la creazione della condizione: " + e.getMessage());
         }
     }
-
-    // Aggiungi qui altri metodi se necessario, come:
-    // public Optional<Utente> findById(int id) { ... }
-    // public void update(Utente utente) { ... }
-    // public void delete(int id) { ... }
 }
