@@ -10,3 +10,4 @@
 /dataSources.local.xml
 # File del database locale
 main.sqlite
+test.sqlite
