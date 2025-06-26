@@ -8,7 +8,7 @@ public class DatabaseManager {
 
     // URL di connessione al database SQLite.
     // "main.sqlite" deve trovarsi nella cartella radice del progetto.
-    private static String URL = "jdbc:sqlite:test.sqlite";
+    private static String URL = "jdbc:sqlite:main.sqlite";
 
     /**
      * Restituisce una nuova connessione al database.
