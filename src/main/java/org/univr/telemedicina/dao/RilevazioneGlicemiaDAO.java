@@ -2,9 +2,9 @@ package org.univr.telemedicina.dao;
 
 import org.univr.telemedicina.model.RilevazioneGlicemia;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class RilevazioneGlicemiaDAO {
     /**
@@ -18,7 +18,7 @@ public class RilevazioneGlicemiaDAO {
 
             pstmt.setInt(1, rilevazione.getIdPaziente());
             pstmt.setInt(2, rilevazione.getValore());
-            pstmt.setTimestamp(3, rilevazione.getTimestamp());
+            pstmt.setObject(3, rilevazione.getTimestamp());
             pstmt.setString(4, rilevazione.getNote());
 
             pstmt.executeUpdate();
@@ -27,32 +27,6 @@ public class RilevazioneGlicemiaDAO {
         }
     }
 
-    /**
-     * trova una rilevazione di glicemia per IDrilevazione.
-     */
-    public Optional<RilevazioneGlicemia> findById(int idRilevazione) {
-        String sql = "SELECT * FROM RilevazioniGlicemia WHERE IDRilevazione = ?";
-        try (Connection conn = DatabaseManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, idRilevazione);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    RilevazioneGlicemia rilevazione = new RilevazioneGlicemia(
-                            rs.getInt("IDRilevazione"),
-                            rs.getInt("IDPaziente"),
-                            rs.getInt("Valore"),
-                            rs.getTimestamp("Timestamp"),
-                            rs.getString("Note")
-                    );
-                    return Optional.of(rilevazione);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Errore durante la ricerca della rilevazione di glicemia: " + e.getMessage());
-        }
-        return Optional.empty();
-    }
     /**
      * trova tutte le rilevazioni di glicemia per un paziente specifico.
      * fa in modo che le rilevazioni piu recenti siano prime nella lista
@@ -71,7 +45,7 @@ public class RilevazioneGlicemiaDAO {
                             rs.getInt("IDRilevazione"),
                             rs.getInt("IDPaziente"),
                             rs.getInt("Valore"),
-                            rs.getTimestamp("Timestamp"),
+                            rs.getObject("Timestamp", LocalDateTime.class),
                             rs.getString("Note")
                     );
                     rilevazioni.add(rilevazione);
@@ -83,5 +57,4 @@ public class RilevazioneGlicemiaDAO {
         return rilevazioni;
     }
 }
-// fine
-
+     //caso in cui si vuole cercare una rilevazione di glicemia specifica per ID. TEORICAMENTE NON DOVREBBE SERVIRE

@@ -1,18 +1,17 @@
 package org.univr.telemedicina.model;
-
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class RilevazioneGlicemia {
     private int idRilevazione;
     private int idPaziente;
     private int valore;
-    private Timestamp timestamp; // Timestamp per registrare la data e l'ora della rilevazione
+    private LocalDateTime timestamp; // Timestamp per registrare la data e l'ora della rilevazione
     private String note;
 
     //costruttore vuoto
     public RilevazioneGlicemia() {}
 
-    public RilevazioneGlicemia(int idRilevazione, int idPaziente, int valore, Timestamp timestamp, String note) {
+    public RilevazioneGlicemia(int idRilevazione, int idPaziente, int valore, LocalDateTime timestamp, String note) {
         this.idRilevazione = idRilevazione;
         this.idPaziente = idPaziente;
         this.valore = valore;
@@ -21,7 +20,7 @@ public class RilevazioneGlicemia {
     }
 
     //costruttore senza idRilevazione, se idRilevazione viene genrerato automaticamente dal database
-    public RilevazioneGlicemia(int idPaziente, int valore, Timestamp timestamp, String note) {
+    public RilevazioneGlicemia(int idPaziente, int valore, LocalDateTime timestamp, String note) {
         this.idPaziente = idPaziente;
         this.valore = valore;
         this.timestamp = timestamp;
@@ -50,10 +49,10 @@ public class RilevazioneGlicemia {
         this.valore = valore;
     }
 
-    public Timestamp getTimestamp() {
+    public LocalDateTime getTimestamp() {
         return timestamp;
     }
-    public void setTimestamp(Timestamp timestamp) {
+    public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -64,5 +63,5 @@ public class RilevazioneGlicemia {
         this.note = note;
     }
 }
-//fine
+
 
