@@ -28,8 +28,8 @@ public class AuthService {
      * @return Utente se le password corrispondono, altrimenti Optional.empty().
      */
     public Optional<Utente> verificaPassword(String emailUtente, String passwordInChiaro) {
-        // cerca nel database per quell'email, restituisce empty se non eiste la mail
-        Optional<Utente> utenteTrovato = Optional.empty();
+        // cerca nel database per quell'email, restituisce empty se non esiste la mail
+        Optional<Utente> utenteTrovato;
         try {
             utenteTrovato = utenteDao.findByEmail(emailUtente);
         } catch (DataAccessException e) {
