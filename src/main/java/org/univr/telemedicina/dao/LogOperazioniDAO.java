@@ -1,5 +1,6 @@
 package org.univr.telemedicina.dao;
 
+import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.LogOperazione;
 
 import java.sql.*;
@@ -21,7 +22,7 @@ public class LogOperazioniDAO {
      * Scrive un log di operazione nel database.
      * @param log L'oggetto LogOperazioni da inserire nel database.
      */
-    public void createLog(LogOperazione log) {
+    public void createLog(LogOperazione log) throws DataAccessException {
         String sql = "INSERT INTO LogOperazioni (IDMedicoOperante, IDPazienteInteressato, TipoOperazione, DescrizioneOperazione, Timestamp) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -37,6 +38,7 @@ public class LogOperazioniDAO {
 
         } catch (SQLException e) {
             System.err.println("Errore durante l'inserimento del log: " + e.getMessage());
+            throw new DataAccessException("Errore durante l'inserimento del log di operazione", e);
         }
     }
 
@@ -46,7 +48,7 @@ public class LogOperazioniDAO {
      * Dal più recente al più vecchio.
      * @return Una lista di LogOperazioni contenente i log di operazioni.
      */
-    public List<LogOperazione> getAllLog(){
+    public List<LogOperazione> getAllLog() throws DataAccessException {
         List<LogOperazione> logs = new ArrayList<>();
         String sql = "SELECT * FROM LogOperazioni ORDER BY Timestamp DESC";
 
@@ -67,6 +69,7 @@ public class LogOperazioniDAO {
             }
         } catch (SQLException e) {
             System.err.println("Errore durante la lettura dei log per paziente: " + e.getMessage());
+            throw new DataAccessException("Errore durante la lettura dei log di operazioni", e);
         }
         return logs;
     }
@@ -78,7 +81,7 @@ public class LogOperazioniDAO {
      * @param IDPaziente L'ID del paziente di cui si vuole la cronologia.
      * @return Una lista di oggetti LogOperazione.
      */
-    public List<LogOperazione> findLogsByPazienteId(int IDPaziente) {
+    public List<LogOperazione> findLogsByPazienteId(int IDPaziente) throws DataAccessException {
         List<LogOperazione> logs = new ArrayList<>();
         String sql = "SELECT * FROM LogOperazioni WHERE IDPazienteInteressato = ? ORDER BY Timestamp DESC";
 
@@ -95,6 +98,7 @@ public class LogOperazioniDAO {
             }
         } catch (SQLException e) {
             System.err.println("Errore durante la lettura dei log per paziente: " + e.getMessage());
+            throw new DataAccessException("Errore durante la lettura dei log per il paziente con ID " + IDPaziente, e);
         }
         return logs;
     }
@@ -106,7 +110,7 @@ public class LogOperazioniDAO {
      * @param IDMedico L'ID del paziente di cui si vuole la cronologia.
      * @return Una lista di oggetti LogOperazione.
      */
-    public List<LogOperazione> findLogsByMedicoId(int IDMedico) {
+    public List<LogOperazione> findLogsByMedicoId(int IDMedico) throws DataAccessException {
         List<LogOperazione> logs = new ArrayList<>();
         String sql = "SELECT * FROM LogOperazioni WHERE IDMedicoOperante = ? ORDER BY Timestamp DESC";
 
@@ -123,6 +127,7 @@ public class LogOperazioniDAO {
             }
         } catch (SQLException e) {
             System.err.println("Errore durante la lettura dei log per medico: " + e.getMessage());
+            throw new DataAccessException("Errore durante la lettura dei log per il medico con ID " + IDMedico, e);
         }
         return logs;
     }

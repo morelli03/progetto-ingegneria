@@ -1,5 +1,6 @@
 package org.univr.telemedicina.dao;
 
+import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.CondizioniPaziente;
 
 import java.sql.Connection;
@@ -16,8 +17,7 @@ public class CondizioniPazienteDAO {
      * @param IDPaziente L'IDPaziente da cercare.
      * @return Una lista contenente le CondizioniPaziente se trovate, altrimenti una lista vuoto.
      */
-    public List<CondizioniPaziente> listByIDPatId(int IDPaziente) {
-        //
+    public List<CondizioniPaziente> listByIDPatId(int IDPaziente) throws DataAccessException {
         List<CondizioniPaziente> condizioni = new ArrayList<>();
 
 
@@ -49,6 +49,7 @@ public class CondizioniPazienteDAO {
             }
         } catch (SQLException e) {
             System.err.println("Errore durante la ricerca delle condizioni per IDPaziente: " + e.getMessage());
+            throw new DataAccessException("Errore durante la ricerca delle condizioni per il paziente con ID " + IDPaziente, e);
         }
 
         // Se non viene trovato nessuna condizione o si verifica un errore, ritorna una lista vuota
@@ -60,7 +61,7 @@ public class CondizioniPazienteDAO {
      *
      * @param condizione L'oggetto CondizioniPaziente da salvare
      */
-    public void create(CondizioniPaziente condizione) {
+    public void create(CondizioniPaziente condizione) throws DataAccessException {
         String sql = "INSERT INTO CondizioniPaziente(IDCondizione, IDPaziente, Tipo, Descrizione, Periodo, DataRegistrazione) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -77,6 +78,7 @@ public class CondizioniPazienteDAO {
 
         } catch (SQLException e) {
             System.err.println("Errore durante la creazione della condizione: " + e.getMessage());
+            throw new DataAccessException("Errore durante la creazione della condizione per il paziente con ID " + condizione.getIDPaziente(), e);
         }
     }
 }

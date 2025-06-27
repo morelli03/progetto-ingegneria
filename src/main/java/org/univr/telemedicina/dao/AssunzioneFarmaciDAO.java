@@ -1,5 +1,6 @@
 package org.univr.telemedicina.dao;
 
+import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.AssunzioneFarmaci;
 
 import java.sql.*;
@@ -20,7 +21,7 @@ public class AssunzioneFarmaciDAO {
      * @param IDPaziente L'ID del paziente
      * @return Una List contenente le AssunzioniFarmaci per il paziente specificato.
      */
-    public List<AssunzioneFarmaci> leggiAssunzioniFarmaci(int IDPaziente){
+    public List<AssunzioneFarmaci> leggiAssunzioniFarmaci(int IDPaziente) throws DataAccessException {
 
         // Lista per memorizzare le assunzioni di farmaci
         List<AssunzioneFarmaci> assunzioni = new ArrayList<>();
@@ -48,6 +49,7 @@ public class AssunzioneFarmaciDAO {
             }
         } catch(SQLException e){
             System.err.println("Errore durante la lettura dei farmaci assunti: " + e.getMessage());
+            throw new DataAccessException("Errore durante la ricerca delle assunzioni per il paziente con ID " + IDPaziente, e);
         }
         // Se non viene trovata nessuna assunzione o si verifica un errore, ritorna una lista vuota
         return assunzioni;
@@ -59,7 +61,7 @@ public class AssunzioneFarmaciDAO {
       * @param data La data per cui si vogliono leggere le assunzioni
       * @return Una List contenente le AssunzioniFarmaci per il paziente specificato.
       */
-     public List<AssunzioneFarmaci> leggiAssunzioniGiorno(int IDPaziente, LocalDate data){
+     public List<AssunzioneFarmaci> leggiAssunzioniGiorno(int IDPaziente, LocalDate data) throws DataAccessException {
          List<AssunzioneFarmaci> assunzioni = new ArrayList<>();
 
          // Query SQL per leggere le assunzioni di farmaci in un giorno specifico
@@ -80,7 +82,6 @@ public class AssunzioneFarmaciDAO {
                 pstmt.setObject(3, inizioGiornoSuccessivo);
 
              try(ResultSet rs = pstmt.executeQuery()) {
-
                  while(rs.next()){
                      AssunzioneFarmaci as = new AssunzioneFarmaci(
                              rs.getInt("IDAssunzione"),
@@ -94,8 +95,10 @@ public class AssunzioneFarmaciDAO {
              }
          } catch(SQLException e){
              System.err.println("Errore durante la lettura dei farmaci assunti: " + e.getMessage());
+             //lancio l'eccezione personalizzata DataAccessException
+             throw new DataAccessException("Errore durante la ricerca delle assunzioni per il giorno " + data, e);
          }
-         // Se non viene trovata nessuna assunzione o si verifica un errore, ritorna un Optional vuoto
+         // Se non viene trovata nessuna assunzione o si verifica un errore, ritorna una lista vuota
          return assunzioni;
      }
 
@@ -103,7 +106,7 @@ public class AssunzioneFarmaciDAO {
      * Aggiunge una nuova assunzione di farmaci per un paziente.
      * @param assunzione L'oggetto AssunzioneFarmaci da aggiungere
      */
-    public void aggiungiAssunzione(AssunzioneFarmaci assunzione) {
+    public void aggiungiAssunzione(AssunzioneFarmaci assunzione) throws DataAccessException {
         String sql = "INSERT INTO AssunzioniFarmaci(IDTerapia, IDPaziente, TimestampAssunzione, QuantitaAssunta) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -120,6 +123,7 @@ public class AssunzioneFarmaciDAO {
 
         } catch (SQLException e){
             System.err.println("Errore durante l'aggiunta di assunzione di farmaci: " + e.getMessage());
+            throw new DataAccessException("Errore durante l'aggiunta dell'assunzione di farmaci per il paziente con ID " + assunzione.getIDPaziente(), e);
         }
     }
 }

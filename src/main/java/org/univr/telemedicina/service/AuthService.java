@@ -2,6 +2,7 @@ package org.univr.telemedicina.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.univr.telemedicina.dao.UtenteDAO;
+import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Utente;
 
 import java.util.Optional;
@@ -28,7 +29,14 @@ public class AuthService {
      */
     public Optional<Utente> verificaPassword(String emailUtente, String passwordInChiaro) {
         // cerca nel database per quell'email, restituisce empty se non eiste la mail
-        Optional<Utente> utenteTrovato = utenteDao.findByEmail(emailUtente);
+        Optional<Utente> utenteTrovato = Optional.empty();
+        try {
+            utenteTrovato = utenteDao.findByEmail(emailUtente);
+        } catch (DataAccessException e) {
+            System.err.println("Errore durante la ricerca dell'utente per email: " + e.getMessage());
+            // qui devo lanciare un'eccezione personalizzata
+            return Optional.empty(); // ritorna empty se c'è un errore nel database
+        }
 
         if (utenteTrovato.isPresent()) {
             Utente utente = utenteTrovato.get(); // prende l'utente dentro optional e lo fa diventare Utente
