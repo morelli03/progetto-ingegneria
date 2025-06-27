@@ -1,6 +1,5 @@
 package org.univr.telemedicina.service;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.univr.telemedicina.dao.UtenteDAO;
 import org.univr.telemedicina.model.Utente;
