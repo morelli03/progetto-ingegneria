@@ -1,5 +1,6 @@
 package org.univr.telemedicina.dao;
 
+import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Utente;
 
 import java.sql.*;
@@ -16,7 +17,7 @@ public class UtenteDAO {
      * @param email L'email da cercare.
      * @return Un Optional contenente l'Utente se trovato, altrimenti un Optional vuoto.
      */
-    public Optional<Utente> findByEmail(String email) {
+    public Optional<Utente> findByEmail(String email) throws DataAccessException {
         // Query per selezionare l'utente con una specifica email
         String sql = "SELECT * FROM Utenti WHERE Email = ?";
 
@@ -46,6 +47,7 @@ public class UtenteDAO {
             }
         } catch (SQLException e) {
             System.err.println("Errore durante la ricerca dell'utente per email: " + e.getMessage());
+            throw new DataAccessException("Errore durante la ricerca dell'utente con email " + email, e);
         }
         // Se non viene trovato nessun utente o si verifica un errore, ritorna un Optional vuoto
         return Optional.empty();
@@ -59,7 +61,7 @@ public class UtenteDAO {
      * @param utente L'oggetto Utente da salvare con IDUtente a 0
      * @return utente con IDUtente aggiornato dopo l'inserimento.
      */
-    public Utente create(Utente utente) {
+    public Utente create(Utente utente) throws DataAccessException {
         String sql = "INSERT INTO Utenti(Email, HashedPassword, Nome, Cognome, Ruolo, DataNascita) VALUES(?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -74,7 +76,7 @@ public class UtenteDAO {
 
             int affectedRows = pstmt.executeUpdate();
 
-            //controllo se ho scritto per generare l'IDUtente
+            //controllo se ho scritto per ottenere l'IDUtente           === IMPORTANTE === sarebbe da mettere UUID
             if(affectedRows > 0){
                 try(ResultSet generatedKeys = pstmt.getGeneratedKeys()){
                     if(generatedKeys.next()){
@@ -85,6 +87,7 @@ public class UtenteDAO {
 
         } catch (SQLException e) {
             System.err.println("Errore durante la creazione dell'utente: " + e.getMessage());
+            throw new DataAccessException("Errore durante la creazione dell'utente con email " + utente.getEmail(), e);
         }
         return utente;
     }

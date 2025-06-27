@@ -1,11 +1,10 @@
 // File: src/test/java/org/univr/telemedicina/dao/UtenteDAOTest.java
 package org.univr.telemedicina.dao;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Utente;
 
-import java.io.File;
 import java.sql.Date;
 import java.util.Optional;
 
@@ -20,15 +19,27 @@ class UtenteDAOTest {
         UtenteDAO utenteDAO = new UtenteDAO();
         Utente nuovoUtente = new Utente(0, "test.utente@email.com", "hashed_password", "Test", "User", "Paziente", new Date(System.currentTimeMillis()));
 
-        // --- ACT (Esegui l'azione da testare) ---
-        Utente utenteCreato = utenteDAO.create(nuovoUtente);
+        // --- ACT (Esegue l'azione da testare) ---
+        Utente utenteCreato = new Utente();
+        try {
+            // Proviamo a creare un nuovo utente
+            utenteCreato = utenteDAO.create(nuovoUtente);
+        } catch (DataAccessException e) {
+            fail("Errore durante la creazione dell'utente: " + e.getMessage());
+        }
 
         // --- ASSERT (Verifica i risultati) ---
         // 1. Verifichiamo che l'ID sia stato generato e sia maggiore di 0
         assertTrue(utenteCreato.getIDUtente() > 0, "L'ID dell'utente non è stato generato correttamente.");
 
         // 2. Ora proviamo a ritrovare l'utente per email per essere sicuri che sia stato salvato
-        Optional<Utente> utenteTrovatoOpt = utenteDAO.findByEmail("test.utente@email.com");
+        Optional<Utente> utenteTrovatoOpt = Optional.empty();
+        try {
+            utenteTrovatoOpt = utenteDAO.findByEmail("test.utente@email.com");
+        } catch (DataAccessException e) {
+            fail("Errore durante la ricerca dell'utente per email: " + e.getMessage());
+        }
+
 
         // 3. Verifichiamo che l'utente sia stato trovato
         assertTrue(utenteTrovatoOpt.isPresent(), "L'utente creato non è stato trovato nel database.");
@@ -47,7 +58,12 @@ class UtenteDAOTest {
         UtenteDAO utenteDAO = new UtenteDAO();
 
         // --- ACT ---
-        Optional<Utente> risultato = utenteDAO.findByEmail("email.inesistente@email.com");
+        Optional<Utente> risultato = Optional.empty();
+        try {
+            risultato = utenteDAO.findByEmail("email.inesistente@email.com");
+        } catch (DataAccessException e) {
+            fail("Errore durante la ricerca dell'utente per email: " + e.getMessage());
+        }
 
         // --- ASSERT ---
         assertFalse(risultato.isPresent(), "Non dovrebbe essere trovato nessun utente con questa email.");

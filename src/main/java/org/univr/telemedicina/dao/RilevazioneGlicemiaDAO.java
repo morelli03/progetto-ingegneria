@@ -1,5 +1,6 @@
 package org.univr.telemedicina.dao;
 
+import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.RilevazioneGlicemia;
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -10,7 +11,7 @@ public class RilevazioneGlicemiaDAO {
     /**
      * Salva nel database una rilevazione di glicemia.
      */
-    public void create(RilevazioneGlicemia rilevazione) {
+    public void create(RilevazioneGlicemia rilevazione) throws DataAccessException {
         String sql = "INSERT INTO RilevazioniGlicemia (IDPaziente, Valore, Timestamp, Note) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -24,6 +25,7 @@ public class RilevazioneGlicemiaDAO {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             System.err.println("Errore durante il salvataggio della rilevazione di glicemia: " + e.getMessage());
+            throw new DataAccessException("Errore durante il salvataggio della rilevazione di glicemia per il paziente con ID " + rilevazione.getIdPaziente(), e);
         }
     }
 
@@ -31,7 +33,7 @@ public class RilevazioneGlicemiaDAO {
      * trova tutte le rilevazioni di glicemia per un paziente specifico.
      * fa in modo che le rilevazioni piu recenti siano prime nella lista
      */
-    public List<RilevazioneGlicemia> getRilevazioniByPaziente(int idPaziente) {
+    public List<RilevazioneGlicemia> getRilevazioniByPaziente(int idPaziente) throws DataAccessException {
         List<RilevazioneGlicemia> rilevazioni = new ArrayList<>();
         String sql = "SELECT * FROM RilevazioniGlicemia WHERE IDPaziente = ? ORDER BY Timestamp DESC";
 
@@ -53,8 +55,8 @@ public class RilevazioneGlicemiaDAO {
             }
         } catch (SQLException e) {
             System.err.println("Errore durante la ricerca delle rilevazioni di glicemia: " + e.getMessage());
+            throw new DataAccessException("Errore durante la ricerca delle rilevazioni di glicemia per il paziente con ID " + idPaziente, e);
         }
         return rilevazioni;
     }
 }
-     //caso in cui si vuole cercare una rilevazione di glicemia specifica per ID. TEORICAMENTE NON DOVREBBE SERVIRE

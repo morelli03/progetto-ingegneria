@@ -1,5 +1,6 @@
 package org.univr.telemedicina.dao;
 
+import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Terapia;
 
 import java.sql.*;
@@ -18,7 +19,7 @@ public class TerapiaDAO {
      */
 
     // IDPaziente
-    public List<Terapia> listTherapiesByPatId(int IDUtente) {
+    public List<Terapia> listTherapiesByPatId(int IDUtente) throws DataAccessException {
         //
         List<Terapia> terapie = new ArrayList<>();
 
@@ -54,6 +55,7 @@ public class TerapiaDAO {
             }
         } catch (SQLException e) {
             System.err.println("Errore durante la ricerca della terapia per IDPaziente: " + e.getMessage());
+            throw new DataAccessException("Errore durante la ricerca delle terapie per il paziente con ID " + IDUtente, e);
         }
 
         // Se non viene trovato nessun utente o si verifica un errore, ritorna una lista vuota
@@ -66,7 +68,7 @@ public class TerapiaDAO {
      * Gestisce anche il caso in cui la DataFine non sia specificata (terapia a tempo indeterminato).
      * @return Una lista di Integer contenente gli ID dei pazienti attivi.
      */
-    public List<Integer> getActivePatientIds() {
+    public List<Integer> getActivePatientIds() throws DataAccessException {
         List<Integer> patientsIds = new ArrayList<>();
 
         // Query che seleziona IDPaziente univoci dove la data odierna
@@ -83,6 +85,7 @@ public class TerapiaDAO {
             }
         } catch (SQLException e) {
             System.err.println("Errore durante il recupero degli ID dei pazienti con terapie in corso: " + e.getMessage());
+            throw new DataAccessException("Errore durante il recupero degli ID dei pazienti con terapie in corso", e);
         }
         return patientsIds;
     }
@@ -95,7 +98,7 @@ public class TerapiaDAO {
      *
      * @param terapia L'oggetto Terapia da salvare nel database.
      */
-    public void assignTherapy(Terapia terapia) {
+    public void assignTherapy(Terapia terapia) throws DataAccessException {
         String sql = "INSERT INTO Terapie (IDPaziente, IDMedico, NomeFarmaco, Quantita, FrequenzaGiornaliera, Indicazioni, DataInizio, DataFine) VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -115,6 +118,7 @@ public class TerapiaDAO {
 
         } catch (SQLException e) {
             System.err.println("Errore durante l'assegnazione della terapia: " + e.getMessage());
+            throw new DataAccessException("Errore durante l'assegnazione della terapia per il paziente con ID " + terapia.getIDPaziente(), e);
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.univr.telemedicina.dao;
 
+import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Paziente;
 import org.univr.telemedicina.model.Utente;
 
@@ -22,7 +23,7 @@ public class PazientiDAO {
      * Va popolato anche IDMedicoRiferimento con l'ID del medico di riferimento.(viene passato quando si crea l'admin crea l'utente)
      * @param paziente oggetto paziente
      */
-    public void create(Paziente paziente) {
+    public void create(Paziente paziente) throws DataAccessException {
         String sql = "INSERT INTO Pazienti(IDPaziente, IDMedicoRiferimento) VALUES (?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
@@ -34,6 +35,7 @@ public class PazientiDAO {
 
         } catch (SQLException e) {
             System.err.println("Errore durante la creazione del paziente: " + e.getMessage());
+            throw new DataAccessException("Errore durante la creazione del paziente con ID " + paziente.getIDPaziente(), e);
         }
     }
 
@@ -42,7 +44,7 @@ public class PazientiDAO {
      * @param IDMedico L'ID del medico di riferimento.
      * @return Una lista di Pazienti associati al medico specificato.
      */
-    public List<Utente> findPazientiByMedId(int IDMedico) {
+    public List<Utente> findPazientiByMedId(int IDMedico) throws DataAccessException {
         List<Utente> pazienti = new ArrayList<>();
 
         // Query JOIN per ottenere gli utenti associati a un medico
@@ -76,6 +78,7 @@ public class PazientiDAO {
             }
         } catch (SQLException e) {
             System.err.println("Errore durante la ricerca dei pazienti per IDMedico: " + e.getMessage());
+            throw new DataAccessException("Errore durante la ricerca dei pazienti per il medico con ID " + IDMedico, e);
         }
         return pazienti;
     }
