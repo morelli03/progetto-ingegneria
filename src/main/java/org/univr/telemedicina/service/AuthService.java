@@ -24,7 +24,7 @@ public class AuthService {
      * Verifica se una password in chiaro corrisponde a un hash salvato.
      * @param emailUtente email che ha inserito
      * @param passwordInChiaro La password fornita dall'utente al momento del login.
-     * @return true se le password corrispondono, altrimenti false.
+     * @return Utente se le password corrispondono, altrimenti Optional.empty().
      */
     public Optional<Utente> verificaPassword(String emailUtente, String passwordInChiaro) {
         // cerca nel database per quell'email, restituisce empty se non eiste la mail
