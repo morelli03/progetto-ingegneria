@@ -61,6 +61,34 @@ public class TerapiaDAO {
     }
 
     /**
+     * Restituisce una lista di ID univoci di tutti i pazienti che hanno almeno una terapia in corso.
+     * Una terapia si considera in corso se la data odierna è compresa tra la DataInizio e la DataFine.
+     * Gestisce anche il caso in cui la DataFine non sia specificata (terapia a tempo indeterminato).
+     * @return Una lista di Integer contenente gli ID dei pazienti attivi.
+     */
+    public List<Integer> getActivePatientIds() {
+        List<Integer> patientsIds = new ArrayList<>();
+
+        // Query che seleziona IDPaziente univoci dove la data odierna
+        // rientra nel range della terapia. La funzione date('now') è specifica di SQLite.
+        String sql = "SELECT DISTINCT IDPaziente FROM Terapie " +
+                "WHERE date('now') >= DataInizio AND (date('now') <= DataFine OR DataFine IS NULL)";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                patientsIds.add(rs.getInt("IDPaziente"));
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante il recupero degli ID dei pazienti con terapie in corso: " + e.getMessage());
+        }
+        return patientsIds;
+    }
+
+
+    /**
      * Salva una nuova terapia nel database. (Attore: Medico)
      *
      * (assegnaTerapia ed esitoAssegnaTerapia in Specifica / Modifica Terapia SD)

@@ -95,7 +95,7 @@ public class AssunzioneFarmaciDAO {
          } catch(SQLException e){
              System.err.println("Errore durante la lettura dei farmaci assunti: " + e.getMessage());
          }
-         // Se non viene trovata nessuna assunzione o si verifica un errore, ritorna un Optional vuoto
+         // Se non viene trovata nessuna assunzione o si verifica un errore, ritorna una lista vuota
          return assunzioni;
      }
 
