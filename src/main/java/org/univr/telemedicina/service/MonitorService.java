@@ -17,7 +17,6 @@ public class MonitorService {
 
     private final TerapiaDAO terapiaDAO;
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO;
-
     /**
      * Costruttore del servizio. Inizializza i DAO necessari.
      */
@@ -25,6 +24,7 @@ public class MonitorService {
         this.terapiaDAO = new TerapiaDAO();
         this.assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
     }
+
 
     /**
      * Controlla se il paziente ha registrato un'assunzione di farmaci oggi.
