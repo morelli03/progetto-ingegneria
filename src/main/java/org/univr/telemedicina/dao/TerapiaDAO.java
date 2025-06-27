@@ -4,8 +4,7 @@ import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Terapia;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class TerapiaDAO {
 
@@ -88,6 +87,49 @@ public class TerapiaDAO {
             throw new DataAccessException("Errore durante il recupero degli ID dei pazienti con terapie in corso", e);
         }
         return patientsIds;
+    }
+
+    /**
+     * Calcola la somma delle frequenze giornaliere di assunzioni farmaci per una lista di pazienti con una singola query.
+     * @param patientIds La lista degli ID dei pazienti.
+     * @return Una mappa dove la chiave è l'ID del paziente e il valore è la sua frequenza totale richiesta.
+     * @throws DataAccessException Se si verifica un errore di accesso ai dati.
+     */
+    public Map<Integer, Integer> getFrequenzeGiornalierePerPazienti(List<Integer> patientIds) throws DataAccessException {
+        if (patientIds == null || patientIds.isEmpty()) {
+            return Collections.emptyMap(); // Ritorna una mappa vuota se non ci sono pazienti
+        }
+
+        //inizializziamo la mappa per memorizzare le frequenze totali
+        Map<Integer, Integer> mapFrequenze = new HashMap<>();
+
+        // creiamo una stringa di placeholder (?,?,?) per la clausola IN, sarà tipo: "531,532,533"
+        // serve perche non sappiamo quanti pazienti ci sono, quindi non possiamo usare un PreparedStatement con un numero fisso di parametri
+        String placeholders = String.join(",", Collections.nCopies(patientIds.size(), "?"));
+
+        // la query usa SUM e GROUP BY per fare il lavoro di aggregazione direttamente nel DB
+        String sql = "SELECT IDPaziente, SUM(FrequenzaGiornaliera) as FrequenzaTotale " +
+                "FROM Terapie WHERE IDPaziente IN (" + placeholders + ") GROUP BY IDPaziente";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // impostiamo i valori per ogni placeholder
+            int index = 1;
+            for (Integer id : patientIds) {
+                pstmt.setInt(index++, id);
+            }
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    mapFrequenze.put(rs.getInt("IDPaziente"), rs.getInt("FrequenzaTotale"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Errore nel recupero massivo delle frequenze giornaliere.", e);
+        }
+        // ritorna la mappa con le frequenze totali per ogni paziente
+        return mapFrequenze;
     }
 
 

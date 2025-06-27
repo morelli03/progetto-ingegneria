@@ -1,5 +1,6 @@
 package org.univr.telemedicina.service;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.univr.telemedicina.dao.UtenteDAO;
 import org.univr.telemedicina.exception.DataAccessException;
@@ -10,15 +11,12 @@ import java.util.Optional;
 
 public class AuthService {
 
-
-    // dependency injection
     private final UtenteDAO utenteDao;
     private final PasswordEncoder passwordEncoder;
 
-    // Le dipendenze vengono passate (iniettate) tramite il costruttore
-    public AuthService(UtenteDAO utenteDao, PasswordEncoder passwordEncoder) {
-        this.utenteDao = utenteDao;
-        this.passwordEncoder = passwordEncoder;
+    public AuthService() {
+        this.utenteDao = new UtenteDAO();
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     /**
