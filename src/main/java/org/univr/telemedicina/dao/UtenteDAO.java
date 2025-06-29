@@ -87,7 +87,7 @@ public class UtenteDAO {
 
         } catch (SQLException e) {
             System.err.println("Errore durante la creazione dell'utente: " + e.getMessage());
-            throw new DataAccessException("Errore durante la creazione dell'utente con email " + utente.getEmail(), e);
+            throw new DataAccessException("Errore durante la creazione dell'utente" + utente.getEmail(), e);
         }
         return utente;
     }
