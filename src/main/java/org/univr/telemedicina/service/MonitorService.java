@@ -1,6 +1,7 @@
 package org.univr.telemedicina.service;
 
 import org.univr.telemedicina.dao.AssunzioneFarmaciDAO;
+import org.univr.telemedicina.dao.PazientiDAO;
 import org.univr.telemedicina.dao.TerapiaDAO;
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.RilevazioneGlicemia;
@@ -20,12 +21,16 @@ public class MonitorService {
 
     private final TerapiaDAO terapiaDAO;
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO;
+    private final NotificheService notificheService;
+    private final PazientiDAO pazientiDAO;
     /**
      * Costruttore del servizio. Inizializza i DAO necessari.
      */
     public MonitorService() {
         this.terapiaDAO = new TerapiaDAO();
         this.assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
+        this.notificheService = new NotificheService();
+        this.pazientiDAO = new PazientiDAO();
     }
 
 
@@ -35,6 +40,9 @@ public class MonitorService {
      * @throws DataAccessException Se si verifica un errore durante l'accesso ai dati.
      */
     public void checkFarmaciDaily() throws DataAccessException {
+
+        // !!! !!! !!! importante !!! !!! !!! metodo non ottimizzato, dovrei creare altri due metodi in dao. Chiedere a g.
+
         // prende gli ID di tutti i pazienti con una terapia in corso
         List<Integer> pazientiAttivi = terapiaDAO.getActivePatientIds();
 
@@ -70,12 +78,14 @@ public class MonitorService {
                 // se non ha ancora registrato nulla ed è pomeriggio
                 if (numeroAssunzioniOggi == 0 && oraAttuale >= 12) {
                     // Sostituzione della notifica con un output su console
-                    System.out.println("NOTIFICA a Paziente ID " + idPaziente + ": Ricorda di registrare le assunzioni dei farmaci per oggi.");
+                    //System.out.println("NOTIFICA a Paziente ID " + idPaziente + ": Ricorda di registrare le assunzioni dei farmaci per oggi.");
+                    notificheService.send(idPaziente, 1, "Assunzioni Farmaci Incompleta", "Hai dimenticato di registrare le assunzioni dei farmaci per oggi.", "Assunzioni Farmaci");
                 }
                 //se ha registrato qualcosa ma non tutto, ed è già sera
                 else if (numeroAssunzioniOggi > 0 && oraAttuale >= 18) {
                     // Sostituzione della notifica con un output su console
-                    System.out.println("NOTIFICA a Paziente ID " + idPaziente + ": Hai registrato " + numeroAssunzioniOggi + " su " + frequenzaRichiesta + " assunzioni richieste. Ricorda di completare la terapia.");
+                    //System.out.println("NOTIFICA a Paziente ID " + idPaziente + ": Hai registrato " + numeroAssunzioniOggi + " su " + frequenzaRichiesta + " assunzioni richieste. Ricorda di completare la terapia.");
+                    notificheService.send(idPaziente, 1, "Assunzioni Farmaci Incompleta", "Hai registrato " + numeroAssunzioniOggi + " su " + frequenzaRichiesta + " assunzioni richieste. Ricorda di completare la terapia.", "Assunzioni Farmaci");
                 }
             }
         }
@@ -97,9 +107,10 @@ public class MonitorService {
         }
                                             // motliplico per 3 perche pèer tre giorni
         Map<Integer, Integer> frequenzeRichieste = terapiaDAO.getFrequenzeGiornalierePerPazienti(pazientiAttivi);
-        int numeroAssunzioni = 0;
+
 
         for (Integer idPaziente : pazientiAttivi) {
+            int numeroAssunzioni = 0;
             int frequenzaRichiesta3Giorni = frequenzeRichieste.getOrDefault(idPaziente, 0) * 3;
 
             // somma tutte le assunzioni degli ultimi 3 giorni
@@ -108,8 +119,10 @@ public class MonitorService {
                 numeroAssunzioni += assunzioneFarmaciDAO.getConteggioAssunzioniGiornoPerPazienti(List.of(idPaziente), LocalDate.now().minusDays(i)).getOrDefault(idPaziente, 0);
             }
 
+            // se il numero di assunzioni effettuate negli ultimi 3 giorni è inferiore alla frequenza richiesta
             if(numeroAssunzioni < frequenzaRichiesta3Giorni){
-                System.out.println("NOTIFICA a Paziente ID " + idPaziente + ": Non hai registrato le assunzioni dei farmaci per tre giorni consecutivi. Controlla la tua terapia.");
+                //System.out.println("NOTIFICA a Paziente ID " + idPaziente + ": Non hai registrato le assunzioni dei farmaci per tre giorni consecutivi. Controlla la tua terapia.");
+                notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(idPaziente).orElseThrow(), 2, "Mancata aderenza alla terapia", "L'utente " + pazientiDAO.findNameById(idPaziente) + " non ha seguito la terapia per più di 3 giorni.", "Assunzioni Farmaci");
             }
         }
 
@@ -121,7 +134,7 @@ public class MonitorService {
      * Se il valore è anormale, invia una notifica al paziente.
      * @param rilevazione L'oggetto RilevazioneGlicemia contenente i dati della rilevazione.
      */
-    public void checkGlicemia(RilevazioneGlicemia rilevazione){
+    public void checkGlicemia(RilevazioneGlicemia rilevazione) throws DataAccessException {
 
         LocalTime oraRilevazione = rilevazione.getTimestamp().toLocalTime();
 
@@ -131,12 +144,14 @@ public class MonitorService {
                 oraRilevazione.isAfter(LocalTime.of(19, 30)) && oraRilevazione.isBefore(LocalTime.of(21, 0))) {
             //entra se è due ore dopo i pasti
             if(rilevazione.getValore() <= 100 || rilevazione.getValore() >= 180){
-                System.out.println("NOTIFICA a Paziente ID " + rilevazione.getIdPaziente() + ": Valore glicemico anormale dopo i pasti: " + rilevazione.getValore() + " mg/dL. Controlla la tua dieta.");
+                //System.out.println("NOTIFICA a Paziente ID " + rilevazione.getIdPaziente() + ": Valore glicemico anormale dopo i pasti: " + rilevazione.getValore() + " mg/dL. Controlla la tua dieta.");
+                notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(rilevazione.getIdPaziente()).orElseThrow(), 3, "Glicemia Anormale", "Il paziente " + pazientiDAO.findNameById(rilevazione.getIdPaziente()) + " ha registrato un valore glicemico anormale dopo i pasti: " + rilevazione.getValore() + " mg/dL.", "Glicemia");
             }
         } else {
             //entra se è prima dei pasti
             if(rilevazione.getValore() <= 80 || rilevazione.getValore() >= 130){
-                System.out.println("NOTIFICA a Paziente ID " + rilevazione.getIdPaziente() + ": Valore glicemico anormale prima dei pasti: " + rilevazione.getValore() + " mg/dL. Controlla la tua dieta.");
+                //System.out.println("NOTIFICA a Paziente ID " + rilevazione.getIdPaziente() + ": Valore glicemico anormale prima dei pasti: " + rilevazione.getValore() + " mg/dL. Controlla la tua dieta.");
+                notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(rilevazione.getIdPaziente()).orElseThrow(), 3, "Glicemia Anormale", "Il paziente " + pazientiDAO.findNameById(rilevazione.getIdPaziente()) + " ha registrato un valore glicemico anormale prima dei pasti: " + rilevazione.getValore() + " mg/dL.", "Glicemia");
             }
         }
 
