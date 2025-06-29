@@ -35,13 +35,13 @@ public class CondizioniPazienteDAO {
                 while (rs.next()) {
                     // ...crea un oggetto CondizioniPaziente e popola i suoi campi con i dati dal ResultSet
                     CondizioniPaziente condizione = new CondizioniPaziente(
-                            rs.getInt("IDCondizione"),
                             rs.getInt("IDPaziente"),
                             rs.getString("Tipo"),
                             rs.getString("Descrizione"),
                             rs.getString("Periodo"),
-                            rs.getDate("DataRegistrazione")
+                            rs.getObject("DataRegistrazione", java.time.LocalDate.class)
                     );
+                    condizione.setIDCondizione(rs.getInt("IDCondizione"));
 
                     // Aggiungi la condiziona alla lista
                     condizioni.add(condizione);
@@ -62,17 +62,16 @@ public class CondizioniPazienteDAO {
      * @param condizione L'oggetto CondizioniPaziente da salvare
      */
     public void create(CondizioniPaziente condizione) throws DataAccessException {
-        String sql = "INSERT INTO CondizioniPaziente(IDCondizione, IDPaziente, Tipo, Descrizione, Periodo, DataRegistrazione) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO CondizioniPaziente(IDPaziente, Tipo, Descrizione, Periodo, DataRegistrazione) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, condizione.getIDCondizione());
             pstmt.setInt(2, condizione.getIDPaziente());
             pstmt.setString(3, condizione.getTipo());
             pstmt.setString(4, condizione.getDescrizione());
             pstmt.setString(5, condizione.getPeriodo());
-            pstmt.setDate(6, condizione.getDataRegistrazione());
+            pstmt.setObject(6, condizione.getDataRegistrazione());
 
             pstmt.executeUpdate();
 

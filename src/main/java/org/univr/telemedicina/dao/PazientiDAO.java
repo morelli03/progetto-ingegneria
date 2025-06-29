@@ -82,4 +82,30 @@ public class PazientiDAO {
         }
         return pazienti;
     }
+
+    /**
+     * Trova un IDMedico da un IDPaziente
+     * @param IDPaziente L'ID del paziente di cui si vuole trovare il medico di riferimento
+     * @return L'ID del medico di riferimento associato al paziente
+     * @throws DataAccessException Se si verifica un errore durante l'accesso ai dati
+     */
+    public int findMedByIDPaziente(int IDPaziente) throws DataAccessException, SQLException {
+        String sql = "SELECT IDMedicoRiferimento FROM Pazienti WHERE IDPaziente = ?";
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, IDPaziente);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("IDMedicoRiferimento");
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante la ricerca del medico per il paziente con ID " + IDPaziente + ": " + e.getMessage());
+            throw new DataAccessException("Errore durante la ricerca del medico per il paziente con ID " + IDPaziente, e);
+            }
+        }
+        throw new DataAccessException("Nessun medico trovato per il paziente con ID " + IDPaziente);
+
+
+    }
 }
