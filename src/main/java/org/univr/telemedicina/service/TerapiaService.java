@@ -11,6 +11,8 @@ import java.util.List;
 
 
 //modificare TerapiaDAO - non contiene un metodo per aggiornare la terapia
+//gestisce le eccezioni legate alle terapie
+//
 
 public class TerapiaService {
 
@@ -23,59 +25,57 @@ public class TerapiaService {
     }
 
     /**
-     * assegnare una nuova terapia a un paziente
+     * assegna una nuova teropia
      */
-    //manca la throw per il metodo
-    public void assegnaTerapia(Terapia terapia, int idMedico) throws DataAccessException {
-
+    public void assegnaTerapia(Terapia terapia, int idMedicoOperante) throws TherapyException {
         if (terapia.getFrequenzaGiornaliera() <= 0) {
-            throw new IllegalArgumentException("La frequenza giornaliera deve essere maggiore di zero.");
+            throw new TherapyException("La frequenza giornaliera deve essere maggiore di zero.");
         }
+        try{
+            terapia.setIDMedico(idMedicoOperante);
 
-        //salvo la terapia
-        terapiaDAO.assignTherapy(terapia);
+            terapiaDAO.assignTherapy(terapia);
 
-        //registro l'operazione
-        String desczione = "Precritta nuova terpaia " + terapia.getNomeFarmaco() + " al paziente ID " + terapia.getIDPaziente();
-        registraOperazione(terapia.getIDMedico(), terapia.getIDPaziente(), "prescrizione terapia", desczione);
-
+            String descrizione = "Prescritto il farmaco  " + terapia.getNomeFarmaco() + " al paziente ID " + terapia.getIDPaziente();
+            registraOperazione(idMedicoOperante, terapia.getIDPaziente(), "assegna terapia", descrizione);
+        } catch (DataAccessException e) {
+            throw new TherapyException("Errore durante l'assegnazione della terapia: " + e.getMessage(), e);
+        }
     }
 
     /**
-     * modificare una terapia esistente
+     * modifica una terapia esistente
      */
+    public void modificaTerapia(Terapia terapia, int idMedicoOperante) throws TherapyException {
+        try {
 
-    //chiama metodo updateTherapy non ancora implementato in TerapiaDAO
-    public void modificaTerapia(Terapia terapia){
+            terapiaDAO.updateTherapy(terapia);
 
-
-        //aggiorno la terapia
-        terapiaDAO.updateTherapy(terapia);
-
-        //registro l'operazione
-        String desczione = "Modificata terapia " + terapia.getNomeFarmaco() + " al paziente ID " + terapia.getIDPaziente();
-        registraOperazione(terapia.getIDMedico(), terapia.getIDPaziente(), "modifica terapia", desczione);
-
+            String descrizione = "Modificata la terapia per il paziente ID " + terapia.getIDPaziente();
+            registraOperazione(idMedicoOperante, terapia.getIDPaziente(), "modifica terapia", descrizione);
+        } catch (DataAccessException e) {
+            throw new TherapyException("Errore durante la modifica della terapia: " + e.getMessage(), e);
+        }
     }
 
     /**
-     * ritorna la lista di terapie associate a un paziente
+     *Lista di tuttel le terapie assegnate a un paziente
      */
-    //anche questa dovrebbe lanciare una eccezzione
-    public List<Terapia> getTerapieByPaziente(int idPaziente) throws DataAccessException {
-        return terapiaDAO.listTherapiesByPatId(idPaziente);
+    public List<Terapia> getTerapieByPazienteId(int idPaziente) throws TherapyException {
+        try {
+            return terapiaDAO.listTherapiesByPatId(idPaziente);
+        } catch (DataAccessException e) {
+            throw new TherapyException("Errore durante il recupero delle terapie: " + e.getMessage(), e);
+        }
     }
 
     /**
-     * metodo per creare e salvare log di un'operazione
+     * registra un'operazione nel log delle operazioni
      */
-
-    private void registraOperazione(int idMedico, int idPaziente, String tipoOperazione, String descrizione) {
-        LogOperazione log = new LogOperazione();
-        log.setIDMedicoOperante(idMedico);
+    private void registraOperazione(int idMedico, int idPaziente, String tipoOperazione, String descrizione) throws DataAccessException {
+        LogOperazione log = new LogOperazione(idMedico, tipoOperazione, descrizione, LocalDateTime.now());
         log.setIDPazienteInteressato(idPaziente);
-        log.setTipoOperazione(tipoOperazione);
-        log.setDescrizioneOperazione(descrizione);
-        log.setTimestamp(LocalDateTime.now());
+        logOperazioniDAO.createLog(log);
     }
 }
+

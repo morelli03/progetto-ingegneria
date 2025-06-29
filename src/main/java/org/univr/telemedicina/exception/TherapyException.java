@@ -1,6 +1,6 @@
 package org.univr.telemedicina.exception;
 
-public class TherapyException extends RuntimeException {
+public class TherapyException extends Exception {
     public TherapyException(String message) {
         super(message);
     }
