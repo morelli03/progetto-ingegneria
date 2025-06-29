@@ -41,7 +41,6 @@ public class MonitorService {
      */
     public void checkFarmaciDaily() throws DataAccessException {
 
-        // !!! !!! !!! importante !!! !!! !!! metodo non ottimizzato, dovrei creare altri due metodi in dao. Chiedere a g.
 
         // prende gli ID di tutti i pazienti con una terapia in corso
         List<Integer> pazientiAttivi = terapiaDAO.getActivePatientIds();
@@ -97,6 +96,8 @@ public class MonitorService {
      * @throws DataAccessException Se si verifica un errore durante l'accesso ai dati.
      */
     public void checkFarmaci3Daily() throws DataAccessException {
+        // !!! !!! !!! importante !!! !!! !!! metodo non ottimizzato, dovrei creare altri due metodi in dao. Chiedere a g.
+
         // prende gli ID di tutti i pazienti con una terapia in corso
         List<Integer> pazientiAttivi = terapiaDAO.getActivePatientIds();
 
