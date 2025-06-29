@@ -104,6 +104,7 @@ public class AssunzioneFarmaciDAO {
 
     /**
      * Conta le assunzioni di farmaci effettuate in un dato giorno per una lista di pazienti con una singola query.
+     * Usato per checkFarmaciDaily
      * @param patientIds La lista degli ID dei pazienti.
      * @param data Il giorno da controllare.
      * @return Una mappa dove la chiave è l'ID del paziente e il valore è il numero di assunzioni effettuate.

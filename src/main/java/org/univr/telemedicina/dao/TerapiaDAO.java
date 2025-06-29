@@ -91,6 +91,7 @@ public class TerapiaDAO {
 
     /**
      * Calcola la somma delle frequenze giornaliere di assunzioni farmaci per una lista di pazienti con una singola query.
+     * Usato per checkFarmaciDaily
      * @param patientIds La lista degli ID dei pazienti.
      * @return Una mappa dove la chiave è l'ID del paziente e il valore è la sua frequenza totale richiesta.
      * @throws DataAccessException Se si verifica un errore di accesso ai dati.
