@@ -1,24 +1,27 @@
 package org.univr.telemedicina.service;
 
-import org.univr.telemedicina.dao.*;
+import org.univr.telemedicina.dao.CondizioniPazienteDAO;
+import org.univr.telemedicina.dao.PazientiDAO;
+import org.univr.telemedicina.dao.RilevazioneGlicemiaDAO;
+import org.univr.telemedicina.dao.UtenteDAO;
+
+import org.univr.telemedicina.model.Terapia;
+
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.exception.WrongAssumptionException;
 import org.univr.telemedicina.model.AssunzioneFarmaci;
 import org.univr.telemedicina.model.CondizioniPaziente;
 import org.univr.telemedicina.model.RilevazioneGlicemia;
-import org.univr.telemedicina.model.Terapia;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 public class PazienteService {
     
     private final RilevazioneGlicemiaDAO rilevazioneDAO;
-    private final TerapiaDAO terapiaDAO;
     private final MonitorService monitorService;
     private final CondizioniPazienteDAO condizioniDAO;
     private final UtenteDAO utenteDAO;
@@ -27,7 +30,6 @@ public class PazienteService {
 
     public PazienteService() {
         this.rilevazioneDAO = new RilevazioneGlicemiaDAO();
-        this.terapiaDAO = new TerapiaDAO();
         this.monitorService = new MonitorService();
         this.condizioniDAO = new CondizioniPazienteDAO();
         this.utenteDAO = new UtenteDAO();
@@ -110,8 +112,7 @@ public class PazienteService {
             throw new DataAccessException("Errore durante la registrazione della condizione del paziente: ", e);
         }
     }
-
-
+    
     /**
      * Invia un'email al medico di riferimento del paziente con un oggetto e un corpo specificati.
      *
@@ -119,13 +120,12 @@ public class PazienteService {
      * @param subject Oggetto dell'email
      * @param body Corpo dell'email
      * @return URL per aprire il client di posta elettronica con i campi precompilati
-     * @throws UnsupportedEncodingException Se la codifica dell'URL fallisce
      * @throws DataAccessException Se si verifica un errore durante l'accesso ai dati
      * @throws SQLException Se si verifica un errore SQL durante la ricerca dell'email del medico
      */
-    public String inviaEmailMedicoRiferimento(int idPaziente, String subject, String body) throws UnsupportedEncodingException, DataAccessException, SQLException {
+    public String inviaEmailMedicoRiferimento(int idPaziente, String subject, String body) throws DataAccessException, SQLException {
 
-        String emailMedico = null;
+        String emailMedico;
 
         // Recupera l'indirizzo email del medico di riferimento dal database
         try{
@@ -142,8 +142,8 @@ public class PazienteService {
         }
 
         // Codifica l'oggetto e il corpo dell'email per l'URL
-        String encodedSubject = URLEncoder.encode(subject, StandardCharsets.UTF_8.toString());
-        String encodedBody = URLEncoder.encode(body, StandardCharsets.UTF_8.toString());
+        String encodedSubject = URLEncoder.encode(subject, StandardCharsets.UTF_8);
+        String encodedBody = URLEncoder.encode(body, StandardCharsets.UTF_8);
 
         // Crea l'URL per aprire il client di posta elettronica
         return "mailto:" + emailMedico + "?subject=" + encodedSubject + "&body=" + encodedBody;
