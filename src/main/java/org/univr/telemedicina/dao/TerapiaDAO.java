@@ -121,4 +121,40 @@ public class TerapiaDAO {
             throw new DataAccessException("Errore durante l'assegnazione della terapia per il paziente con ID " + terapia.getIDPaziente(), e);
         }
     }
+    /**
+     * Aggiorna una terapia esistente nel database. (Attore: Medico)
+     *
+     * (modificaTerapia ed esitoModificaTerapia in Specifica / Modifica Terapia SD)
+     *
+     * @param terapia L'oggetto Terapia da aggiornare nel database.
+     */
+    public void updateTherapy(Terapia terapia) throws DataAccessException {
+        String sql = "UPDATE Terapie SET IDPaziente = ?, IDMedico = ?, NomeFarmaco = ?, Quantita = ?, FrequenzaGiornaliera = ?, Indicazioni = ?, DataInizio = ?, DataFine = ? WHERE IDTerapia = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, terapia.getIDPaziente());
+            pstmt.setInt(2, terapia.getIDMedico());
+            pstmt.setString(3, terapia.getNomeFarmaco());
+            pstmt.setString(4, terapia.getQuantita());
+            pstmt.setInt(5, terapia.getFrequenzaGiornaliera());
+            pstmt.setString(6, terapia.getIndicazioni());
+            pstmt.setDate(7, terapia.getDataInizio());
+            pstmt.setDate(8, terapia.getDataFine());
+            pstmt.setInt(9, terapia.getIDTerapia());
+
+            int affectedRows = pstmt.executeUpdate();
+
+            //verifa che la terapia sia stata effettivamente aggiornata
+            if(affectedRows == 0){
+                throw new DataAccessException("Modifica terapia fallita, non è stata trovata nessuna terapia con ID " + terapia.getIDTerapia(), null);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Errore durante l'aggiornamento della terapia: " + e.getMessage());
+            throw new DataAccessException("Errore durante l'aggiornamento della terapia con ID " + terapia.getIDTerapia(), e);
+        }
+    }
 }
+

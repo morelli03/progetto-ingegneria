@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Classe DAO per trovare tutti i pazienti associati ad un medico e creare l'associazione utente-paziente.
@@ -81,5 +82,44 @@ public class PazientiDAO {
             throw new DataAccessException("Errore durante la ricerca dei pazienti per il medico con ID " + IDMedico, e);
         }
         return pazienti;
+    }
+
+    /**
+     * trova un paziente per IDPaziente.
+     */
+    public Optional<Paziente> findById(int idPaziente) throws DataAccessException {
+        String sql = "SELECT u.*, p.IDMedicoRiferimento FROM Utenti u " +
+                "JOIN Pazienti p ON u.IDUtente = p.IDPaziente " +
+                "WHERE u.IDUtente = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idPaziente);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    Paziente paziente = new Paziente();
+
+                    rs.getInt("IDUtente");
+                    rs.getString("Email");
+                    rs.getString("HashedPassword");
+                    rs.getString("Nome");
+                    rs.getString("Cognome");
+                    rs.getString("Ruolo");
+                    rs.getDate("DataNascita");
+
+                    paziente.setIDPaziente(rs.getInt("IDPaziente"));
+                    paziente.setIDPaziente(rs.getInt("IDMedicoRiferimento"));
+
+                    return Optional.of(paziente);
+
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante la ricerca del paziente per ID: " + e.getMessage());
+            throw new DataAccessException("Errore durante la ricerca del paziente con ID " + idPaziente, e);
+        }
+        return Optional.empty();
     }
 }
