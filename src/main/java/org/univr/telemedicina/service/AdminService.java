@@ -35,7 +35,7 @@ public class AdminService {
 
             // Acquisizione e validazione degli input
             String email = leggiEmailValida(sc);
-            String hashedPassword = leggiPasswordHash(sc); // TODO: Implementare una funzione di hashing sicura!
+            String hashedPassword = leggiPasswordHash(sc);
             String nome = leggiStringaNonVuota(sc, "Inserisci il nome dell'utente:", "Errore: il nome non può essere vuoto. Riprova.");
             String cognome = leggiStringaNonVuota(sc, "Inserisci il cognome dell'utente:", "Errore: il cognome non può essere vuoto. Riprova.");
             String ruolo = leggiRuoloValido(sc);
@@ -146,8 +146,12 @@ public class AdminService {
     }
 
     /**
-     * TODO: Implementare una funzione di hashing sicura per la password.
-     * Questa è una placeholder e NON è sicura.
+     * Legge una password dall'input dell'utente e la converte in un hash sicuro.
+     * Utilizza BCrypt per l'hashing della password.
+     *
+     * @param sc lo Scanner per leggere l'input dell'utente
+     * @return l'hash della password
+     * @throws AuthServiceException se si verifica un errore durante la lettura della password
      */
     private String leggiPasswordHash(Scanner sc) throws AuthServiceException {
         String in = leggiStringaNonVuota(sc, "Inserisci la password dell'utente:", "Errore: la password non può essere vuota. Riprova.");
