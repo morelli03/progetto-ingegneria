@@ -4,8 +4,7 @@ import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.AssunzioneFarmaci;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 
@@ -101,6 +100,59 @@ public class AssunzioneFarmaciDAO {
          // Se non viene trovata nessuna assunzione o si verifica un errore, ritorna una lista vuota
          return assunzioni;
      }
+
+
+    /**
+     * Conta le assunzioni di farmaci effettuate in un dato giorno per una lista di pazienti con una singola query.
+     * Usato per checkFarmaciDaily
+     * @param patientIds La lista degli ID dei pazienti.
+     * @param data Il giorno da controllare.
+     * @return Una mappa dove la chiave è l'ID del paziente e il valore è il numero di assunzioni effettuate.
+     * @throws DataAccessException Se si verifica un errore di accesso ai dati.
+     */
+    public Map<Integer, Integer> getConteggioAssunzioniGiornoPerPazienti(List<Integer> patientIds, LocalDate data) throws DataAccessException {
+        if (patientIds == null || patientIds.isEmpty()) {
+            return Collections.emptyMap(); // ritorna una mappa vuota se non ci sono pazienti
+        }
+
+        // inizializza la mappa per memorizzare il conteggio delle assunzioni
+        Map<Integer, Integer> mapConteggio = new HashMap<>();
+        //crea un placeholder per ogni ID paziente nella query
+        String placeholders = String.join(",", Collections.nCopies(patientIds.size(), "?"));
+
+        //la query usa COUNT e GROUP BY
+        String sql = "SELECT IDPaziente, COUNT(*) as ConteggioAssunzioni " +
+                "FROM AssunzioniFarmaci WHERE IDPaziente IN (" + placeholders + ") " +
+                "AND TimestampAssunzione >= ? AND TimestampAssunzione < ? " +
+                "GROUP BY IDPaziente";
+
+        // definisce l'intervallo di tempo per l'intera giornata
+        LocalDateTime inizioGiorno = data.atStartOfDay();
+        LocalDateTime inizioGiornoSuccessivo = data.plusDays(1).atStartOfDay();
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            // imposta i parametri per la query
+            int index = 1;
+            for (Integer id : patientIds) {
+                pstmt.setInt(index++, id);
+            }
+            // imposta i parametri per l'intervallo di tempo
+            pstmt.setObject(index++, inizioGiorno);
+            pstmt.setObject(index, inizioGiornoSuccessivo);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    mapConteggio.put(rs.getInt("IDPaziente"), rs.getInt("ConteggioAssunzioni"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Errore nel recupero del conteggio assunzioni.", e);
+        }
+        return mapConteggio;
+    }
+
 
     /**
      * Aggiunge una nuova assunzione di farmaci per un paziente.
