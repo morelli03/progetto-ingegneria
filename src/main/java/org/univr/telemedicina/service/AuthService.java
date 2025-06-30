@@ -1,7 +1,9 @@
 package org.univr.telemedicina.service;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.univr.telemedicina.dao.UtenteDAO;
+import org.univr.telemedicina.exception.AuthServiceException;
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Utente;
 
@@ -10,15 +12,12 @@ import java.util.Optional;
 
 public class AuthService {
 
-
-    // dependency injection
     private final UtenteDAO utenteDao;
     private final PasswordEncoder passwordEncoder;
 
-    // Le dipendenze vengono passate (iniettate) tramite il costruttore
-    public AuthService(UtenteDAO utenteDao, PasswordEncoder passwordEncoder) {
-        this.utenteDao = utenteDao;
-        this.passwordEncoder = passwordEncoder;
+    public AuthService() {
+        this.utenteDao = new UtenteDAO();
+        this.passwordEncoder = new BCryptPasswordEncoder();
     }
 
     /**
@@ -27,15 +26,15 @@ public class AuthService {
      * @param passwordInChiaro La password fornita dall'utente al momento del login.
      * @return Utente se le password corrispondono, altrimenti Optional.empty().
      */
-    public Optional<Utente> verificaPassword(String emailUtente, String passwordInChiaro) {
-        // cerca nel database per quell'email, restituisce empty se non eiste la mail
-        Optional<Utente> utenteTrovato = Optional.empty();
+    public Optional<Utente> verificaPassword(String emailUtente, String passwordInChiaro) throws AuthServiceException {
+        // cerca nel database per quell'email, restituisce empty se non esiste la mail
+        Optional<Utente> utenteTrovato;
         try {
             utenteTrovato = utenteDao.findByEmail(emailUtente);
         } catch (DataAccessException e) {
             System.err.println("Errore durante la ricerca dell'utente per email: " + e.getMessage());
             // qui devo lanciare un'eccezione personalizzata
-            return Optional.empty(); // ritorna empty se c'è un errore nel database
+            throw new AuthServiceException("Impossibile completare l'autenticazione a causa di un errore del server.", e);
         }
 
         if (utenteTrovato.isPresent()) {
