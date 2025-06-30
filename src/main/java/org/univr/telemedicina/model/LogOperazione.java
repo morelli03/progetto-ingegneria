@@ -21,8 +21,9 @@ public class LogOperazione {
     }
 
     //costruttore per inserimento, non c'è IDLog perché è auto-incrementato nel database
-    public LogOperazione(int IDMedicoOperante, String TipoOperazione, String DescrizioneOperazione, LocalDateTime Timestamp) {
+    public LogOperazione(int IDMedicoOperante, int IDPazienteInteressato, String TipoOperazione, String DescrizioneOperazione, LocalDateTime Timestamp) {
         this.IDMedicoOperante = IDMedicoOperante;
+        this.IDPazienteInteressato = IDPazienteInteressato;
         this.TipoOperazione = TipoOperazione;
         this.DescrizioneOperazione = DescrizioneOperazione;
         this.Timestamp = Timestamp;
