@@ -1,0 +1,151 @@
+package org.univr.telemedicina.service;
+
+import org.univr.telemedicina.dao.CondizioniPazienteDAO;
+import org.univr.telemedicina.dao.PazientiDAO;
+import org.univr.telemedicina.dao.RilevazioneGlicemiaDAO;
+import org.univr.telemedicina.dao.UtenteDAO;
+
+import org.univr.telemedicina.model.Terapia;
+
+import org.univr.telemedicina.exception.DataAccessException;
+import org.univr.telemedicina.exception.WrongAssumptionException;
+import org.univr.telemedicina.model.AssunzioneFarmaci;
+import org.univr.telemedicina.model.CondizioniPaziente;
+import org.univr.telemedicina.model.RilevazioneGlicemia;
+
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
+public class PazienteService {
+    
+    private final RilevazioneGlicemiaDAO rilevazioneDAO;
+    private final MonitorService monitorService;
+    private final CondizioniPazienteDAO condizioniDAO;
+    private final UtenteDAO utenteDAO;
+    private final PazientiDAO pazienteDAO;
+
+
+    public PazienteService() {
+        this.rilevazioneDAO = new RilevazioneGlicemiaDAO();
+        this.monitorService = new MonitorService();
+        this.condizioniDAO = new CondizioniPazienteDAO();
+        this.utenteDAO = new UtenteDAO();
+        this.pazienteDAO = new PazientiDAO();
+    }
+
+    /**
+     * Registra una nuova rilevazione di glicemia per un paziente.
+     *
+     * @param idPaziente ID del paziente per cui si sta registrando la rilevazione
+     * @param valore Valore della glicemia rilevata
+     * @param timestamp Data e ora della rilevazione
+     * @param note Eventuali note aggiuntive sulla rilevazione
+     */
+    public void registraRilevazioneGlicemia(int idPaziente, int valore, LocalDateTime timestamp, String note) throws DataAccessException {
+
+        // Crea un'istanza di RilevazioneGlicemia con i dati forniti
+        RilevazioneGlicemia rilevazione = new RilevazioneGlicemia(idPaziente, valore, timestamp, note);
+
+        // Prova a salvare la rilevazione nel database
+        try {
+            rilevazioneDAO.create(rilevazione);
+        } catch (DataAccessException e) {
+            System.err.println("Errore durante la registrazione della rilevazione di glicemia: " + e.getMessage());
+            throw new DataAccessException("Errore durante la registrazione della rilevazione di glicemia: ", e);
+        }
+        try{
+            monitorService.checkGlicemia(rilevazione);
+        }
+        catch (RuntimeException e) {
+            System.err.println("Errore durante il controllo dei parametri di glicemia: " + e.getMessage());
+            throw new RuntimeException("Errore durante il controllo dei parametri di glicemia: ", e);
+        }
+        catch (DataAccessException e) {
+            System.err.println(e.getMessage());
+            throw new DataAccessException("Errore durante il salvataggio del valore glicemico: ", e);
+        }
+    }
+
+    /**
+     * Aggiungere le assunzioni di farmaci, verificando che siano coerenti con la terapia prescritta. (usando AssunzioneFarmacoDAO e TerapiaDAO)
+     * @param terapia la terapia per cui si sta registrando l'assunzione
+     * @param quantitaAssunta Quantità di farmaco assunta
+     */
+    public void registraAssunzioneFarmaci(Terapia terapia, String quantitaAssunta) throws WrongAssumptionException {
+
+        // Verifica se la terapia esiste per il paziente
+        try {
+            if(terapia.getQuantita().equals(quantitaAssunta)) {
+                AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), LocalDateTime.now(), quantitaAssunta);
+            }
+            else {
+                throw new WrongAssumptionException("Quantita' assunta non corrisponde con quantita' da assumere");
+            }
+
+        } catch (WrongAssumptionException e) {
+            System.err.println("Quantita' assunta non corrisponde con quantita' da assumere: " + e.getMessage());
+            throw new WrongAssumptionException("Quantita' assunta non corrisponde con quantita' da assumere: ");
+        }
+    }
+
+    /**
+     * Segnalare sintomi, patologie o terapie concomitanti (utilizzando CondizioniPazienteDAO)
+     * @param idPaziente ID del paziente per cui si sta registrando la condizione
+     * @param tipo Tipo di condizione (Sintomo, Patologia, Fattore di Rischio, Comorbidita)
+     * @param descrizione Descrizione della condizione
+     * @param periodo Periodo in cui la condizione è stata riscontrata
+     * @throws DataAccessException se si verifica un errore durante l'accesso al database
+     */
+
+    public void segnalaCondizionePaziente(int idPaziente, String tipo, String descrizione, String periodo) throws DataAccessException {
+
+        try{
+            // Il tipo (Sintomo, Patologia, Fattore di Rischio, Comorbidita) viene forzato da una scelta nella GUI, quindi non dovrebbe essere necessario controllare il tipo\
+            CondizioniPaziente condizione = new CondizioniPaziente(idPaziente, tipo, descrizione, periodo, java.time.LocalDate.now());
+            condizioniDAO.create(condizione);
+
+        } catch (DataAccessException e) {
+            System.err.println("Errore durante la registrazione della condizione del paziente: " + e.getMessage());
+            throw new DataAccessException("Errore durante la registrazione della condizione del paziente: ", e);
+        }
+    }
+    
+    /**
+     * Invia un'email al medico di riferimento del paziente con un oggetto e un corpo specificati.
+     *
+     * @param idPaziente ID del paziente per cui si vuole inviare l'email
+     * @param subject Oggetto dell'email
+     * @param body Corpo dell'email
+     * @return URL per aprire il client di posta elettronica con i campi precompilati
+     * @throws DataAccessException Se si verifica un errore durante l'accesso ai dati
+     * @throws SQLException Se si verifica un errore SQL durante la ricerca dell'email del medico
+     */
+    public String inviaEmailMedicoRiferimento(int idPaziente, String subject, String body) throws DataAccessException, SQLException {
+
+        String emailMedico;
+
+        // Recupera l'indirizzo email del medico di riferimento dal database
+        try{
+            // Trova l'email del medico di riferimento associato al paziente
+            emailMedico = utenteDAO.findEmailById(pazienteDAO.findMedByIDPaziente(idPaziente)).orElse(null);
+        } catch (DataAccessException e) {
+            System.err.println("Errore durante la ricerca dell'email del medico di riferimento: " + e.getMessage());
+            throw new DataAccessException("Errore durante la ricerca dell'email del medico di riferimento: ", e);
+        }
+
+        // Se l'email del medico è null o vuota, lancia un'eccezione
+        if (emailMedico == null || emailMedico.isEmpty()) {
+            throw new DataAccessException("Nessun medico di riferimento trovato per il paziente con ID: " + idPaziente);
+        }
+
+        // Codifica l'oggetto e il corpo dell'email per l'URL
+        String encodedSubject = URLEncoder.encode(subject, StandardCharsets.UTF_8);
+        String encodedBody = URLEncoder.encode(body, StandardCharsets.UTF_8);
+
+        // Crea l'URL per aprire il client di posta elettronica
+        return "mailto:" + emailMedico + "?subject=" + encodedSubject + "&body=" + encodedBody;
+    }
+}
