@@ -7,6 +7,7 @@ import org.univr.telemedicina.model.*;
 
 import java.util.List;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 /**
  * Service layer che implementa tutte le funzionalità a disposizione del medico.
@@ -23,9 +24,7 @@ public class MedicoService {
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO;
 
     //costruttore
-    public MedicoService(PazientiDAO pazientiDAO, RilevazioneGlicemiaDAO rivelazioneGlicemiaDAO,
-                         CondizioniPazienteDAO condizioniPazienteDAO, LogOperazioniDAO logOperazioniDAO,
-                         TerapiaDAO terapiaDAO, AssunzioneFarmaciDAO assunzioneFarmaciDAO, UtenteDAO utenteDAO) {
+    public MedicoService() {
         this.pazientiDAO = new PazientiDAO();
         this.rivelazioneGlicemiaDAO = new RilevazioneGlicemiaDAO();
         this.condizioniPazienteDAO = new CondizioniPazienteDAO();
@@ -50,7 +49,7 @@ public class MedicoService {
     /**
      * raccoglie dati necessari per la dashboard del singolo paziente
      */
-    public PazienteDashboard getDatiPazienteDasboard(Utente utente, int idMedico) throws MedicoServiceException{
+    public PazienteDashboard getDatiPazienteDasboard(Utente utente) throws MedicoServiceException{
         try{
 
             //recupera liste di informazioni dai DAO
@@ -70,7 +69,7 @@ public class MedicoService {
      * aggiunge una nuova condizione
      */
 
-    public void addCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDateTime dataRegistrazione) throws MedicoServiceException {
+    public void addCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDate dataRegistrazione) throws MedicoServiceException {
 
         if(!("anamnestiche".equalsIgnoreCase(tipo) || "fattoriRischio".equalsIgnoreCase(tipo))){
             throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'anamnestiche' o 'fattoriRischio'.");
@@ -83,7 +82,7 @@ public class MedicoService {
             condizioniPazienteDAO.create(condizione);
 
             // LOGGING: Traccia l'aggiornamento delle condizioni del paziente
-            String descrizioneLog = "Aggiunta condizione " + condizione.getTipo() + ":" + condizione.getDescrizione(); ;
+            String descrizioneLog = "Aggiunta condizione " + condizione.getTipo() + ":" + condizione.getDescrizione();
             logOperazione(idMedicoOperante, condizione.getIDPaziente(), "AGGIORNAMENTO_CONDIZIONI", descrizioneLog);
 
         } catch (DataAccessException e) {
@@ -91,12 +90,12 @@ public class MedicoService {
         }
     }
 
-    /*
+    /**
      * aggiorna una condizione
      */
     //da aggiungere il metodo update in CondizioniPazienteDAO
 
-    public void updateCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDateTime dataRegistrazione ) throws MedicoServiceException {
+    public void updateCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDate dataRegistrazione ) throws MedicoServiceException {
 
         if(!("anamnestiche".equalsIgnoreCase(tipo) || "fattoriRischio".equalsIgnoreCase(tipo))){
             throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'anamnestiche' o 'fattoriRischio'.");
@@ -125,7 +124,7 @@ public class MedicoService {
 
         LogOperazione log = new LogOperazione(idMedico, idPaziente, tipoOperazione, descrizione, LocalDateTime.now());
 
-        logOperazioniDAO.createLog(log);;
+        logOperazioniDAO.createLog(log);
     }
 
 
