@@ -80,4 +80,34 @@ public class CondizioniPazienteDAO {
             throw new DataAccessException("Errore durante la creazione della condizione per il paziente con ID " + condizione.getIDPaziente(), e);
         }
     }
+
+    /**
+     * Aggiorna una condizione esistente nel database
+     *
+     * @param condizione L'oggetto CondizioniPaziente da aggiornare
+     */
+    public void update(CondizioniPaziente condizione) throws DataAccessException {
+        String sql = "UPDATE CondizioniPaziente SET IDPaziente = ?, Tipo = ?, Descrizione = ?, Periodo = ?, DataRegistrazione = ? WHERE IDCondizione = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, condizione.getIDPaziente());
+            pstmt.setString(2, condizione.getTipo());
+            pstmt.setString(3, condizione.getDescrizione());
+            pstmt.setString(4, condizione.getPeriodo());
+            pstmt.setDate(5, condizione.getDataRegistrazione());
+            pstmt.setInt(6, condizione.getIDCondizione());
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new DataAccessException("Nessuna condizione trovata con ID " + condizione.getIDCondizione() + " per l'aggiornamento.", null);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Errore durante l'aggiornamento della condizione: " + e.getMessage());
+            throw new DataAccessException("Errore durante l'aggiornamento della condizione con ID " + condizione.getIDCondizione(), e);
+        }
+    }
 }

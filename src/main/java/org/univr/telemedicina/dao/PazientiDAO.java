@@ -84,7 +84,6 @@ public class PazientiDAO {
         return pazienti;
     }
 
-
     /**
      * Restituisce l'id del medico di riferimento per un paziente specifico.
      * @param IDPaziente L'ID del paziente di cui si vuole conoscere il medico di riferimento.
