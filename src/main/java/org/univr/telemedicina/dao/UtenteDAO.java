@@ -87,8 +87,39 @@ public class UtenteDAO {
 
         } catch (SQLException e) {
             System.err.println("Errore durante la creazione dell'utente: " + e.getMessage());
-            throw new DataAccessException("Errore durante la creazione dell'utente con email " + utente.getEmail(), e);
+            throw new DataAccessException("Errore durante la creazione dell'utente" + utente.getEmail(), e);
         }
         return utente;
+    }
+
+
+    /**
+     * Trova l'email di un utente basandosi sul suo IDUtente.
+     * Restituisce un Optional per gestire in modo pulito il caso in cui l'utente non esista.
+     * @param idUtente L'IDUtente da cercare.
+     * @return Un Optional contenente l'email dell'Utente se trovato, altrimenti un Optional vuoto.
+     */
+    public Optional<String> findEmailById(int idUtente) throws DataAccessException {
+        // Query per selezionare l'email dell'utente con un IDUtente specifico
+        String sql = "SELECT Email FROM Utenti WHERE IDUtente = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idUtente);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                // Se c'è un risultato...
+                if (rs.next()) {
+                    // ...ritorna l'email dell'utente, avvolta in un Optional
+                    return Optional.of(rs.getString("Email"));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore durante la ricerca dell'email per IDUtente: " + e.getMessage());
+            throw new DataAccessException("Errore durante la ricerca dell'email per IDUtente " + idUtente, e);
+        }
+        // Se non viene trovato nessun utente o si verifica un errore, ritorna un Optional vuoto
+        return Optional.empty();
     }
 }

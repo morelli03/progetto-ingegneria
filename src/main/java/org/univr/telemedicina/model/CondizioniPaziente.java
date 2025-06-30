@@ -1,6 +1,6 @@
 package org.univr.telemedicina.model;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class CondizioniPaziente {
     private int IDCondizione;
@@ -8,12 +8,12 @@ public class CondizioniPaziente {
     private String Tipo;
     private String Descrizione;
     private String Periodo;
-    private Date DataRegistrazione;  //importante che sia di tipo java.sql.Date per compatibilità con il database
+    private LocalDate DataRegistrazione;  //importante che sia di tipo java.sql.LocalDate per compatibilità con il database
 
     public CondizioniPaziente() {} //costruttore vuoto per poter aggiungere un utente senza parametri
 
-    public CondizioniPaziente (int IDCondizione, int IDPaziente, String Tipo, String Descrizione, String Periodo, Date DataRegistrazione) {
-        this.IDCondizione = IDCondizione;
+    // costruttori senza IDCondizione, gestitio da database con auto-increment
+    public CondizioniPaziente (int IDPaziente, String Tipo, String Descrizione, String Periodo, LocalDate DataRegistrazione) {
         this.IDPaziente = IDPaziente;
         this.Tipo = Tipo;
         this.Descrizione = Descrizione;
@@ -52,10 +52,10 @@ public class CondizioniPaziente {
     public void setPeriodo(String periodo) {
         Periodo = periodo;
     }
-    public Date getDataRegistrazione() {
+    public LocalDate getDataRegistrazione() {
         return DataRegistrazione;
     }
-    public void setDataRegistrazione(Date dataRegistrazione) {
+    public void setDataRegistrazione(LocalDate dataRegistrazione) {
         DataRegistrazione = dataRegistrazione;
     }
 
