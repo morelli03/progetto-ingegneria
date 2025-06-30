@@ -7,19 +7,11 @@ import org.univr.telemedicina.model.*;
 
 import java.util.List;
 import java.time.LocalDateTime;
-/**
- * errori in condizioniPazienteDAO
- * 1- query SQL sbagliata nel metodo listByIDPatId
- * 2- inserimento id autoincrementato nel metodo crate
- *
- * in UtenteDAO
- * Aggiungi il Metodo findById a UtenteDAO.java
- *
- * //crea MedicoServiceException
- *
- * //dubbi su quando lanciare quale eccezione
- */
 
+/**
+ * [cite_start]Service layer che implementa tutte le funzionalità a disposizione del medico. [cite: 320]
+ * [cite_start]Permette di visualizzare le liste pazienti, i dati aggregati (dashboard) e aggiornare le condizioni cliniche. [cite: 321, 322, 323]
+ * */
 
 public class MedicoService {
 
@@ -29,7 +21,6 @@ public class MedicoService {
     private final LogOperazioniDAO logOperazioniDAO;
     private final TerapiaDAO terapiaDAO;
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO;
-    private final UtenteDAO utenteDAO;
 
     //costruttore
     public MedicoService(PazientiDAO pazientiDAO, RilevazioneGlicemiaDAO rivelazioneGlicemiaDAO,
@@ -41,7 +32,6 @@ public class MedicoService {
         this.logOperazioniDAO = new LogOperazioniDAO();
         this.terapiaDAO = new TerapiaDAO();
         this.assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
-        this.utenteDAO = new UtenteDAO();
     }
 
     /**

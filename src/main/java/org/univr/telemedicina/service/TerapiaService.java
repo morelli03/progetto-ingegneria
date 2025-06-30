@@ -10,9 +10,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-//modificare TerapiaDAO - non contiene un metodo per aggiornare la terapia
-//gestisce le eccezioni legate alle terapie
-//
+/**
+ * Service layer per la logica di business legata alla gestione delle terapie.
+ * Responsabile di assegnare, modificare e visualizzare le terapie di un paziente, [cite: 325, 326]
+ * validandone i dati e interagendo con TerapiaDAO per la persistenza.
+ * [cite_start]Traccia ogni operazione tramite LogOperazioniDAO e gestisce gli errori con TherapyException. [cite: 324]
+ */
 
 public class TerapiaService {
 
@@ -51,7 +54,7 @@ public class TerapiaService {
 
             terapiaDAO.updateTherapy(terapia);
 
-            String descrizione = "Modificata la terapia per il paziente ID " + terapia.getIDPaziente();
+            String descrizione = "Modificata la terapia per il paziente ID " + terapia.getIDPaziente() + " con il farmaco " + terapia.getNomeFarmaco() + "per il paziente ID " + terapia.getIDPaziente();
             registraOperazione(idMedicoOperante, terapia.getIDPaziente(), "modifica terapia", descrizione);
         } catch (DataAccessException e) {
             throw new TherapyException("Errore durante la modifica della terapia: " + e.getMessage(), e);
