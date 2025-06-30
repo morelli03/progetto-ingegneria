@@ -96,7 +96,7 @@ public class CondizioniPazienteDAO {
             pstmt.setString(2, condizione.getTipo());
             pstmt.setString(3, condizione.getDescrizione());
             pstmt.setString(4, condizione.getPeriodo());
-            pstmt.setDate(5, condizione.getDataRegistrazione());
+            pstmt.setObject(5, condizione.getDataRegistrazione());
             pstmt.setInt(6, condizione.getIDCondizione());
 
             int affectedRows = pstmt.executeUpdate();
