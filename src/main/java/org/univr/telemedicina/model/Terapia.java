@@ -81,16 +81,16 @@ public class Terapia {
     public void setIndicazioni(String indicazioni) {
         Indicazioni = indicazioni;
     }
-    public Date getDataInizio() {
+    public LocalDate getDataInizio() {
         return DataInizio;
     }
-    public void setDataInizio(Date dataInizio) {
+    public void setDataInizio(LocalDate dataInizio) {
         DataInizio = dataInizio;
     }
-    public Date getDataFine() {
+    public LocalDate getDataFine() {
         return DataFine;
     }
-    public void setDataFine(Date dataFine) {
+    public void setDataFine(LocalDate dataFine) {
         DataFine = dataFine;
     }
 }
