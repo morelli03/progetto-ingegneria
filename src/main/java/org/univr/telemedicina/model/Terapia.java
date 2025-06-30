@@ -1,6 +1,6 @@
 package org.univr.telemedicina.model;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class Terapia {
     private int IDTerapia;
@@ -10,11 +10,11 @@ public class Terapia {
     private String Quantita;
     private int FrequenzaGiornaliera;
     private String Indicazioni;
-    private Date DataInizio;
-    private Date DataFine;
+    private LocalDate DataInizio;
+    private LocalDate DataFine;
 
 
-    public Terapia(int IDTerapia, int IDPaziente, int IDMedico, String NomeFarmaco, String Quantita, int FrequenzaGiornaliera, String Indicazioni, Date DataInizio, Date DataFine) {
+    public Terapia(int IDTerapia, int IDPaziente, int IDMedico, String NomeFarmaco, String Quantita, int FrequenzaGiornaliera, String Indicazioni, LocalDate DataInizio, LocalDate DataFine) {
         this.IDTerapia = IDTerapia;
         this.IDPaziente = IDPaziente;
         this.IDMedico = IDMedico;
@@ -25,6 +25,18 @@ public class Terapia {
         this.DataInizio = DataInizio;
         this.DataFine = DataFine;
     }
+
+    public Terapia(int IDPaziente, int IDMedico, String NomeFarmaco, String Quantita, int FrequenzaGiornaliera, String Indicazioni, LocalDate DataInizio, LocalDate DataFine) {
+        this.IDPaziente = IDPaziente;
+        this.IDMedico = IDMedico;
+        this.NomeFarmaco = NomeFarmaco;
+        this.Quantita = Quantita;
+        this.FrequenzaGiornaliera = FrequenzaGiornaliera;
+        this.Indicazioni = Indicazioni;
+        this.DataInizio = DataInizio;
+        this.DataFine = DataFine;
+    }
+
 
     //metodi getter e setter
     public int getIDTerapia() {

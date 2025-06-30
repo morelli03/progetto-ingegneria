@@ -1,21 +1,17 @@
 package org.univr.telemedicina.model;
-import org.univr.telemedicina.model.CondizioniPaziente;
-import org.univr.telemedicina.model.RilevazioneGlicemia;
-import org.univr.telemedicina.model.Terapia;
-import org.univr.telemedicina.model.Utente;
 
 import java.util.List;
 
 public class PazienteDashboard{
 
-    private final Paziente datiPaziente;
+    private final Utente utente;
     private final List<RilevazioneGlicemia> elencoRilevazioni;
     private final List<Terapia> elencoTerapie;
     private final List<CondizioniPaziente> elencoCondizioni;
     private final List<AssunzioneFarmaci> elencoAssunzioni;
 
-    public PazienteDashboard(Paziente datiPaziente, List<RilevazioneGlicemia> elencoRilevazioni, List<Terapia> elencoTerapie, List<CondizioniPaziente> elencoCondizioni, List<AssunzioneFarmaci> elencoAssunzioni) {
-        this.datiPaziente = datiPaziente;
+    public PazienteDashboard(Utente utente, List<RilevazioneGlicemia> elencoRilevazioni, List<Terapia> elencoTerapie, List<CondizioniPaziente> elencoCondizioni, List<AssunzioneFarmaci> elencoAssunzioni) {
+        this.utente = utente;
         this.elencoRilevazioni = elencoRilevazioni;
         this.elencoTerapie = elencoTerapie;
         this.elencoCondizioni = elencoCondizioni;
@@ -25,8 +21,8 @@ public class PazienteDashboard{
 
     // --- Metodi Getter ---
 
-    public Paziente getDatiPaziente() {
-        return datiPaziente;
+    public Utente getDatiUtente() {
+        return utente;
     }
 
     public List<RilevazioneGlicemia> getElencoRilevazioni() {

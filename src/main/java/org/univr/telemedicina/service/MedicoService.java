@@ -9,8 +9,8 @@ import java.util.List;
 import java.time.LocalDateTime;
 
 /**
- * [cite_start]Service layer che implementa tutte le funzionalità a disposizione del medico. [cite: 320]
- * [cite_start]Permette di visualizzare le liste pazienti, i dati aggregati (dashboard) e aggiornare le condizioni cliniche. [cite: 321, 322, 323]
+ * Service layer che implementa tutte le funzionalità a disposizione del medico.
+ * Permette di visualizzare le liste pazienti, i dati aggregati (dashboard) e aggiornare le condizioni cliniche.
  * */
 
 public class MedicoService {
@@ -50,24 +50,16 @@ public class MedicoService {
     /**
      * raccoglie dati necessari per la dashboard del singolo paziente
      */
-    public PazienteDashboard getDatiPazienteDasboard(int idPaziente, int idMedico) throws MedicoServiceException{
+    public PazienteDashboard getDatiPazienteDasboard(Utente utente, int idMedico) throws MedicoServiceException{
         try{
-            //recupero i dati
-            //da implementare metodo findById in UtenteDAO
-            Paziente datiPaziente = pazientiDAO.findById(idPaziente)
-                    .orElseThrow(() -> new DataAccessException("Paziente non trovato con ID: " + idPaziente, null));
 
             //recupera liste di informazioni dai DAO
-            List<RilevazioneGlicemia> elencoRilevazioni = rivelazioneGlicemiaDAO.getRilevazioniByPaziente(idPaziente);
-            List<Terapia> elencoTerapie = terapiaDAO.listTherapiesByPatId(idPaziente);
-            List<CondizioniPaziente> elencoCondizioni = condizioniPazienteDAO.listByIDPatId(idPaziente);
-            List<AssunzioneFarmaci> elencoAssunzioni = assunzioneFarmaciDAO.leggiAssunzioniFarmaci(idPaziente);
+            List<RilevazioneGlicemia> elencoRilevazioni = rivelazioneGlicemiaDAO.getRilevazioniByPaziente(utente.getIDUtente());
+            List<Terapia> elencoTerapie = terapiaDAO.listTherapiesByPatId(utente.getIDUtente());
+            List<CondizioniPaziente> elencoCondizioni = condizioniPazienteDAO.listByIDPatId(utente.getIDUtente());
+            List<AssunzioneFarmaci> elencoAssunzioni = assunzioneFarmaciDAO.leggiAssunzioniFarmaci(utente.getIDUtente());
 
-            // LOGGING: Traccia chi ha visualizzato i dati del paziente, come da requisiti
-            //String descrizioneLog = "Visualizzazione dati dashboard del paziente ID " + idPaziente;
-            //registraOperazione(idMedicoOperante, idPaziente, "VISUALIZZAZIONE_DATI", descrizioneLog);
-
-            return new PazienteDashboard(datiPaziente, elencoRilevazioni, elencoTerapie, elencoCondizioni, elencoAssunzioni);
+            return new PazienteDashboard(utente, elencoRilevazioni, elencoTerapie, elencoCondizioni, elencoAssunzioni);
         }catch (DataAccessException e){
             throw new MedicoServiceException("Errore durante il recupero dei dati del paziente: " + e.getMessage(), e);
         }
@@ -78,14 +70,21 @@ public class MedicoService {
      * aggiunge una nuova condizione
      */
 
-    public void addCondizioniPaziente(int idMedicoOperante, CondizioniPaziente condizione) throws MedicoServiceException {
+    public void addCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDateTime dataRegistrazione) throws MedicoServiceException {
+
+        if(!("anamnestiche".equalsIgnoreCase(tipo) || "fattoriRischio".equalsIgnoreCase(tipo))){
+            throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'anamnestiche' o 'fattoriRischio'.");
+        }
+
         try {
-            // Aggiorna le condizioni del paziente
+
+            CondizioniPaziente condizione = new CondizioniPaziente(IDPaziente, tipo, descrizione, periodo, dataRegistrazione);
+
             condizioniPazienteDAO.create(condizione);
 
             // LOGGING: Traccia l'aggiornamento delle condizioni del paziente
             String descrizioneLog = "Aggiunta condizione " + condizione.getTipo() + ":" + condizione.getDescrizione(); ;
-            registraOperazione(idMedicoOperante, condizione.getIDPaziente(), "AGGIORNAMENTO_CONDIZIONI", descrizioneLog);
+            logOperazione(idMedicoOperante, condizione.getIDPaziente(), "AGGIORNAMENTO_CONDIZIONI", descrizioneLog);
 
         } catch (DataAccessException e) {
             throw new MedicoServiceException("Errore durante l'aggiornamento delle condizioni del paziente: " + e.getMessage(), e);
@@ -97,15 +96,22 @@ public class MedicoService {
      */
     //da aggiungere il metodo update in CondizioniPazienteDAO
 
-    public void updateCondizioniPaziente(int idMedicoOperante, CondizioniPaziente condizione) throws MedicoServiceException {
+    public void updateCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDateTime dataRegistrazione ) throws MedicoServiceException {
+
+        if(!("anamnestiche".equalsIgnoreCase(tipo) || "fattoriRischio".equalsIgnoreCase(tipo))){
+            throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'anamnestiche' o 'fattoriRischio'.");
+        }
+
         try {
             // Aggiorna le condizioni del paziente
+            CondizioniPaziente condizione = new CondizioniPaziente (IDPaziente, tipo, descrizione, periodo, dataRegistrazione);
+
 
             condizioniPazienteDAO.update(condizione);
 
             // LOGGING: Traccia l'aggiornamento delle condizioni del paziente
             String descrizioneLog = "Aggiornata condizione ID "+ condizione.getIDCondizione() + " con descrizione " + condizione.getDescrizione();
-            registraOperazione(idMedicoOperante, condizione.getIDPaziente(), "AGGIORNAMENTO_CONDIZIONI", descrizioneLog);
+            logOperazione(idMedicoOperante, condizione.getIDPaziente(), "AGGIORNAMENTO_CONDIZIONI", descrizioneLog);
 
         } catch (DataAccessException e) {
             throw new MedicoServiceException("Errore durante l'aggiornamento delle condizioni del paziente: " + e.getMessage(), e);
@@ -115,18 +121,11 @@ public class MedicoService {
     /**
      * registra un'operazione effettuata da un medico su un paziente
      */
-    public void registraOperazione(int idMedico, int idPaziente, String tipoOperazione, String descrizione) throws DataAccessException {
+    public void logOperazione(int idMedico, int idPaziente, String tipoOperazione, String descrizione) throws DataAccessException {
 
-        LogOperazione log = new LogOperazione();
-        log.setIDMedicoOperante(idMedico);
-        log.setIDPazienteInteressato(idPaziente);
-        log.setTipoOperazione(tipoOperazione);
-        log.setDescrizioneOperazione(descrizione);
-        log.setTimestamp(LocalDateTime.now());
+        LogOperazione log = new LogOperazione(idMedico, idPaziente, tipoOperazione, descrizione, LocalDateTime.now());
 
         logOperazioniDAO.createLog(log);;
-
-
     }
 
 

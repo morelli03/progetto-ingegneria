@@ -6,6 +6,7 @@ import org.univr.telemedicina.model.Terapia;
 import org.univr.telemedicina.model.LogOperazione;
 import org.univr.telemedicina.dao.LogOperazioniDAO;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -30,17 +31,17 @@ public class TerapiaService {
     /**
      * assegna una nuova teropia
      */
-    public void assegnaTerapia(Terapia terapia, int idMedicoOperante) throws TherapyException {
-        if (terapia.getFrequenzaGiornaliera() <= 0) {
+    public void assegnaTerapia(int idPaziente, int idMedicoOperante, String nomeFarmaco, String quantita, int frequenzaGiornaliera, String indicazioni, LocalDate dataInizio, LocalDate dataFine) throws TherapyException {
+        if (frequenzaGiornaliera <= 0) {
             throw new TherapyException("La frequenza giornaliera deve essere maggiore di zero.");
         }
         try{
-            terapia.setIDMedico(idMedicoOperante);
+            Terapia nuovaTerapia = new Terapia(idPaziente, idMedicoOperante, nomeFarmaco, quantita, frequenzaGiornaliera, indicazioni, dataInizio, dataFine);
 
-            terapiaDAO.assignTherapy(terapia);
+            terapiaDAO.assignTherapy(nuovaTerapia);
 
-            String descrizione = "Prescritto il farmaco  " + terapia.getNomeFarmaco() + " al paziente ID " + terapia.getIDPaziente();
-            registraOperazione(idMedicoOperante, terapia.getIDPaziente(), "assegna terapia", descrizione);
+            String descrizione = "Prescritto il farmaco  " + nuovaTerapia.getNomeFarmaco() + " al paziente ID " + nuovaTerapia.getIDPaziente();
+            registraOperazione(idMedicoOperante, nuovaTerapia.getIDPaziente(), "assegna terapia", descrizione);
         } catch (DataAccessException e) {
             throw new TherapyException("Errore durante l'assegnazione della terapia: " + e.getMessage(), e);
         }
@@ -62,22 +63,10 @@ public class TerapiaService {
     }
 
     /**
-     *Lista di tuttel le terapie assegnate a un paziente
-     */
-    public List<Terapia> getTerapieByPazienteId(int idPaziente) throws TherapyException {
-        try {
-            return terapiaDAO.listTherapiesByPatId(idPaziente);
-        } catch (DataAccessException e) {
-            throw new TherapyException("Errore durante il recupero delle terapie: " + e.getMessage(), e);
-        }
-    }
-
-    /**
      * registra un'operazione nel log delle operazioni
      */
     private void registraOperazione(int idMedico, int idPaziente, String tipoOperazione, String descrizione) throws DataAccessException {
-        LogOperazione log = new LogOperazione(idMedico, tipoOperazione, descrizione, LocalDateTime.now());
-        log.setIDPazienteInteressato(idPaziente);
+        LogOperazione log = new LogOperazione(idMedico, idPaziente, tipoOperazione, descrizione, LocalDateTime.now());
         logOperazioniDAO.createLog(log);
     }
 }

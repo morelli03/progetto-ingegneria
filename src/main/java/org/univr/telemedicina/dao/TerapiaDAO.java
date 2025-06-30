@@ -4,6 +4,7 @@ import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Terapia;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,8 +46,8 @@ public class TerapiaDAO {
                             rs.getString("Quantita"),
                             rs.getInt("FrequenzaGiornaliera"),
                             rs.getString("Indicazioni"),
-                            rs.getDate("DataInizio"),
-                            rs.getDate("DataFine")
+                            rs.getObject("DataInizio", LocalDate.class),
+                            rs.getObject("DataFine", LocalDate.class)
                     );
 
                     // Aggiungi la terapia alla lista
@@ -111,8 +112,8 @@ public class TerapiaDAO {
             pstmt.setString(4, terapia.getQuantita());
             pstmt.setInt(5, terapia.getFrequenzaGiornaliera());
             pstmt.setString(6, terapia.getIndicazioni());
-            pstmt.setDate(7, terapia.getDataInizio());
-            pstmt.setDate(8, terapia.getDataFine());
+            pstmt.setObject(7, terapia.getDataInizio());
+            pstmt.setObject(8, terapia.getDataFine());
 
             pstmt.executeUpdate();
 
@@ -140,8 +141,8 @@ public class TerapiaDAO {
             pstmt.setString(4, terapia.getQuantita());
             pstmt.setInt(5, terapia.getFrequenzaGiornaliera());
             pstmt.setString(6, terapia.getIndicazioni());
-            pstmt.setDate(7, terapia.getDataInizio());
-            pstmt.setDate(8, terapia.getDataFine());
+            pstmt.setObject(7, terapia.getDataInizio());
+            pstmt.setObject(8, terapia.getDataFine());
             pstmt.setInt(9, terapia.getIDTerapia());
 
             int affectedRows = pstmt.executeUpdate();
