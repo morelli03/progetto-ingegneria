@@ -23,12 +23,13 @@ public class NotificheDAO {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, notifica.getPriorita());
-            pstmt.setString(2, notifica.getTitolo());
-            pstmt.setString(3, notifica.getMessaggio());
-            pstmt.setString(4, notifica.getTipo());
-            pstmt.setInt(5, notifica.getLetta());
-            pstmt.setObject(6, notifica.getTimestamp());
+            pstmt.setInt(1, notifica.getIdDestinatario());
+            pstmt.setInt(2, notifica.getPriorita());
+            pstmt.setString(3, notifica.getTitolo());
+            pstmt.setString(4, notifica.getMessaggio());
+            pstmt.setString(5, notifica.getTipo());
+            pstmt.setInt(6, notifica.getLetta());
+            pstmt.setObject(7, notifica.getTimestamp());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
@@ -45,29 +46,36 @@ public class NotificheDAO {
     public List<Notifica> leggiNotifichePerId(int idDestinatario) throws DataAccessException {
         List<Notifica> notifiche = new ArrayList<>();
 
-        // Query che seleziona IDPaziente univoci dove la data odierna
-        // rientra nel range della terapia. La funzione date('now') è specifica di SQLite.
+        // La query SQL per recuperare le notifiche non lette per un determinato destinatario.
         String sql = "SELECT * FROM Notifiche " +
                 "WHERE Letta = 0 AND IDDestinatario = ?" +
                 "ORDER BY Priorita DESC, Timestamp DESC";
 
+
+
+        // Utilizza un PreparedStatement per la sicurezza e la corretta gestione dei parametri.
         try (Connection conn = DatabaseManager.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                Notifica notifica = new Notifica(
-                        rs.getInt("IDNotifica"),
-                        rs.getInt("IDDestinatario"),
-                        rs.getInt("Priorita"),
-                        rs.getString("Titolo"),
-                        rs.getString("Messaggio"),
-                        rs.getString("Tipo"),
-                        rs.getInt("Letta"),
-                        rs.getObject("Timestamp", java.time.LocalDateTime.class)
-                );
+            // Imposta il valore del parametro (?) nella query.
+            // Il primo parametro ha indice 1.
+            pstmt.setInt(1, idDestinatario);
 
-                notifiche.add(notifica);
+            // Esegui la query e ottieni i risultati.
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    Notifica notifica = new Notifica(
+                            rs.getInt("IDNotifica"),
+                            rs.getInt("IDDestinatario"),
+                            rs.getInt("Priorita"),
+                            rs.getString("Titolo"),
+                            rs.getString("Messaggio"),
+                            rs.getString("Tipo"),
+                            rs.getInt("Letta"),
+                            rs.getObject("Timestamp", java.time.LocalDateTime.class)
+                    );
+                    notifiche.add(notifica);
+                }
             }
         } catch (SQLException e) {
             System.err.println("Errore durante il recupero delle notifiche per IDDestinatario: " + e.getMessage());
