@@ -67,11 +67,11 @@ public class CondizioniPazienteDAO {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(2, condizione.getIDPaziente());
-            pstmt.setString(3, condizione.getTipo());
-            pstmt.setString(4, condizione.getDescrizione());
-            pstmt.setString(5, condizione.getPeriodo());
-            pstmt.setObject(6, condizione.getDataRegistrazione());
+            pstmt.setInt(1, condizione.getIDPaziente());
+            pstmt.setString(2, condizione.getTipo());
+            pstmt.setString(3, condizione.getDescrizione());
+            pstmt.setString(4, condizione.getPeriodo());
+            pstmt.setObject(5, condizione.getDataRegistrazione());
 
             pstmt.executeUpdate();
 
