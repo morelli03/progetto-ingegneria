@@ -15,9 +15,10 @@ public class AuthService {
     private final UtenteDAO utenteDao;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService() {
-        this.utenteDao = new UtenteDAO();
-        this.passwordEncoder = new BCryptPasswordEncoder();
+
+    public AuthService(UtenteDAO utenteDao, PasswordEncoder passwordEncoder) {
+        this.utenteDao = utenteDao;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
