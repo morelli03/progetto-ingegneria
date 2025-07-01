@@ -21,7 +21,7 @@ public class CondizioniPazienteDAO {
         List<CondizioniPaziente> condizioni = new ArrayList<>();
 
 
-        String sql = "SELECT * FROM Terapie WHERE IDPaziente = ?";
+        String sql = "SELECT * FROM CondizioniPaziente WHERE IDPaziente = ?";
 
         // try-with-resources per garantire la chiusura automatica delle risorse (Connection, PreparedStatement, ResultSet)
         try (Connection conn = DatabaseManager.getConnection();
