@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Utente;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,7 +17,7 @@ class UtenteDAOTest {
     void testCreateAndFindByEmail() {
         // --- ARRANGE (Prepara i dati del test) ---
         UtenteDAO utenteDAO = new UtenteDAO();
-        Utente nuovoUtente = new Utente(0, "test.utente@email.com", "hashed_password", "Test", "User", "Paziente", new Date(System.currentTimeMillis()));
+        Utente nuovoUtente = new Utente(0, "test.utente@email.com", "hashed_password", "Test", "User", "Paziente", LocalDate.of(1990, 1, 1));
 
         // --- ACT (Esegue l'azione da testare) ---
         Utente utenteCreato = new Utente();

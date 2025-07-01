@@ -7,7 +7,9 @@ import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Paziente;
 import org.univr.telemedicina.model.Utente;
 
+
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -39,7 +41,7 @@ public class AdminService {
             String nome = leggiStringaNonVuota(sc, "Inserisci il nome dell'utente:", "Errore: il nome non può essere vuoto. Riprova.");
             String cognome = leggiStringaNonVuota(sc, "Inserisci il cognome dell'utente:", "Errore: il cognome non può essere vuoto. Riprova.");
             String ruolo = leggiRuoloValido(sc);
-            Date dataNascita = leggiDataValida(sc);
+            LocalDate dataNascita = leggiDataValida(sc).toLocalDate(); // ho modificato per incapsulare in localdate, non come si comporta la funzione ho preferito non toccarla.
 
             // Crea e salva l'utente
             Utente nuovoUtente = new Utente(0, email, hashedPassword, nome, cognome, ruolo, dataNascita);

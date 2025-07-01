@@ -6,6 +6,7 @@ import org.univr.telemedicina.model.Utente;
 import java.sql.*;
 //import java.util.ArrayList;
 //import java.util.List;
+import java.time.LocalDate;
 import java.util.Optional;
 
 public class UtenteDAO {
@@ -39,7 +40,7 @@ public class UtenteDAO {
                             rs.getString("Nome"),
                             rs.getString("Cognome"),
                             rs.getString("Ruolo"),
-                            rs.getDate("DataNascita") // Assicurati che il campo DataUtente sia presente nella tabella Utenti
+                            rs.getObject("DataNascita", LocalDate.class) // Assicurati che il campo DataUtente sia presente nella tabella Utenti
                     );
                     // Ritorna l'utente trovato, avvolto in un Optional
                     return Optional.of(utente);
@@ -72,7 +73,7 @@ public class UtenteDAO {
             pstmt.setString(3, utente.getNome());
             pstmt.setString(4, utente.getCognome());
             pstmt.setString(5, utente.getRuolo());
-            pstmt.setDate(6, utente.getDataNascita());
+            pstmt.setObject(6, utente.getDataNascita());
 
             int affectedRows = pstmt.executeUpdate();
 
