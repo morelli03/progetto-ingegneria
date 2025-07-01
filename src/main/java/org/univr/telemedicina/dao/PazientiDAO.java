@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +71,7 @@ public class PazientiDAO {
                             rs.getString("Nome"),
                             rs.getString("Cognome"),
                             rs.getString("Ruolo"),
-                            rs.getDate("DataNascita")
+                            rs.getObject("DataNascita", LocalDate.class) // Assicurati che il campo DataNascita sia presente nella tabella Utenti
                     );
 
                     // Aggiungi il paziente alla lista

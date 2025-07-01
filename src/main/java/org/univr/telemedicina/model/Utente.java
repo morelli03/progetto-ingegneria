@@ -1,6 +1,6 @@
 package org.univr.telemedicina.model;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 public class Utente {
     private int IDUtente;
@@ -9,11 +9,11 @@ public class Utente {
     private String nome;
     private String cognome;
     private String Ruolo;
-    private Date DataNascita;  //importante che sia di tipo java.sql.Date per compatibilità con il database
+    private LocalDate DataNascita;  //importante che sia di tipo java.sql.Date per compatibilità con il database
 
     public Utente() {} //costruttore vuoto per poter aggiungere un utente senza parametri
 
-    public Utente(int IDUtente, String email, String hashedPassword, String nome, String cognome, String ruolo, Date dataNascita) { //costruttore con parametri
+    public Utente(int IDUtente, String email, String hashedPassword, String nome, String cognome, String ruolo, LocalDate dataNascita) { //costruttore con parametri
         this.IDUtente = IDUtente;
         this.email = email;
         this.hashedPassword = hashedPassword;
@@ -66,10 +66,10 @@ public class Utente {
         this.Ruolo = ruolo;
     }
 
-    public Date getDataNascita() {
+    public LocalDate getDataNascita() {
         return DataNascita;
     }
-    public void setDataNascita(Date dataNascita) {
+    public void setDataNascita(LocalDate dataNascita) {
         this.DataNascita = dataNascita;
     }
 }
