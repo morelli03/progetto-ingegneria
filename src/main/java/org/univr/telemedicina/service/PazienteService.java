@@ -1,9 +1,6 @@
 package org.univr.telemedicina.service;
 
-import org.univr.telemedicina.dao.CondizioniPazienteDAO;
-import org.univr.telemedicina.dao.PazientiDAO;
-import org.univr.telemedicina.dao.RilevazioneGlicemiaDAO;
-import org.univr.telemedicina.dao.UtenteDAO;
+import org.univr.telemedicina.dao.*;
 
 import org.univr.telemedicina.model.Terapia;
 
@@ -74,12 +71,16 @@ public class PazienteService {
      * @param terapia la terapia per cui si sta registrando l'assunzione
      * @param quantitaAssunta Quantità di farmaco assunta
      */
-    public void registraAssunzioneFarmaci(Terapia terapia, String quantitaAssunta) throws WrongAssumptionException {
+    public void registraAssunzioneFarmaci(Terapia terapia, String quantitaAssunta) throws WrongAssumptionException, DataAccessException {
 
         // Verifica se la terapia esiste per il paziente
         try {
             if(terapia.getQuantita().equals(quantitaAssunta)) {
                 AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), LocalDateTime.now(), quantitaAssunta);
+
+                AssunzioneFarmaciDAO assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
+                // Prova a salvare l'assunzione nel database
+                assunzioneFarmaciDAO.aggiungiAssunzione(assunzione);
             }
             else {
                 throw new WrongAssumptionException("Quantita' assunta non corrisponde con quantita' da assumere");
@@ -88,6 +89,8 @@ public class PazienteService {
         } catch (WrongAssumptionException e) {
             System.err.println("Quantita' assunta non corrisponde con quantita' da assumere: " + e.getMessage());
             throw new WrongAssumptionException("Quantita' assunta non corrisponde con quantita' da assumere: ");
+        } catch (DataAccessException e) {
+            throw new DataAccessException("Errore durante la registrazione dell'assunzione di farmaci: ", e);
         }
     }
 

@@ -23,13 +23,12 @@ public class NotificheDAO {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, notifica.getIdNotifica());
-            pstmt.setInt(2, notifica.getPriorita());
-            pstmt.setString(3, notifica.getTitolo());
-            pstmt.setString(4, notifica.getMessaggio());
-            pstmt.setString(5, notifica.getTipo());
-            pstmt.setInt(6, notifica.getLetta());
-            pstmt.setObject(7, notifica.getTimestamp());
+            pstmt.setInt(1, notifica.getPriorita());
+            pstmt.setString(2, notifica.getTitolo());
+            pstmt.setString(3, notifica.getMessaggio());
+            pstmt.setString(4, notifica.getTipo());
+            pstmt.setInt(5, notifica.getLetta());
+            pstmt.setObject(6, notifica.getTimestamp());
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
