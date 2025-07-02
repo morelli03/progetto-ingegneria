@@ -1,7 +1,12 @@
 package org.univr.telemedicina.scheduler; // o dove preferisci metterla
 
+import org.univr.telemedicina.dao.AssunzioneFarmaciDAO;
+import org.univr.telemedicina.dao.NotificheDAO;
+import org.univr.telemedicina.dao.PazientiDAO;
+import org.univr.telemedicina.dao.TerapiaDAO;
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.service.MonitorService;
+import org.univr.telemedicina.service.NotificheService;
 
 import java.time.Duration;
 import java.time.ZoneId;
@@ -15,7 +20,7 @@ public class ApplicationScheduler {
     public static void main(String[] args) {
         // Crea un pool di thread per eseguire i task in background. 1 thread è sufficiente qui.
         try (ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1)) {
-            MonitorService monitorService = new MonitorService();
+            MonitorService monitorService = new MonitorService(new TerapiaDAO(), new AssunzioneFarmaciDAO(), new NotificheService(new NotificheDAO()), new PazientiDAO());
 
             System.out.println("Avvio dello scheduler dei task di monitoraggio...");
 

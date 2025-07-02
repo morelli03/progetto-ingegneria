@@ -24,13 +24,13 @@ public class MedicoService {
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO;
 
     //costruttore
-    public MedicoService() {
-        this.pazientiDAO = new PazientiDAO();
-        this.rivelazioneGlicemiaDAO = new RilevazioneGlicemiaDAO();
-        this.condizioniPazienteDAO = new CondizioniPazienteDAO();
-        this.logOperazioniDAO = new LogOperazioniDAO();
-        this.terapiaDAO = new TerapiaDAO();
-        this.assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
+    public MedicoService(PazientiDAO pazientiDAO, RilevazioneGlicemiaDAO rivelazioneGlicemiaDAO, CondizioniPazienteDAO condizioniPazienteDAO, LogOperazioniDAO logOperazioniDAO, TerapiaDAO terapiaDAO, AssunzioneFarmaciDAO assunzioneFarmaciDAO) {
+        this.pazientiDAO = pazientiDAO;
+        this.rivelazioneGlicemiaDAO = rivelazioneGlicemiaDAO;
+        this.condizioniPazienteDAO = condizioniPazienteDAO;
+        this.logOperazioniDAO = logOperazioniDAO;
+        this.terapiaDAO = terapiaDAO;
+        this.assunzioneFarmaciDAO = assunzioneFarmaciDAO;
     }
 
     /**

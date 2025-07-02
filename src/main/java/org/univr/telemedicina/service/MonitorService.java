@@ -26,11 +26,11 @@ public class MonitorService {
     /**
      * Costruttore del servizio. Inizializza i DAO necessari.
      */
-    public MonitorService() {
-        this.terapiaDAO = new TerapiaDAO();
-        this.assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
-        this.notificheService = new NotificheService();
-        this.pazientiDAO = new PazientiDAO();
+    public MonitorService(TerapiaDAO terapiaDAO, AssunzioneFarmaciDAO assunzioneFarmaciDAO, NotificheService notificheService, PazientiDAO pazientiDAO) {
+        this.terapiaDAO = terapiaDAO;
+        this.assunzioneFarmaciDAO = assunzioneFarmaciDAO;
+        this.notificheService = notificheService;
+        this.pazientiDAO = pazientiDAO;
     }
 
 
