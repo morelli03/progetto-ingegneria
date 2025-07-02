@@ -13,28 +13,50 @@ import java.util.List;
  */
 public class NotificheService {
 
-    NotificheDAO notificheDAO = new NotificheDAO();
+    private final NotificheDAO notificheDAO;
 
-    public void send(int IdDestinatario, int priorita, String titolo, String messaggio, String tipo) {
+    public NotificheService(NotificheDAO notificheDAO) {
+        this.notificheDAO = notificheDAO;
+    }
+
+    /**
+     * Invia una notifica al destinatario specificato.
+     *
+     * @param IdDestinatario l'ID del destinatario della notifica
+     * @param priorita       la priorità della notifica
+     * @param titolo         il titolo della notifica
+     * @param messaggio      il messaggio della notifica
+     * @param tipo           il tipo di notifica
+     */
+    public void send(int IdDestinatario, int priorita, String titolo, String messaggio, String tipo) throws DataAccessException {
         // Implementazione per inviare una notifica
 
         // inizializza una nuova notifica con i parametri forniti
         Notifica notifica = new Notifica(IdDestinatario, priorita, titolo, messaggio, tipo, LocalDateTime.now());
 
         //manda la notifica al database
-        try {
-            notificheDAO.inserisciNotifica(notifica);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+        notificheDAO.inserisciNotifica(notifica);
+
     }
 
-    public List<Notifica> read(int idDestinatario) {
+    /**
+     * Legge le notifiche per un destinatario specifico.
+     *
+     * @param idDestinatario l'ID del destinatario delle notifiche
+     * @return una lista di notifiche per il destinatario specificato
+     */
+    public List<Notifica> read(int idDestinatario) throws DataAccessException {
         // Implementazione per leggere una notifica
-        try {
-            return notificheDAO.leggiNotifichePerId(idDestinatario);
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
+        return notificheDAO.leggiNotifichePerId(idDestinatario);
+    }
+
+    /**
+     * Segna una notifica specifica come letta.
+     * @param idNotifica l'ID della notifica da aggiornare.
+     * @throws DataAccessException se si verifica un errore durante l'aggiornamento.
+     */
+    public void setNotificaLetta(int idNotifica) throws DataAccessException {
+        // Chiama direttamente il metodo corrispondente nel DAO
+        notificheDAO.setNotificaLetta(idNotifica);
     }
 }

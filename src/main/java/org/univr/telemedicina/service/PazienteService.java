@@ -23,14 +23,17 @@ public class PazienteService {
     private final CondizioniPazienteDAO condizioniDAO;
     private final UtenteDAO utenteDAO;
     private final PazientiDAO pazienteDAO;
+    private final AssunzioneFarmaciDAO assunzioneFarmaciDAO;
 
 
-    public PazienteService() {
-        this.rilevazioneDAO = new RilevazioneGlicemiaDAO();
-        this.monitorService = new MonitorService();
-        this.condizioniDAO = new CondizioniPazienteDAO();
-        this.utenteDAO = new UtenteDAO();
-        this.pazienteDAO = new PazientiDAO();
+    public PazienteService(RilevazioneGlicemiaDAO rilevazioneDAO, MonitorService monitorService, CondizioniPazienteDAO condizioniDAO, UtenteDAO utenteDAO, PazientiDAO pazienteDAO, AssunzioneFarmaciDAO assunzioneFarmaciDAO) {
+        this.rilevazioneDAO = rilevazioneDAO;
+        this.monitorService = monitorService;
+        this.condizioniDAO = condizioniDAO;
+        this.utenteDAO = utenteDAO;
+        this.pazienteDAO = pazienteDAO;
+        this.assunzioneFarmaciDAO = assunzioneFarmaciDAO;
+
     }
 
     /**
@@ -78,8 +81,7 @@ public class PazienteService {
             if(terapia.getQuantita().equals(quantitaAssunta)) {
                 AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), LocalDateTime.now(), quantitaAssunta);
 
-                AssunzioneFarmaciDAO assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
-                // Prova a salvare l'assunzione nel database
+                // usavi un istanza generica di assunzionefarmaci, per il test dobbiamo usare dependency injection
                 assunzioneFarmaciDAO.aggiungiAssunzione(assunzione);
             }
             else {
