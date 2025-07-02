@@ -41,6 +41,7 @@ class AdminServiceTest {
 
     // Stream per catturare l'output su console e simulare l'input
     private final ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+    private final ByteArrayOutputStream errContent = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
     private final InputStream originalIn = System.in;
 
@@ -52,6 +53,7 @@ class AdminServiceTest {
     @BeforeEach
     public void setUpStreams() {
         System.setOut(new PrintStream(outContent));
+        System.setErr(new PrintStream(errContent));
     }
 
     /**
@@ -139,27 +141,58 @@ class AdminServiceTest {
         verify(pazientiDAO, never()).create(any(Paziente.class));
     }
 
-    // Test per la creazione di un utente con dati non validi
+    // Test per la creazione di un medico con dati non validi
     @Test
-    void creaUtente_FallimentoCreazioneUtenteDAO() throws DataAccessException {
+    void creaMedico_FallimentoCreazioneUtenteDAO() throws DataAccessException {
         // --- ARRANGE ---
         String input = "utente.fallito@email.com\n" +
                        "password123\n" +
                        "Utente\n" +
                        "Fallito\n" +
-                       "Paziente\n" +
+                       "Medico\n" +
                        "2000-01-01\n";
         provideInput(input);
 
         // Simula che il DAO restituisca null durante la creazione
-        when(utenteDAO.create(any(Utente.class))).thenReturn(null);
+        when(utenteDAO.create(any(Utente.class))).thenThrow(new DataAccessException("Errore durante la creazione dell'utente" + "utente.fallito@email.com"));
 
         // --- ACT ---
         adminService.creaUtente();
 
         // --- ASSERT ---
-        String output = outContent.toString();
-        assertTrue(output.contains("Errore durante la creazione dell'utente. Il DAO ha restituito null."));
+        String output = errContent.toString();
+        assertTrue(output.contains("Si è verificato un errore inaspettato: "));
+
+        // Nessuna interazione successiva con i DAO
+        verify(utenteDAO, times(1)).create(any(Utente.class));
+        verifyNoMoreInteractions(pazientiDAO);
+    }
+
+    // Test per la creazione di un paziente con dati non validi
+    @Test
+    void creaPaziente_FallimentoCreazioneUtenteDAO() throws DataAccessException {
+        // --- ARRANGE ---
+        String input = "utente.fallito@email.com\n" +
+                "password123\n" +
+                "Utente\n" +
+                "Fallito\n" +
+                "Paziente\n" +
+                "2000-01-01\n" +
+                "medico@email.com\n";
+        provideInput(input);
+
+        // Simula che il DAO restituisca null durante la creazione
+        when(utenteDAO.create(any(Utente.class))).thenThrow(new DataAccessException("Errore durante la creazione dell'utente" + "utente.fallito@email.com"));
+
+        // Simula che il DAO trovi un medico con l'email specificata
+        when(utenteDAO.findByEmail("medico@email.com")).thenReturn(Optional.of(new Utente(2, "medico.test@email.com", "hashedPass", "Dottor", "Verdi", "Medico", LocalDate.of(1980, 2, 2))));
+
+        // --- ACT ---
+        adminService.creaUtente();
+
+        // --- ASSERT ---
+        String output = errContent.toString();
+        assertTrue(output.contains("Si è verificato un errore inaspettato: "));
 
         // Nessuna interazione successiva con i DAO
         verify(utenteDAO, times(1)).create(any(Utente.class));
@@ -167,40 +200,45 @@ class AdminServiceTest {
     }
 
 
-    // Test per la creazione di un paziente con un medico di riferimento che non esiste
+    /**
+     * Test corretto per il caso in cui si crea un paziente
+     * ma l'email del medico di riferimento non esiste.
+     */
     @Test
-    void creaPaziente_MedicoNonEsiste() throws DataAccessException {
+    void creaPaziente_QuandoMedicoRiferimentoNonEsiste() throws DataAccessException {
         // --- ARRANGE ---
-        // 1. Simula l'input dell'utente per creare un PAZIENTE
+        // 1. Simula l'input dell'utente con un'email di un medico che non esiste
         String input = "paziente.test@email.com\n" + // email
                 "password123\n" +             // password
                 "Mario\n" +                   // nome
                 "Rossi\n" +                   // cognome
                 "Paziente\n" +                // ruolo
                 "1990-01-01\n" +              // data di nascita
-                "medico.ref@email.com\n";     // email del medico di riferimento
+                "medico.inesistente@email.com\n"; // email del medico NON ESISTENTE
         provideInput(input);
 
-        // 2. Definisci il comportamento atteso dei MOCK
-        Utente pazienteCreato = new Utente(1, "paziente.test@email.com", "hashedPass", "Mario", "Rossi", "Paziente", LocalDate.of(1990, 1, 1));
-        Utente medicoRiferimento = new Utente(10, "medico.ref@email.com", "hashedPassDoc", "Dottore", "Bianchi", "Medico", LocalDate.of(1975, 5, 5));
-
-        // Quando il DAO crea l'utente, deve restituire il nostro utente finto
-        when(utenteDAO.create(any(Utente.class))).thenReturn(pazienteCreato);
-        // Quando il DAO cerca il medico, non deve trovarlo
-        when(utenteDAO.findByEmail("medico.ref@email.com")).thenReturn(Optional.empty());
+        // 2. Definisci il comportamento dei MOCK
+        when(utenteDAO.findByEmail("medico.inesistente@email.com")).thenReturn(Optional.empty());
 
         // --- ACT ---
         adminService.creaUtente();
 
         // --- ASSERT ---
         // 3. Verifica i risultati
-        String output = outContent.toString();
-        assertTrue(output.contains("Errore: "));
 
-        // Verifica che i metodi dei DAO siano stati chiamati correttamente
-        verify(utenteDAO, times(1)).create(any(Utente.class));
-        verify(utenteDAO, times(1)).findByEmail("medico.ref@email.com");
-        verify(pazientiDAO, times(1)).create(any(Paziente.class)); // Verifica che l'associazione sia stata creata
+        String output = errContent.toString();
+
+        // Verifica che l'utente sia stato creato prima del fallimento
+        //assertTrue(output.contains("Utente creato con successo. ID Utente: 1"));
+        // Verifica che sia stato stampato il messaggio di errore proveniente dall'eccezione
+
+        //stampa l'output per debug
+        System.out.println(output);
+
+        assertTrue(output.contains("Nessun medico trovato con l'email: "));
+        // Verifica che l'associazione paziente-medico NON sia stata creata
+        verify(pazientiDAO, never()).create(any(Paziente.class));
+        // Verifica che la ricerca del medico sia stata tentata
+        verify(utenteDAO, times(1)).findByEmail("medico.inesistente@email.com");
     }
 }

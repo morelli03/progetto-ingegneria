@@ -60,7 +60,7 @@ public class AdminService {
                     pazientiDAO.create(paziente);
                     System.out.println("Associazione medico-paziente creata con successo.");// Chiede l'ID del medico di riferimento e lo salva in idMedico
                 } catch (DataAccessException e) {
-                    System.err.println("Errore durante la verifica dell'email: " + e.getMessage());
+                    System.err.println("Si è verificato un errore inaspettato: " + e.getMessage());
                 } catch (MedicoNotFound e) {
                     System.err.println("Errore: " + e.getMessage());
                 }
@@ -160,7 +160,7 @@ public class AdminService {
                     System.out.println("Errore: l'email inserita non corrisponde a un utente con ruolo 'Medico'. Riprova.");
                 }
             } else { // se il medico non esiste
-                System.out.println("Errore: nessun utente trovato con questa email. Riprova.");
+                //System.err.println("Errore: nessun utente trovato con questa email. Riprova.");
                 throw new MedicoNotFound("Nessun medico trovato con l'email: " + emailMedico);
             }
         }
