@@ -91,29 +91,35 @@ public class MedicoService {
     }
 
     /**
-     * aggiorna una condizione
+     * Aggiorna una condizione esistente di un paziente.
+     * @param idMedicoOperante L'ID del medico che esegue l'operazione.
+     * @param condizione L'oggetto CondizioniPaziente da aggiornare.
+     *                   DEVE contenere l'IDCondizione della riga da modificare.
+     * @throws MedicoServiceException se l'aggiornamento fallisce o i dati non sono validi.
      */
-    //da aggiungere il metodo update in CondizioniPazienteDAO
+    public void updateCondizioniPaziente(int idMedicoOperante, CondizioniPaziente condizione) throws MedicoServiceException {
 
-    public void updateCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDate dataRegistrazione ) throws MedicoServiceException {
+        // 1. Validazione dell'input
+        if (condizione == null || condizione.getIDCondizione() <= 0) {
+            throw new MedicoServiceException("ID della condizione non valido per l'aggiornamento.");
+        }
 
-        if(!("anamnestiche".equalsIgnoreCase(tipo) || "fattoriRischio".equalsIgnoreCase(tipo))){
+        if (!("anamnestiche".equalsIgnoreCase(condizione.getTipo()) || "fattoriRischio".equalsIgnoreCase(condizione.getTipo()))) {
             throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'anamnestiche' o 'fattoriRischio'.");
         }
 
         try {
-            // Aggiorna le condizioni del paziente
-            CondizioniPaziente condizione = new CondizioniPaziente (IDPaziente, tipo, descrizione, periodo, dataRegistrazione);
-
-
+            // 2. Chiamata al DAO con l'oggetto completo
+            // Il DAO ora ha tutte le informazioni necessarie, incluso l'ID per la clausola WHERE.
             condizioniPazienteDAO.update(condizione);
 
-            // LOGGING: Traccia l'aggiornamento delle condizioni del paziente
-            String descrizioneLog = "Aggiornata condizione ID "+ condizione.getIDCondizione() + " con descrizione " + condizione.getDescrizione();
+            // 3. Logging corretto, perché ora l'ID è presente
+            String descrizioneLog = "Aggiornata condizione ID " + condizione.getIDCondizione() + " con descrizione: " + condizione.getDescrizione();
             logOperazione(idMedicoOperante, condizione.getIDPaziente(), "AGGIORNAMENTO_CONDIZIONI", descrizioneLog);
 
         } catch (DataAccessException e) {
-            throw new MedicoServiceException("Errore durante l'aggiornamento delle condizioni del paziente: " + e.getMessage(), e);
+            // Fornisce un messaggio di errore più specifico
+            throw new MedicoServiceException("Errore durante l'aggiornamento della condizione ID " + condizione.getIDCondizione(), e);
         }
     }
 
