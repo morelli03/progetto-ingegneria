@@ -4,6 +4,7 @@ import org.univr.telemedicina.dao.PazientiDAO;
 import org.univr.telemedicina.dao.UtenteDAO;
 import org.univr.telemedicina.exception.AuthServiceException;
 import org.univr.telemedicina.exception.DataAccessException;
+import org.univr.telemedicina.exception.MedicoNotFound;
 import org.univr.telemedicina.model.Paziente;
 import org.univr.telemedicina.model.Utente;
 
@@ -20,9 +21,9 @@ public class AdminService {
     private final UtenteDAO utenteDAO;
     private final PazientiDAO pazientiDAO;
 
-    public AdminService() {
-        this.utenteDAO = new UtenteDAO();
-        this.pazientiDAO = new PazientiDAO();
+    public AdminService(UtenteDAO utenteDao, PazientiDAO pazientiDao) {
+        this.utenteDAO = utenteDao;
+        this.pazientiDAO = pazientiDao;
     }
 
     /**
@@ -43,25 +44,34 @@ public class AdminService {
             String ruolo = leggiRuoloValido(sc);
             LocalDate dataNascita = leggiDataValida(sc).toLocalDate(); // ho modificato per incapsulare in localdate, non come si comporta la funzione ho preferito non toccarla.
 
-            // Crea e salva l'utente
-            Utente nuovoUtente = new Utente(0, email, hashedPassword, nome, cognome, ruolo, dataNascita);
-            Utente utenteCreato = utenteDAO.create(nuovoUtente); // Variabile locale, non di istanza
-
-            if (utenteCreato != null) {
-                System.out.println("Utente creato con successo. ID Utente: " + utenteCreato.getIDUtente());
-
-                // Se l'utente è un paziente, associa un medico
-                if (utenteCreato.getRuolo().equalsIgnoreCase("Paziente")) {
+            //se è un paziente
+            if(ruolo.equalsIgnoreCase("Paziente")) {
+                try{
                     int idMedico = leggiIdMedicoDiRiferimento(sc);
+
+                    // Crea e salva l'utente
+                    Utente nuovoUtente = new Utente(0, email, hashedPassword, nome, cognome, ruolo, dataNascita);
+                    Utente utenteCreato = utenteDAO.create(nuovoUtente); // Variabile locale, non di istanza
+
+                    System.out.println("Utente creato con successo. ID Utente: " + utenteCreato.getIDUtente());
 
                     // Crea e salva l'associazione paziente-medico
                     Paziente paziente = new Paziente(utenteCreato.getIDUtente(), idMedico);
                     pazientiDAO.create(paziente);
-                    System.out.println("Associazione medico-paziente creata con successo.");
+                    System.out.println("Associazione medico-paziente creata con successo.");// Chiede l'ID del medico di riferimento e lo salva in idMedico
+                } catch (DataAccessException e) {
+                    System.err.println("Errore durante la verifica dell'email: " + e.getMessage());
+                } catch (MedicoNotFound e) {
+                    System.err.println("Errore: " + e.getMessage());
                 }
-            } else {
-                System.out.println("Errore durante la creazione dell'utente. Il DAO ha restituito null.");
+            } else { // se è un medico
+                // Crea e salva l'utente
+                Utente nuovoUtente = new Utente(0, email, hashedPassword, nome, cognome, ruolo, dataNascita);
+                Utente utenteCreato = utenteDAO.create(nuovoUtente); // Variabile locale, non di istanza
+
+                System.out.println("Utente creato con successo. ID Utente: " + utenteCreato.getIDUtente());
             }
+
 
         }
         catch (DataAccessException | AuthServiceException e) {
@@ -125,8 +135,16 @@ public class AdminService {
         return dataNascita;
     }
 
-    private int leggiIdMedicoDiRiferimento(Scanner sc) throws DataAccessException {
-        int idMedico = -1;
+    /**
+     * Legge l'ID del medico di riferimento dall'input dell'utente.
+     * Questo metodo richiede che l'utente inserisca un'email valida di un medico esistente.
+     *
+     * @param sc lo Scanner per leggere l'input dell'utente
+     * @return l'ID del medico di riferimento
+     * @throws DataAccessException se si verifica un errore durante l'accesso ai dati
+     * @throws MedicoNotFound se il medico non viene trovato nel database
+     */
+    private int leggiIdMedicoDiRiferimento(Scanner sc) throws DataAccessException, MedicoNotFound {
         while (true) {
             System.out.println("Inserisci l'email del medico di riferimento:");
             String emailMedico = sc.nextLine();
@@ -141,8 +159,9 @@ public class AdminService {
                 } else {
                     System.out.println("Errore: l'email inserita non corrisponde a un utente con ruolo 'Medico'. Riprova.");
                 }
-            } else {
+            } else { // se il medico non esiste
                 System.out.println("Errore: nessun utente trovato con questa email. Riprova.");
+                throw new MedicoNotFound("Nessun medico trovato con l'email: " + emailMedico);
             }
         }
     }
