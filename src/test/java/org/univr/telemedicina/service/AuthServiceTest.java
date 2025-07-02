@@ -9,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder; // Importa l'interfaccia
 import org.univr.telemedicina.dao.UtenteDAO;
-import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Utente;
 
 import java.util.Optional;
