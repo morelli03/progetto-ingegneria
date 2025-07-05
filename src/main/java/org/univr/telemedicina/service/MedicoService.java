@@ -104,7 +104,7 @@ public class MedicoService {
             throw new MedicoServiceException("ID della condizione non valido per l'aggiornamento.");
         }
 
-        if (!("anamnestiche".equalsIgnoreCase(condizione.getTipo()) || "fattoriRischio".equalsIgnoreCase(condizione.getTipo()))) {
+        if (!("anamnestiche".equalsIgnoreCase(condizione.getTipo()) || "fattoreRischio".equalsIgnoreCase(condizione.getTipo()))) {
             throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'anamnestiche' o 'fattoriRischio'.");
         }
 
