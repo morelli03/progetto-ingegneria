@@ -96,7 +96,7 @@ class MedicoServiceTest {
         CondizioniPaziente condizioneDaAggiornare = new CondizioniPaziente();
         condizioneDaAggiornare.setIDCondizione(100); // ID esistente
         condizioneDaAggiornare.setIDPaziente(2);
-        condizioneDaAggiornare.setTipo("fattoriRischio");
+        condizioneDaAggiornare.setTipo("fattoreRischio");
         condizioneDaAggiornare.setDescrizione("Descrizione aggiornata");
 
         // ACT
