@@ -71,8 +71,8 @@ public class MedicoService {
 
     public void addCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDate dataRegistrazione) throws MedicoServiceException {
 
-        if(!("anamnestiche".equalsIgnoreCase(tipo) || "fattoriRischio".equalsIgnoreCase(tipo))){
-            throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'anamnestiche' o 'fattoriRischio'.");
+        if(!("anamnestiche".equalsIgnoreCase(tipo) || "fattoreRischio".equalsIgnoreCase(tipo))){
+            throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'anamnestiche' o 'fattoreRischio'.");
         }
 
         try {
