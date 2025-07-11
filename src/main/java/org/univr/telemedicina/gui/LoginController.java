@@ -1,5 +1,6 @@
 package org.univr.telemedicina.gui;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,7 +15,11 @@ import org.univr.telemedicina.exception.AuthServiceException;
 import org.univr.telemedicina.model.Utente;
 import org.univr.telemedicina.service.AuthService;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 public class LoginController {
@@ -82,19 +87,6 @@ public class LoginController {
         }
     }
 
-    /**
-     * Metodo di utilità per mostrare un messaggio di errore all'utente.
-     */
-    private void showError(String message) {
-        if (message == null || message.isEmpty()) {
-            errorLabel.setVisible(false);
-            errorLabel.setManaged(false);
-        } else {
-            errorLabel.setText(message);
-            errorLabel.setVisible(true);
-            errorLabel.setManaged(true);
-        }
-    }
 
     /**
      * Carica la scena della dashboard e la mostra.
@@ -118,6 +110,59 @@ public class LoginController {
         } catch (IOException e) {
             e.printStackTrace();
             showError("Impossibile caricare la dashboard.");
+        }
+    }
+
+    /**
+     * Gestisce il click sul pulsante "Contatta amministrazione".
+     * Apre il client di posta predefinito dell'utente con una mail precompilata.
+     */
+    /**
+     * Gestisce il click sul pulsante "Contatta amministrazione".
+     * Apre il client di posta predefinito su un thread separato per non bloccare la UI.
+     */
+    @FXML
+    private void contattaAmministrazione() {
+        // Eseguiamo tutta l'operazione in un nuovo thread.
+        new Thread(() -> {
+            String emailDestinatario = "amministrazione@telemedicina.it";
+            String oggetto = "Richiesta Assistenza Account";
+            String corpoMail = "Buongiorno,\n\nScrivo per richiedere assistenza riguardo il mio account.\n\nCordiali saluti,\n[Il tuo Nome]";
+
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.MAIL)) {
+                try {
+                    String uriString = String.format("mailto:%s?subject=%s&body=%s",
+                            emailDestinatario,
+                            URLEncoder.encode(oggetto, StandardCharsets.UTF_8).replace("+", "%20"),
+                            URLEncoder.encode(corpoMail, StandardCharsets.UTF_8).replace("+", "%20")
+                    );
+
+                    URI mailto = new URI(uriString);
+                    Desktop.getDesktop().mail(mailto);
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    // Se si verifica un errore, aggiorna la UI nel thread corretto usando Platform.runLater
+                    Platform.runLater(() -> showError("Errore: Impossibile aprire il client di posta."));
+                }
+            } else {
+                // Anche questo aggiornamento della UI deve usare Platform.runLater
+                Platform.runLater(() -> showError("Funzionalità non supportata su questo sistema."));
+            }
+        }).start(); // Avvia il thread
+    }
+
+    /**
+     * Metodo di utilità per mostrare un messaggio di errore all'utente.
+     */
+    private void showError(String message) {
+        if (message == null || message.isEmpty()) {
+            errorLabel.setVisible(false);
+            errorLabel.setManaged(false);
+        } else {
+            errorLabel.setText(message);
+            errorLabel.setVisible(true);
+            errorLabel.setManaged(true);
         }
     }
 }

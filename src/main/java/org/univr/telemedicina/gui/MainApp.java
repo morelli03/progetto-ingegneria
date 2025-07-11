@@ -14,7 +14,7 @@ public class MainApp extends Application {
         try {
             // Carica la vista di login dal file FXML
             FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource("/org/univr/telemedicina/gui/fxml/login.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 800, 600); // Imposta dimensioni iniziali
+            Scene scene = new Scene(fxmlLoader.load(), 1440, 1024); // Imposta dimensioni iniziali
 
             primaryStage.setTitle("TeleMedicina - Login");
             primaryStage.setScene(scene);
