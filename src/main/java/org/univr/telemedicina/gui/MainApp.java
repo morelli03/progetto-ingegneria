@@ -1,48 +1,28 @@
 package org.univr.telemedicina.gui;
 
 import javafx.application.Application;
-import javafx.stage.Stage;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
-import javafx.geometry.Pos;
-import javafx.event.EventHandler;
-import javafx.event.ActionEvent;
+import javafx.stage.Stage;
 
-public class MainApp extends Application
-{
+import java.io.IOException;
+
+public class MainApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        try {
+            // Carica la vista di login dal file FXML
+            FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource("/org/univr/telemedicina/gui/fxml/login.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 800, 600); // Imposta dimensioni iniziali
 
-        Label label;
-        TextField tf;
-        Button button;
-        VBox vbox;
-        Scene scene;
+            primaryStage.setTitle("TeleMedicina - Login");
+            primaryStage.setScene(scene);
+            primaryStage.show();
 
-        tf = new TextField("Text Field!");
-        tf.setMaxWidth(200);
-
-        label = new Label("Type text and click the button");
-        button = new Button("Click");
-
-        button.setOnAction(new EventHandler<ActionEvent>() {
-            @Override public void handle(ActionEvent e) {
-                label.setText(tf.getText());
-            }
-        });
-
-        vbox = new VBox(label, tf, button);
-        vbox.setSpacing(20);
-        vbox.setAlignment(Pos.CENTER);
-        scene = new Scene(vbox, 300, 200);
-
-        primaryStage.setTitle("A Simple Scene!");
-        primaryStage.setScene(scene);
-        primaryStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void main(String[] args) {

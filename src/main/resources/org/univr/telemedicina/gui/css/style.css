@@ -1,0 +1,98 @@
+/* Importa il font Inter dalla cartella resources */
+@font-face {
+    src: url('../fonts/Inter-Regular.ttf');
+}
+
+/* Stile di base per l'intera finestra */
+.root-pane {
+    -fx-background-color: #FFFFFF; /* Sfondo bianco */
+    -fx-font-family: 'Inter';     /* Applica il font Inter a tutto */
+}
+
+/* Stile generico per le etichette di testo */
+.label {
+    -fx-text-fill: #828282; /* Colore testo grigio scuro */
+    -fx-font-size: 16px;
+}
+
+/* Stile per il titolo "TeleMedicina" */
+.title-label {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000; /* Nero */
+}
+
+/* Stili per le intestazioni "Fai il login", ecc. */
+.header-label {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #000000;
+}
+
+.sub-header-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: #000000; /* Grigio più chiaro */
+    -fx-padding: 0 0 10 0; /* Spazio sotto */
+}
+
+/* Stile per i campi di testo e password */
+.text-field, .password-field {
+    -fx-pref-height: 45px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #DDDDDD; /* Bordo grigio chiaro */
+    -fx-border-radius: 8px;   /* Angoli arrotondati */
+    -fx-background-radius: 8px;
+    -fx-font-size: 14px;
+}
+
+/* Stile per il pulsante di Login principale */
+.login-button {
+    -fx-pref-width: 320px;
+    -fx-pref-height: 45px;
+    -fx-background-color: #000000; /* Sfondo nero */
+    -fx-text-fill: #FFFFFF;       /* Testo bianco */
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand; /* Cursore a manina */
+}
+
+.login-button:hover {
+    -fx-background-color: #333333; /* Un po' più chiaro al passaggio del mouse */
+}
+
+/* Stile per il pulsante secondario */
+.secondary-button {
+    -fx-pref-width: 320px;
+    -fx-pref-height: 45px;
+    -fx-background-color: #FFFFFF;
+    -fx-text-fill: #000000;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-border-color: #000000;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand;
+}
+
+.secondary-button:hover {
+    -fx-background-color: #f0f0f0;
+}
+
+/* Stile per la label di errore */
+.error-label {
+    -fx-text-fill: #D32F2F; /* Rosso per gli errori */
+    -fx-font-size: 12px;
+}
+
+/* Stile per il testo in piccolo in fondo */
+.footer-text {
+    -fx-font-size: 13px;
+    -fx-text-fill: #828282; /* Colore testo grigio scuro */
+
+}
+
+.link-text {
+    -fx-font-weight: bold;
+    -fx-fill: #000000;
+}
