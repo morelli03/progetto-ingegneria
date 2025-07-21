@@ -67,6 +67,32 @@
     -fx-cursor: hand; /* Cursore a manina */
 }
 
+.top-buttons{
+    -fx-alignment: center;
+    -fx-spacing: 10px; /* Spazio tra i pulsanti */
+    -fx-pref-width: 85px;
+    -fx-pref-height: 40px;
+    -fx-background-color: #000000; /* Sfondo nero */
+    -fx-text-fill: #FFFFFF;       /* Testo bianco */
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand; /* Cursore a manina */
+}
+
+.red-notification-button{
+    -fx-alignment: center;
+    -fx-spacing: 10px; /* Spazio tra i pulsanti */
+    -fx-pref-width: 85px;
+    -fx-pref-height: 40px;
+    -fx-background-color: #d60f0f; /* Sfondo nero */
+    -fx-text-fill: #FFFFFF;       /* Testo bianco */
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand; /* Cursore a manina */
+}
+
 .login-button:hover {
     -fx-background-color: #333333; /* Un po' più chiaro al passaggio del mouse */
 }
