@@ -111,7 +111,7 @@ public class LoginController {
 
             Scene scene = new Scene(root);
             stage.setScene(scene);
-            stage.setTitle("Dashboard Medico");
+            stage.setTitle("Dashboard");
             stage.show();
 
         } catch (IOException e) {

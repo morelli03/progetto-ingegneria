@@ -130,3 +130,13 @@
 .link-text {
     -fx-fill: #000000;
 }
+
+
+.transparent-split-pane {
+    -fx-background-color: transparent; /* Rende trasparente lo sfondo del contenitore */
+}
+
+.transparent-split-pane > .split-pane-divider {
+    -fx-background-color: transparent; /* Rende trasparente la linea divisoria */
+    -fx-padding: 0; /* Rimuove eventuali spazi aggiuntivi */
+}
