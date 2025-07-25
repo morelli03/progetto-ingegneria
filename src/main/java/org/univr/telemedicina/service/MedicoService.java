@@ -43,7 +43,24 @@ public class MedicoService {
         } catch (DataAccessException e) {
             throw new MedicoServiceException("Errore durante il recupero dei pazienti assegnati: " + e.getMessage(), e);
         }
+    }
 
+    /**
+     * restituisce una lista di pazienti attivi, ovvero chi ha una terapia in corso
+     */
+    public List<Utente> getPazientiAttivi(int idMedico) throws MedicoServiceException {
+        try {
+            List<Utente> pazientiAssegnati = getPazientiAssegnati(idMedico);
+
+            // Filtra i pazienti che hanno almeno una terapia attiva
+            List<Integer> pazientiAttiviGlobal = terapiaDAO.getActivePatientIds();
+            return pazientiAssegnati.stream()
+                    .filter(paziente -> pazientiAttiviGlobal.contains(paziente.getIDUtente()))
+                    .toList();
+
+        } catch (DataAccessException e) {
+            throw new MedicoServiceException("Errore durante il recupero dei pazienti attivi: " + e.getMessage(), e);
+        }
     }
 
     /**
@@ -134,4 +151,56 @@ public class MedicoService {
     }
 
 
+    /**
+     * Calcola l'indice di aderenza globale dei pazienti assegnati al medico.
+     * L'aderenza è calcolata come la media delle aderenze individuali dei pazienti.
+     *
+     * @param pazienti Lista di pazienti da considerare per il calcolo dell'aderenza.
+     * @return L'indice di aderenza globale come valore compreso tra 0 e 1.
+     * @throws MedicoServiceException se si verifica un errore durante il calcolo.
+     */
+    public double calcolaAderenzaGlobale(List<Utente> pazienti) throws MedicoServiceException {
+        double aderenzaMedia = 0;
+        int pazientiConTerapia = 0;
+
+        for (Utente paziente : pazienti) {
+            try {
+                List<Terapia> terapie = terapiaDAO.listTherapiesByPatId(paziente.getIDUtente());
+                if (terapie.isEmpty()) {
+                    continue;
+                }
+
+                pazientiConTerapia++;
+                double aderenzaPaziente = calcolaAderenzaPaziente(paziente.getIDUtente(), terapie);
+                aderenzaMedia += aderenzaPaziente;
+            } catch (DataAccessException e) {
+                throw new MedicoServiceException("Errore nel calcolo dell'aderenza per il paziente " + paziente.getIDUtente(), e);
+            }
+        }
+
+        if (pazientiConTerapia > 0) {
+            return aderenzaMedia / pazientiConTerapia;
+        } else {
+            return 0.0;
+        }
+    }
+
+    private double calcolaAderenzaPaziente(int idPaziente, List<Terapia> terapie) throws DataAccessException {
+        int dosiTotaliPrescritte = 0;
+        int dosiTotaliAssunte = 0;
+
+        for (Terapia terapia : terapie) {
+            LocalDate fineTerapia = (terapia.getDataFine() != null && terapia.getDataFine().isBefore(LocalDate.now())) ? terapia.getDataFine() : LocalDate.now();
+            long giorniTerapia = java.time.temporal.ChronoUnit.DAYS.between(terapia.getDataInizio(), fineTerapia) + 1;
+            dosiTotaliPrescritte += (int) (terapia.getFrequenzaGiornaliera() * giorniTerapia);
+        }
+
+        dosiTotaliAssunte = assunzioneFarmaciDAO.leggiAssunzioniFarmaci(idPaziente).size();
+
+        if (dosiTotaliPrescritte > 0) {
+            return (double) dosiTotaliAssunte / dosiTotaliPrescritte;
+        } else {
+            return 0.0;
+        }
+    }
 }

@@ -6,7 +6,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.text.Text;
 import org.univr.telemedicina.dao.*;
+import org.univr.telemedicina.exception.MedicoServiceException;
 import org.univr.telemedicina.model.Utente;
 import org.univr.telemedicina.service.MedicoService;
 
@@ -33,10 +35,20 @@ public class DashboardMedicoController {
 
     @FXML
     private Label ageLable;
-
-    // Ti consiglio di dare un fx:id anche al MenuButton per popolarlo dinamicamente
+    
     @FXML
     private MenuButton pazienteMenuButton;
+    
+    //lable dati header
+    @FXML
+    private Text pazientiAttivi;
+
+    @FXML
+    private Text indiceAderenzaGlobale;
+
+    @FXML
+    private Text pazientiTotali;
+
 
     // Inizializza i DAO necessari per il servizio medico
     private final PazientiDAO pazientiDAO = new PazientiDAO();
@@ -62,6 +74,57 @@ public class DashboardMedicoController {
 
         pazienteMenuButton.getItems().clear();
 
+
+        // Imposta uno stato iniziale per le label
+        nameLable.setText("Nessun paziente selezionato");
+        emailLable.setText("");
+        dateLable.setText("");
+        ageLable.setText("");
+
+        //imposta il testo nell'header
+        topTexts(medicoLoggato);
+
+        //carica i pazienti assegnati al medico
+        init(medicoLoggato);
+    }
+
+    private void topTexts(Utente medicoLoggato) {
+        // Recupera il numero totale di pazienti
+        List<Utente> pazientiTotaliCount = null;
+        String count2 = "0";
+        try {
+            pazientiTotaliCount = medicoService.getPazientiAssegnati(medicoLoggato.getIDUtente());
+            count2 = String.valueOf(pazientiTotaliCount.size());
+
+        } catch (MedicoServiceException e) {
+            throw new RuntimeException(e);
+        }
+        pazientiTotali.setText(count2);
+
+
+        // Recupera il numero di pazienti attivi
+        List<Utente> pazientiAttiviList = null;
+        String count1 = "0";
+        try {
+            pazientiAttiviList = medicoService.getPazientiAttivi(medicoLoggato.getIDUtente());
+            count1 = String.valueOf(pazientiAttiviList.size());
+        } catch (MedicoServiceException e) {
+            throw new RuntimeException(e);
+        }
+        pazientiAttivi.setText(count1);
+
+        // Calcola l'indice di aderenza globale
+        double aderenzaGlobale = 0;
+        try {
+            aderenzaGlobale = medicoService.calcolaAderenzaGlobale(pazientiAttiviList);
+        } catch (MedicoServiceException e) {
+            throw new RuntimeException(e);
+        }
+        indiceAderenzaGlobale.setText(String.format("%.2f%%", aderenzaGlobale * 100));
+
+    }
+
+    private void init(Utente medicoLoggato){
         // 1. Recupera la lista dei pazienti assegnati al medico
         List<Utente> listaPazienti;
         try {
@@ -92,12 +155,6 @@ public class DashboardMedicoController {
 
             pazienteMenuButton.getItems().add(menuItem);
         }
-
-        // Imposta uno stato iniziale per le label
-        nameLable.setText("Nessun paziente selezionato");
-        emailLable.setText("");
-        dateLable.setText("");
-        ageLable.setText("");
     }
 
     private void pazienteSelezionato(Utente paziente) {
