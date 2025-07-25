@@ -67,6 +67,19 @@
     -fx-cursor: hand; /* Cursore a manina */
 }
 
+.seleziona-paziente {
+    -fx-pref-width: 500px;
+    -fx-pref-height: 40px;
+    -fx-background-color: #ffffff; /* Sfondo nero */
+    -fx-stroke: #E0E0E0;
+    -fx-text-fill: #FFFFFF;       /* Testo bianco */
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand; /* Cursore a manina */
+}
+
+
 .top-buttons{
     -fx-alignment: center;
     -fx-spacing: 10px; /* Spazio tra i pulsanti */
@@ -140,3 +153,13 @@
     -fx-background-color: transparent; /* Rende trasparente la linea divisoria */
     -fx-padding: 0; /* Rimuove eventuali spazi aggiuntivi */
 }
+
+.seleziona-paziente {
+    -fx-pref-height: 40px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #DDDDDD; /* Bordo grigio chiaro */
+    -fx-border-radius: 8px;   /* Angoli arrotondati */
+    -fx-background-radius: 8px;
+    -fx-font-size: 16px;
+}
+
