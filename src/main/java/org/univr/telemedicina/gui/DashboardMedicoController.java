@@ -7,8 +7,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.univr.telemedicina.dao.*;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import java.io.IOException;
 import org.univr.telemedicina.exception.MedicoServiceException;
 import org.univr.telemedicina.model.Utente;
 import org.univr.telemedicina.service.MedicoService;
@@ -67,6 +71,9 @@ public class DashboardMedicoController {
     @FXML
     private Button creaModificaCondizioniButton;
 
+    @FXML
+    private VBox formContainer;
+
 
     // Inizializza i DAO necessari per il servizio medico
     private final PazientiDAO pazientiDAO = new PazientiDAO();
@@ -78,6 +85,9 @@ public class DashboardMedicoController {
 
     // Inizializza il servizio medico con i DAO
     private MedicoService medicoService = new MedicoService(pazientiDAO, rivelazioneGlicemiaDAO, condizioniPazienteDAO, logOperazioniDAO, terapiaDAO, assunzioneFarmaciDAO);
+
+    private Parent formTerapia;
+    private Parent formCondizioni;
 
     /**
      * Metodo per inizializzare il controller con i dati dell'utente.
@@ -105,7 +115,17 @@ public class DashboardMedicoController {
         //carica i pazienti assegnati al medico
         init(medicoLoggato);
 
-        
+        // Carica i form FXML per terapia e condizioni
+        // Questi form saranno caricati in un VBox per essere visualizzati dinamicamente
+        try {
+            formTerapia = FXMLLoader.load(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_terapia.fxml"));
+            formCondizioni = FXMLLoader.load(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_condizioni.fxml"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Imposta il form di default
+        handleCreaModificaTerapiaButton(null);
     }
 
     /**
@@ -144,7 +164,7 @@ public class DashboardMedicoController {
         } catch (MedicoServiceException e) {
             throw new RuntimeException(e);
         }
-        indiceAderenzaGlobale.setText(String.format("%.2f%%", aderenzaGlobale * 100));
+        indiceAderenzaGlobale.setText(String.format("%.2f", aderenzaGlobale * 100) + "%");
 
     }
 
@@ -244,21 +264,21 @@ public class DashboardMedicoController {
     private void handleCreaModificaTerapiaButton(ActionEvent event) {
         // Logica per il pulsante Crea/Modifica Terapia
         System.out.println("Pulsante Crea/Modifica Terapia premuto");
-        // Aggiungi qui la logica per aprire la finestra di creazione/modifica terapia
         creaModificaTerapiaButton.getStyleClass().remove("deactivated-button-graph");
         creaModificaTerapiaButton.getStyleClass().add("activated-button-graph");
         creaModificaCondizioniButton.getStyleClass().remove("activated-button-graph");
         creaModificaCondizioniButton.getStyleClass().add("deactivated-button-graph");
+        formContainer.getChildren().setAll(formTerapia);
     }
 
     @FXML
     private void handleCreaModificaCondizioniButton(ActionEvent event) {
         // Logica per il pulsante Crea/Modifica Condizioni
         System.out.println("Pulsante Crea/Modifica Condizioni premuto");
-        // Aggiungi qui la logica per aprire la finestra di creazione/modifica condizioni
         creaModificaCondizioniButton.getStyleClass().remove("deactivated-button-graph");
         creaModificaCondizioniButton.getStyleClass().add("activated-button-graph");
         creaModificaTerapiaButton.getStyleClass().remove("activated-button-graph");
         creaModificaTerapiaButton.getStyleClass().add("deactivated-button-graph");
+        formContainer.getChildren().setAll(formCondizioni);
     }
 }

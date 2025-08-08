@@ -88,8 +88,9 @@ public class MedicoService {
 
     public void addCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDate dataRegistrazione) throws MedicoServiceException {
 
-        if(!("anamnestiche".equalsIgnoreCase(tipo) || "fattoreRischio".equalsIgnoreCase(tipo))){
-            throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'anamnestiche' o 'fattoreRischio'.");
+        // validazione dell'input
+        if (!("patologia".equalsIgnoreCase(tipo) || "fattoreRischio".equalsIgnoreCase(tipo) || "comorbidita".equalsIgnoreCase(tipo))) {
+            throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'Patologia' o 'FattoreRischio' o 'Comorbidita'.");
         }
 
         try {
@@ -121,8 +122,8 @@ public class MedicoService {
             throw new MedicoServiceException("ID della condizione non valido per l'aggiornamento.");
         }
 
-        if (!("anamnestiche".equalsIgnoreCase(condizione.getTipo()) || "fattoreRischio".equalsIgnoreCase(condizione.getTipo()))) {
-            throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'anamnestiche' o 'fattoreRischio'.");
+        if (!("patologia".equalsIgnoreCase(condizione.getTipo()) || "fattoreRischio".equalsIgnoreCase(condizione.getTipo()) || "comorbidita".equalsIgnoreCase(condizione.getTipo()))) {
+            throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'Patologia' o 'FattoreRischio' o 'Comorbidita'.");
         }
 
         try {
