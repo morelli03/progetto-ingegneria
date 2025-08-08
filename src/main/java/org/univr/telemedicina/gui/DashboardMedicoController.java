@@ -61,6 +61,12 @@ public class DashboardMedicoController {
     @FXML
     private Button mensileButton;
 
+    @FXML
+    private Button creaModificaTerapiaButton;
+
+    @FXML
+    private Button creaModificaCondizioniButton;
+
 
     // Inizializza i DAO necessari per il servizio medico
     private final PazientiDAO pazientiDAO = new PazientiDAO();
@@ -98,6 +104,8 @@ public class DashboardMedicoController {
 
         //carica i pazienti assegnati al medico
         init(medicoLoggato);
+
+        
     }
 
     /**
@@ -215,6 +223,10 @@ public class DashboardMedicoController {
         // Logica per il pulsante destra
         System.out.println("Pulsante mese premuto");
         // Aggiungi qui la logica per aggiornare il grafico
+        mensileButton.getStyleClass().remove("deactivated-button-graph");
+        mensileButton.getStyleClass().add("activated-button-graph");
+        settimanaleButton.getStyleClass().remove("activated-button-graph");
+        settimanaleButton.getStyleClass().add("deactivated-button-graph");
     }
 
     @FXML
@@ -222,7 +234,31 @@ public class DashboardMedicoController {
         // Logica per il pulsante destra
         System.out.println("Pulsante settimana premuto");
         // Aggiungi qui la logica per aggiornare il grafico
+        settimanaleButton.getStyleClass().remove("deactivated-button-graph");
+        settimanaleButton.getStyleClass().add("activated-button-graph");
+        mensileButton.getStyleClass().remove("activated-button-graph");
+        mensileButton.getStyleClass().add("deactivated-button-graph");
     }
 
-    //to do...
+    @FXML
+    private void handleCreaModificaTerapiaButton(ActionEvent event) {
+        // Logica per il pulsante Crea/Modifica Terapia
+        System.out.println("Pulsante Crea/Modifica Terapia premuto");
+        // Aggiungi qui la logica per aprire la finestra di creazione/modifica terapia
+        creaModificaTerapiaButton.getStyleClass().remove("deactivated-button-graph");
+        creaModificaTerapiaButton.getStyleClass().add("activated-button-graph");
+        creaModificaCondizioniButton.getStyleClass().remove("activated-button-graph");
+        creaModificaCondizioniButton.getStyleClass().add("deactivated-button-graph");
+    }
+
+    @FXML
+    private void handleCreaModificaCondizioniButton(ActionEvent event) {
+        // Logica per il pulsante Crea/Modifica Condizioni
+        System.out.println("Pulsante Crea/Modifica Condizioni premuto");
+        // Aggiungi qui la logica per aprire la finestra di creazione/modifica condizioni
+        creaModificaCondizioniButton.getStyleClass().remove("deactivated-button-graph");
+        creaModificaCondizioniButton.getStyleClass().add("activated-button-graph");
+        creaModificaTerapiaButton.getStyleClass().remove("activated-button-graph");
+        creaModificaTerapiaButton.getStyleClass().add("deactivated-button-graph");
+    }
 }

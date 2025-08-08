@@ -266,8 +266,8 @@
                 </AnchorPane>
                 <AnchorPane layoutX="595.0" layoutY="245.0" prefWidth="815.0">
                     <children>
-                        <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="391.0" layoutY="-1.0" stroke="#e0e0e0" strokeType="INSIDE" width="815.0" />
-                        <LineChart layoutY="48.0" prefHeight="344.0" prefWidth="815.0">
+                        <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="379.0" layoutY="-1.0" stroke="#e0e0e0" strokeType="INSIDE" width="815.0" />
+                        <LineChart layoutY="48.0" prefHeight="331.0" prefWidth="815.0">
                             <xAxis>
                                 <CategoryAxis />
                             </xAxis>
@@ -286,7 +286,7 @@
                                         </InnerShadow>
                                     </effect>
                                 </Rectangle>
-                                <Button fx:id="mensileButton" onAction="#setMensileButton" layoutX="11.0" layoutY="3.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="M" textAlignment="CENTER">
+                                <Button fx:id="mensileButton" layoutX="11.0" layoutY="3.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#setMensileButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="M" textAlignment="CENTER">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
@@ -301,7 +301,7 @@
                                         </DropShadow>
                                     </effect>
                                 </Button>
-                                <Button fx:id="settimanaleButton" onAction="#setSettimanaleButton" layoutX="53.0" layoutY="3.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="S" textAlignment="CENTER">
+                                <Button fx:id="settimanaleButton" layoutX="53.0" layoutY="3.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#setSettimanaleButton" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="S" textAlignment="CENTER">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
@@ -329,7 +329,7 @@
                                         </InnerShadow>
                                     </effect>
                                 </Rectangle>
-                                <Button fx:id="sinistraButton" onAction="#handleSinistraButton" layoutX="6.0" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="&lt;" textAlignment="CENTER">
+                                <Button fx:id="sinistraButton" layoutX="6.0" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleSinistraButton" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="&lt;" textAlignment="CENTER">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
@@ -344,7 +344,7 @@
                                         </DropShadow>
                                     </effect>
                                 </Button>
-                                <Button fx:id="destraButton" onAction="#handleDestraButton" layoutX="169.0" layoutY="5.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="&gt;" textAlignment="CENTER">
+                                <Button fx:id="destraButton" layoutX="169.0" layoutY="5.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleDestraButton" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="&gt;" textAlignment="CENTER">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
@@ -371,6 +371,74 @@
                                 <Font name="Inter 24pt Medium" size="18.0" />
                             </font>
                         </Text>
+                    </children>
+                </AnchorPane>
+                <Text layoutX="34.0" layoutY="658.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Azioni">
+                    <font>
+                        <Font name="Inter 24pt Medium" size="20.0" />
+                    </font>
+                </Text>
+                <AnchorPane layoutX="30.0" layoutY="668.0" prefHeight="255.0" prefWidth="1304.0">
+                    <children>
+                        <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="255.0" stroke="#e0e0e0" strokeType="INSIDE" width="1380.0" />
+                        <AnchorPane layoutX="12.0" layoutY="12.0" minWidth="86.0" prefHeight="45.0" prefWidth="585.0">
+                            <children>
+                                <Rectangle arcHeight="15.0" arcWidth="15.0" fill="#ffffffbd" height="45.0" stroke="#e0e0e0" strokeType="INSIDE" width="574.0">
+                                    <effect>
+                                        <InnerShadow height="15.08" offsetY="4.0" radius="4.8125" width="6.17">
+                                            <color>
+                                                <Color red="0.8299999833106995" green="0.8299999833106995" blue="0.8299999833106995" />
+                                            </color>
+                                        </InnerShadow>
+                                    </effect>
+                                </Rectangle>
+                                <Button fx:id="creaModificaTerapiaButton" onAction="#handleCreaModificaTerapiaButton" layoutX="3.0" layoutY="3.0" maxHeight="37.0" minHeight="0.0" mnemonicParsing="false" prefHeight="48.0" styleClass="activated-button-graph" text="Aggiungi / modifica terapia" textAlignment="CENTER">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                    <font>
+                                        <Font name="Inter 24pt Regular" size="16.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow height="18.35" offsetY="2.0" radius="7.8375" spread="0.1" width="15.0">
+                                            <color>
+                                                <Color red="0.3100000023841858" green="0.3100000023841858" blue="0.3100000023841858" opacity="0.4300000071525574" />
+                                            </color>
+                                        </DropShadow>
+                                    </effect>
+                                </Button>
+                                <Button fx:id="creaModificaCondizioniButton" onAction="#handleCreaModificaCondizioniButton" layoutX="248.0" layoutY="3.0" maxHeight="37.0" minHeight="0.0" mnemonicParsing="false" prefHeight="48.0" styleClass="deactivated-button-graph" text="Aggiungi / modifica condizione paziente" textAlignment="CENTER">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                    <font>
+                                        <Font name="Inter 24pt Regular" size="16.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow height="18.35" offsetY="2.0" radius="7.8375" spread="0.1" width="15.0">
+                                            <color>
+                                                <Color red="0.3100000023841858" green="0.3100000023841858" blue="0.3100000023841858" opacity="0.4329501986503601" />
+                                            </color>
+                                        </DropShadow>
+                                    </effect>
+                                </Button>
+                            </children>
+                        </AnchorPane>
+                        <Button layoutX="1237.0" layoutY="13.0" maxHeight="150.0" maxWidth="142.0" minWidth="131.0" mnemonicParsing="false" prefWidth="131.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                            <font>
+                                <Font name="Inter 24pt Regular" size="16.0" />
+                            </font>
+                            <effect>
+                                <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
+                                    <color>
+                                        <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.5299999713897705" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </Button>
                     </children>
                 </AnchorPane>
             </children>
