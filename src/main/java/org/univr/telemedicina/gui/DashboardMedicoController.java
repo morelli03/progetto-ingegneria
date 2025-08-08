@@ -1,5 +1,6 @@
 package org.univr.telemedicina.gui;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -49,6 +50,17 @@ public class DashboardMedicoController {
     @FXML
     private Text pazientiTotali;
 
+    //tasti per cambiare il grafico di glicemia
+    @FXML
+    private Button sinistraButton;
+    @FXML
+    private Button destraButton;
+
+    @FXML
+    private Button settimanaleButton;
+    @FXML
+    private Button mensileButton;
+
 
     // Inizializza i DAO necessari per il servizio medico
     private final PazientiDAO pazientiDAO = new PazientiDAO();
@@ -88,6 +100,10 @@ public class DashboardMedicoController {
         init(medicoLoggato);
     }
 
+    /**
+     * Metodo che aggiorna le label nell'header della dashboard del medico.
+     * @param medicoLoggato L'utente medico che ha effettuato l'accesso.
+     */
     private void topTexts(Utente medicoLoggato) {
         // Recupera il numero totale di pazienti
         List<Utente> pazientiTotaliCount = null;
@@ -124,6 +140,12 @@ public class DashboardMedicoController {
 
     }
 
+
+    /**
+     * Metodo che inizializza la dashboard del medico.
+     * Questo metodo viene chiamato per popolare il MenuButton con i pazienti assegnati al medico.
+     * @param medicoLoggato L'utente medico che ha effettuato l'accesso.
+     */
     private void init(Utente medicoLoggato){
         // 1. Recupera la lista dei pazienti assegnati al medico
         List<Utente> listaPazienti;
@@ -157,6 +179,12 @@ public class DashboardMedicoController {
         }
     }
 
+    /**
+     * Metodo che viene chiamato quando un paziente viene selezionato dal MenuButton.
+     * Aggiorna le label con i dati del paziente selezionato.
+     *
+     * @param paziente L'utente paziente selezionato.
+     */
     private void pazienteSelezionato(Utente paziente) {
         nameLable.setText(paziente.getNome() + " " + paziente.getCognome());
         emailLable.setText(paziente.getEmail());
@@ -166,4 +194,35 @@ public class DashboardMedicoController {
         ageLable.setText(String.valueOf(eta));
     }
 
+    //metodi per i pulsanti del grafico di glicemia
+
+    @FXML
+    private void handleSinistraButton(ActionEvent event) {
+        // Logica per il pulsante sinistra
+        System.out.println("Pulsante sinistra premuto");
+        // Aggiungi qui la logica per aggiornare il grafico
+    }
+
+    @FXML
+    private void handleDestraButton(ActionEvent event) {
+        // Logica per il pulsante destra
+        System.out.println("Pulsante destra premuto");
+        // Aggiungi qui la logica per aggiornare il grafico
+    }
+
+    @FXML
+    private void setMensileButton(ActionEvent event) {
+        // Logica per il pulsante destra
+        System.out.println("Pulsante mese premuto");
+        // Aggiungi qui la logica per aggiornare il grafico
+    }
+
+    @FXML
+    private void setSettimanaleButton(ActionEvent event) {
+        // Logica per il pulsante destra
+        System.out.println("Pulsante settimana premuto");
+        // Aggiungi qui la logica per aggiornare il grafico
+    }
+
+    //to do...
 }

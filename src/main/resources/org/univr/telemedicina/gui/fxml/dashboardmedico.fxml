@@ -152,7 +152,7 @@
                                 <Font name="Inter 24pt SemiBold" size="40.0" />
                             </font>
                         </Text>
-                        <Text fill="#828282" layoutX="18.0" layoutY="93.0" strokeType="OUTSIDE" strokeWidth="0.0" text="+8%  rispetto al mese scorso">
+                        <Text fill="#828282" layoutX="18.0" layoutY="93.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Pazienti assegnati al medico">
                             <font>
                                 <Font name="Inter 24pt Regular" size="16.0" />
                             </font>
@@ -172,7 +172,7 @@
                                 <Font name="Inter 24pt SemiBold" size="40.0" />
                             </font>
                         </Text>
-                        <Text fill="#828282" layoutX="18.0" layoutY="93.0" strokeType="OUTSIDE" strokeWidth="0.0" text="-3% rispetto al mese scorso">
+                        <Text fill="#828282" layoutX="18.0" layoutY="93.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Pazienti con una terapia in corso">
                             <font>
                                 <Font name="Inter 24pt Regular" size="16.0" />
                             </font>
@@ -182,7 +182,7 @@
                 <AnchorPane layoutX="1007.0" layoutY="30.0" prefHeight="60.0" prefWidth="405.0">
                     <children>
                         <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="108.0" layoutY="-2.0" stroke="#e0e0e0" strokeType="INSIDE" width="405.0" />
-                        <Text layoutX="18.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Indice aderenza terapia globale">
+                        <Text layoutX="18.0" layoutY="20.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Costanza terapeutica">
                             <font>
                                 <Font name="Inter 24pt Medium" size="16.0" />
                             </font>
@@ -192,7 +192,7 @@
                                 <Font name="Inter 24pt SemiBold" size="40.0" />
                             </font>
                         </Text>
-                        <Text fill="#828282" layoutX="18.0" layoutY="93.0" strokeType="OUTSIDE" strokeWidth="0.0" text="+4%  rispetto al mese scorso">
+                        <Text fill="#828282" layoutX="18.0" layoutY="93.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Aderenza dei pazienti alle terapie">
                             <font>
                                 <Font name="Inter 24pt Regular" size="16.0" />
                             </font>
@@ -286,7 +286,7 @@
                                         </InnerShadow>
                                     </effect>
                                 </Rectangle>
-                                <Button layoutX="11.0" layoutY="3.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="M" textAlignment="CENTER">
+                                <Button fx:id="mensileButton" onAction="#setMensileButton" layoutX="11.0" layoutY="3.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="M" textAlignment="CENTER">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
@@ -301,7 +301,7 @@
                                         </DropShadow>
                                     </effect>
                                 </Button>
-                                <Button layoutX="53.0" layoutY="3.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="S" textAlignment="CENTER">
+                                <Button fx:id="settimanaleButton" onAction="#setSettimanaleButton" layoutX="53.0" layoutY="3.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="S" textAlignment="CENTER">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
@@ -329,7 +329,7 @@
                                         </InnerShadow>
                                     </effect>
                                 </Rectangle>
-                                <Button layoutX="6.0" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="&lt;" textAlignment="CENTER">
+                                <Button fx:id="sinistraButton" onAction="#handleSinistraButton" layoutX="6.0" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="&lt;" textAlignment="CENTER">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
@@ -344,7 +344,7 @@
                                         </DropShadow>
                                     </effect>
                                 </Button>
-                                <Button layoutX="169.0" layoutY="5.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="&gt;" textAlignment="CENTER">
+                                <Button fx:id="destraButton" onAction="#handleDestraButton" layoutX="169.0" layoutY="5.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" prefHeight="48.0" prefWidth="55.0" styleClass="deactivated-button-graph" text="&gt;" textAlignment="CENTER">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
