@@ -410,7 +410,7 @@
                                 </Button>
                             </children>
                         </AnchorPane>
-                        <Button layoutX="1237.0" layoutY="13.0" maxHeight="150.0" maxWidth="142.0" minWidth="131.0" mnemonicParsing="false" prefWidth="131.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
+                        <Button fx:id="saveButton" layoutX="1237.0" layoutY="13.0" maxHeight="150.0" maxWidth="142.0" minWidth="131.0" mnemonicParsing="false" onAction="#handleSaveButton" prefWidth="131.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
                             <opaqueInsets>
                                 <Insets />
                             </opaqueInsets>

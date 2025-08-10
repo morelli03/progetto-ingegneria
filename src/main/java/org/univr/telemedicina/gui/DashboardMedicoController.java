@@ -1,31 +1,28 @@
 package org.univr.telemedicina.gui;
 
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.univr.telemedicina.dao.*;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import java.io.IOException;
 import org.univr.telemedicina.exception.MedicoServiceException;
+import org.univr.telemedicina.exception.TherapyException;
 import org.univr.telemedicina.model.*;
 import org.univr.telemedicina.service.MedicoService;
+import org.univr.telemedicina.service.TerapiaService;
 
-import java.net.URL;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.ResourceBundle;
 
 public class DashboardMedicoController {
 
@@ -35,13 +32,10 @@ public class DashboardMedicoController {
     // Dichiarazione delle label collegate tramite @FXML
     @FXML
     private Label nameLable;
-
     @FXML
     private Label emailLable;
-
     @FXML
     private Label dateLable;
-
     @FXML
     private Label ageLable;
     @FXML
@@ -65,6 +59,8 @@ public class DashboardMedicoController {
     @FXML
     private Button creaModificaCondizioniButton;
     @FXML
+    private Button saveButton;
+    @FXML
     private VBox formContainer;
     @FXML
     private AnchorPane informazioniPazienteContainer;
@@ -75,6 +71,22 @@ public class DashboardMedicoController {
     @FXML
     private Label periodoLabel;
 
+    // Campi per il form terapia
+    private ComboBox<Object> terapiaComboBox;
+    private TextField farmacoTextField;
+    private TextField quantitaTextField;
+    private TextField frequenzaTextField;
+    private TextArea indicazioniTextArea;
+    private DatePicker dataInizioPicker;
+    private DatePicker dataFinePicker;
+    private CheckBox dataFineCheckBox;
+
+    // Campi per il form condizioni
+    private ComboBox<Object> condizioneComboBox;
+    private ComboBox<String> tipoCondizioneComboBox;
+    private TextArea descrizioneCondizioneTextArea;
+    private TextArea periodoCondizioneTextArea;
+
     private final PazientiDAO pazientiDAO = new PazientiDAO();
     private final RilevazioneGlicemiaDAO rivelazioneGlicemiaDAO = new RilevazioneGlicemiaDAO();
     private final CondizioniPazienteDAO condizioniPazienteDAO = new CondizioniPazienteDAO();
@@ -82,12 +94,15 @@ public class DashboardMedicoController {
     private final TerapiaDAO terapiaDAO = new TerapiaDAO();
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
     private final MedicoService medicoService = new MedicoService(pazientiDAO, rivelazioneGlicemiaDAO, condizioniPazienteDAO, logOperazioniDAO, terapiaDAO, assunzioneFarmaciDAO);
+    private final TerapiaService terapiaService = new TerapiaService(terapiaDAO, logOperazioniDAO);
 
     private Parent formTerapia;
     private Parent formCondizioni;
     private Utente pazienteSelezionato;
+    private PazienteDashboard datiPazienteCorrente;
     private String tipoVista = "mensile"; // o "settimanale"
     private LocalDate dataCorrente = LocalDate.now();
+    private String formCorrente;
 
     public void initData(Utente medicoLoggato) {
         this.medicoLoggato = medicoLoggato;
@@ -103,6 +118,49 @@ public class DashboardMedicoController {
         try {
             formTerapia = FXMLLoader.load(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_terapia.fxml"));
             formCondizioni = FXMLLoader.load(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_condizioni.fxml"));
+
+            // Inizializzazione campi form terapia
+            terapiaComboBox = (ComboBox<Object>) formTerapia.lookup("#terapiaComboBox");
+            farmacoTextField = (TextField) formTerapia.lookup("#farmacoTextField");
+            quantitaTextField = (TextField) formTerapia.lookup("#quantitaTextField");
+            frequenzaTextField = (TextField) formTerapia.lookup("#frequenzaTextField");
+            indicazioniTextArea = (TextArea) formTerapia.lookup("#indicazioniTextArea");
+            dataInizioPicker = (DatePicker) formTerapia.lookup("#dataInizioPicker");
+            dataFinePicker = (DatePicker) formTerapia.lookup("#dataFinePicker");
+            dataFineCheckBox = (CheckBox) formTerapia.lookup("#dataFineCheckBox");
+
+            // Inizializzazione campi form condizioni
+            condizioneComboBox = (ComboBox<Object>) formCondizioni.lookup("#condizioneComboBox");
+            tipoCondizioneComboBox = (ComboBox<String>) formCondizioni.lookup("#tipoCondizioneComboBox");
+            descrizioneCondizioneTextArea = (TextArea) formCondizioni.lookup("#descrizioneCondizioneTextArea");
+            periodoCondizioneTextArea = (TextArea) formCondizioni.lookup("#periodoCondizioneTextArea");
+
+            // Aggiungi listener
+            terapiaComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                if (newSelection != null) {
+                    mostraDettagliTerapia(newSelection);
+                }
+            });
+
+            condizioneComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                if (newSelection != null) {
+                    mostraDettagliCondizione(newSelection);
+                }
+            });
+
+            dataFineCheckBox.selectedProperty().addListener((obs, wasSelected, isNowSelected) -> {
+                dataFinePicker.setDisable(!isNowSelected);
+                if (!isNowSelected) {
+                    dataFinePicker.setValue(null);
+                }
+            });
+
+            // Imposta stato iniziale
+            dataFineCheckBox.setSelected(false);
+            dataFinePicker.setDisable(true);
+
+            tipoCondizioneComboBox.setItems(FXCollections.observableArrayList("FattoriRischio", "Patologia", "Comorbidita"));
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -159,23 +217,25 @@ public class DashboardMedicoController {
         terapiePrescritteContainer.getChildren().clear();
 
         try {
-            PazienteDashboard datiPaziente = medicoService.getDatiPazienteDasboard(paziente);
+            datiPazienteCorrente = medicoService.getDatiPazienteDasboard(paziente);
 
             VBox condizioniBox = new VBox(5);
-            for (CondizioniPaziente condizione : datiPaziente.getElencoCondizioni()) {
+            for (CondizioniPaziente condizione : datiPazienteCorrente.getElencoCondizioni()) {
                 Label label = new Label(condizione.getTipo() + ": " + condizione.getDescrizione());
                 condizioniBox.getChildren().add(label);
             }
             informazioniPazienteContainer.getChildren().add(condizioniBox);
 
             VBox terapieBox = new VBox(5);
-            for (Terapia terapia : datiPaziente.getElencoTerapie()) {
+            for (Terapia terapia : datiPazienteCorrente.getElencoTerapie()) {
                 Label label = new Label(terapia.getNomeFarmaco() + " - " + terapia.getQuantita());
                 terapieBox.getChildren().add(label);
             }
             terapiePrescritteContainer.getChildren().add(terapieBox);
 
             updateChart();
+            caricaTerapiePaziente();
+            caricaCondizioniPaziente();
 
         } catch (MedicoServiceException e) {
             e.printStackTrace();
@@ -186,44 +246,37 @@ public class DashboardMedicoController {
         glicemiaChart.getData().clear();
         if (pazienteSelezionato == null) return;
 
-        try {
-            PazienteDashboard datiPaziente = medicoService.getDatiPazienteDasboard(pazienteSelezionato);
-            List<RilevazioneGlicemia> rilevazioni = datiPaziente.getElencoRilevazioni();
+        List<RilevazioneGlicemia> rilevazioni = datiPazienteCorrente.getElencoRilevazioni();
 
-            LocalDate inizioPeriodo;
-            LocalDate finePeriodo;
+        LocalDate inizioPeriodo;
+        LocalDate finePeriodo;
 
-            if ("settimanale".equals(tipoVista)) {
-                inizioPeriodo = dataCorrente.minusDays(dataCorrente.getDayOfWeek().getValue() - 1);
-                finePeriodo = inizioPeriodo.plusDays(6);
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd");
-                periodoLabel.setText(inizioPeriodo.format(formatter) + "-" + finePeriodo.format(formatter) + " " + dataCorrente.format(DateTimeFormatter.ofPattern("MMMM")));
-            } else { // mensile
-                inizioPeriodo = dataCorrente.withDayOfMonth(1);
-                finePeriodo = dataCorrente.withDayOfMonth(dataCorrente.lengthOfMonth());
-                periodoLabel.setText(dataCorrente.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
-            }
-
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName("Andamento Glicemia");
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
-
-            List<XYChart.Data<String, Number>> dataPoints = new java.util.ArrayList<>();
-            for (RilevazioneGlicemia rilevazione : rilevazioni) {
-                LocalDate dataRilevazione = rilevazione.getTimestamp().toLocalDate();
-                if (!dataRilevazione.isBefore(inizioPeriodo) && !dataRilevazione.isAfter(finePeriodo)) {
-                    dataPoints.add(new XYChart.Data<>(rilevazione.getTimestamp().format(formatter), rilevazione.getValore()));
-                }
-            }
-
-            // Inverti l'ordine dei dati
-            java.util.Collections.reverse(dataPoints);
-            series.getData().addAll(dataPoints);
-            glicemiaChart.getData().add(series);
-
-        } catch (MedicoServiceException e) {
-            e.printStackTrace();
+        if ("settimanale".equals(tipoVista)) {
+            inizioPeriodo = dataCorrente.minusDays(dataCorrente.getDayOfWeek().getValue() - 1);
+            finePeriodo = inizioPeriodo.plusDays(6);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd");
+            periodoLabel.setText(inizioPeriodo.format(formatter) + "-" + finePeriodo.format(formatter) + " " + dataCorrente.format(DateTimeFormatter.ofPattern("MMMM")));
+        } else { // mensile
+            inizioPeriodo = dataCorrente.withDayOfMonth(1);
+            finePeriodo = dataCorrente.withDayOfMonth(dataCorrente.lengthOfMonth());
+            periodoLabel.setText(dataCorrente.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
         }
+
+        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        series.setName("Andamento Glicemia");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+
+        List<XYChart.Data<String, Number>> dataPoints = new java.util.ArrayList<>();
+        for (RilevazioneGlicemia rilevazione : rilevazioni) {
+            LocalDate dataRilevazione = rilevazione.getTimestamp().toLocalDate();
+            if (!dataRilevazione.isBefore(inizioPeriodo) && !dataRilevazione.isAfter(finePeriodo)) {
+                dataPoints.add(new XYChart.Data<>(rilevazione.getTimestamp().format(formatter), rilevazione.getValore()));
+            }
+        }
+
+        java.util.Collections.reverse(dataPoints);
+        series.getData().addAll(dataPoints);
+        glicemiaChart.getData().add(series);
     }
 
     @FXML
@@ -268,23 +321,232 @@ public class DashboardMedicoController {
 
     @FXML
     private void handleCreaModificaTerapiaButton(ActionEvent event) {
-        // Logica per il pulsante Crea/Modifica Terapia
+        formCorrente = "terapia";
         creaModificaTerapiaButton.getStyleClass().remove("deactivated-button-graph");
         creaModificaTerapiaButton.getStyleClass().add("activated-button-graph");
         creaModificaCondizioniButton.getStyleClass().remove("activated-button-graph");
         creaModificaCondizioniButton.getStyleClass().add("deactivated-button-graph");
-        System.out.println("Pulsante Crea/Modifica Terapia premuto");
         formContainer.getChildren().setAll(formTerapia);
     }
 
     @FXML
     private void handleCreaModificaCondizioniButton(ActionEvent event) {
-        // Logica per il pulsante Crea/Modifica Condizioni
+        formCorrente = "condizioni";
         creaModificaCondizioniButton.getStyleClass().remove("deactivated-button-graph");
         creaModificaCondizioniButton.getStyleClass().add("activated-button-graph");
         creaModificaTerapiaButton.getStyleClass().remove("activated-button-graph");
         creaModificaTerapiaButton.getStyleClass().add("deactivated-button-graph");
-        System.out.println("Pulsante Crea/Modifica Condizioni premuto");
         formContainer.getChildren().setAll(formCondizioni);
+    }
+
+    @FXML
+    private void handleSaveButton(ActionEvent event) {
+        if (pazienteSelezionato == null) {
+            showAlert("Errore", "Nessun paziente selezionato.");
+            return;
+        }
+
+        if ("terapia".equals(formCorrente)) {
+            salvaTerapia();
+        } else if ("condizioni".equals(formCorrente)) {
+            salvaCondizione();
+        }
+    }
+
+    private void caricaTerapiePaziente() {
+        terapiaComboBox.getItems().clear();
+        terapiaComboBox.getItems().add("Nuova terapia");
+        if (datiPazienteCorrente != null) {
+            terapiaComboBox.getItems().addAll(datiPazienteCorrente.getElencoTerapie());
+        }
+        terapiaComboBox.setCellFactory(param -> new ListCell<Object>() {
+            @Override
+            protected void updateItem(Object item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else if (item instanceof String) {
+                    setText((String) item);
+                } else {
+                    setText(((Terapia) item).getNomeFarmaco());
+                }
+            }
+        });
+        terapiaComboBox.setButtonCell(new ListCell<Object>() {
+            @Override
+            protected void updateItem(Object item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else if (item instanceof String) {
+                    setText((String) item);
+                } else {
+                    setText(((Terapia) item).getNomeFarmaco());
+                }
+            }
+        });
+        pulisciFormTerapia();
+    }
+
+    private void caricaCondizioniPaziente() {
+        condizioneComboBox.getItems().clear();
+        condizioneComboBox.getItems().add("Nuova condizione");
+        if (datiPazienteCorrente != null) {
+            condizioneComboBox.getItems().addAll(datiPazienteCorrente.getElencoCondizioni());
+        }
+        condizioneComboBox.setCellFactory(param -> new ListCell<Object>() {
+            @Override
+            protected void updateItem(Object item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else if (item instanceof String) {
+                    setText((String) item);
+                } else {
+                    setText(((CondizioniPaziente) item).getTipo() + " - " + ((CondizioniPaziente) item).getDescrizione());
+                }
+            }
+        });
+        condizioneComboBox.setButtonCell(new ListCell<Object>() {
+            @Override
+            protected void updateItem(Object item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else if (item instanceof String) {
+                    setText((String) item);
+                } else {
+                    setText(((CondizioniPaziente) item).getTipo() + " - " + ((CondizioniPaziente) item).getDescrizione());
+                }
+            }
+        });
+        pulisciFormCondizione();
+    }
+
+    private void mostraDettagliTerapia(Object terapiaObj) {
+        if (terapiaObj instanceof Terapia) {
+            Terapia terapia = (Terapia) terapiaObj;
+            farmacoTextField.setText(terapia.getNomeFarmaco());
+            quantitaTextField.setText(terapia.getQuantita());
+            frequenzaTextField.setText(String.valueOf(terapia.getFrequenzaGiornaliera()));
+            indicazioniTextArea.setText(terapia.getIndicazioni());
+            dataInizioPicker.setValue(terapia.getDataInizio());
+            if (terapia.getDataFine() != null) {
+                dataFinePicker.setValue(terapia.getDataFine());
+                dataFineCheckBox.setSelected(true);
+            } else {
+                dataFinePicker.setValue(null);
+                dataFineCheckBox.setSelected(false);
+            }
+        } else {
+            pulisciFormTerapia();
+        }
+    }
+
+    private void mostraDettagliCondizione(Object condizioneObj) {
+        if (condizioneObj instanceof CondizioniPaziente) {
+            CondizioniPaziente condizione = (CondizioniPaziente) condizioneObj;
+            tipoCondizioneComboBox.setValue(condizione.getTipo());
+            descrizioneCondizioneTextArea.setText(condizione.getDescrizione());
+            periodoCondizioneTextArea.setText(condizione.getPeriodo());
+        } else {
+            pulisciFormCondizione();
+        }
+    }
+
+    private void pulisciFormTerapia() {
+        terapiaComboBox.getSelectionModel().selectFirst();
+        farmacoTextField.clear();
+        quantitaTextField.clear();
+        frequenzaTextField.clear();
+        indicazioniTextArea.clear();
+        dataInizioPicker.setValue(LocalDate.now());
+        dataFinePicker.setValue(null);
+        dataFineCheckBox.setSelected(false);
+    }
+
+    private void pulisciFormCondizione() {
+        condizioneComboBox.getSelectionModel().selectFirst();
+        tipoCondizioneComboBox.getSelectionModel().clearSelection();
+        descrizioneCondizioneTextArea.clear();
+        periodoCondizioneTextArea.clear();
+    }
+
+    private void salvaTerapia() {
+        String nomeFarmaco = farmacoTextField.getText();
+        String quantita = quantitaTextField.getText();
+        int frequenza;
+        try {
+            frequenza = Integer.parseInt(frequenzaTextField.getText());
+        } catch (NumberFormatException e) {
+            showAlert("Errore", "La frequenza deve essere un numero.");
+            return;
+        }
+        String indicazioni = indicazioniTextArea.getText();
+        LocalDate dataInizio = dataInizioPicker.getValue();
+        LocalDate dataFine = dataFinePicker.getValue();
+
+        if (nomeFarmaco.isEmpty() || quantita.isEmpty() || dataInizio == null) {
+            showAlert("Errore", "Compilare tutti i campi obbligatori.");
+            return;
+        }
+
+        Object selected = terapiaComboBox.getSelectionModel().getSelectedItem();
+        try {
+            if (selected instanceof Terapia) {
+                Terapia terapia = (Terapia) selected;
+                terapia.setNomeFarmaco(nomeFarmaco);
+                terapia.setQuantita(quantita);
+                terapia.setFrequenzaGiornaliera(frequenza);
+                terapia.setIndicazioni(indicazioni);
+                terapia.setDataInizio(dataInizio);
+                terapia.setDataFine(dataFine);
+                terapiaService.modificaTerapia(terapia, medicoLoggato.getIDUtente());
+            } else {
+                terapiaService.assegnaTerapia(pazienteSelezionato.getIDUtente(), medicoLoggato.getIDUtente(), nomeFarmaco, quantita, frequenza, indicazioni, dataInizio, dataFine);
+            }
+            showAlert("Successo", "Terapia salvata con successo.");
+            pazienteSelezionato(pazienteSelezionato); // Ricarica i dati
+        } catch (TherapyException e) {
+            showAlert("Errore", "Errore durante il salvataggio della terapia.");
+            e.printStackTrace();
+        }
+    }
+
+    private void salvaCondizione() {
+        String tipo = tipoCondizioneComboBox.getValue();
+        String descrizione = descrizioneCondizioneTextArea.getText();
+        String periodo = periodoCondizioneTextArea.getText();
+
+        if (tipo == null || descrizione.isEmpty()) {
+            showAlert("Errore", "Compilare tutti i campi obbligatori.");
+            return;
+        }
+
+        Object selected = condizioneComboBox.getSelectionModel().getSelectedItem();
+        try {
+            if (selected instanceof CondizioniPaziente) {
+                CondizioniPaziente condizione = (CondizioniPaziente) selected;
+                condizione.setTipo(tipo);
+                condizione.setDescrizione(descrizione);
+                condizione.setPeriodo(periodo);
+                medicoService.updateCondizioniPaziente(medicoLoggato.getIDUtente(), condizione);
+            } else {
+                medicoService.addCondizioniPaziente(medicoLoggato.getIDUtente(), pazienteSelezionato.getIDUtente(), tipo, descrizione, periodo, LocalDate.now());
+            }
+            showAlert("Successo", "Condizione salvata con successo.");
+            pazienteSelezionato(pazienteSelezionato); // Ricarica i dati
+        } catch (MedicoServiceException e) {
+            showAlert("Errore", "Errore durante il salvataggio della condizione.");
+            e.printStackTrace();
+        }
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }
