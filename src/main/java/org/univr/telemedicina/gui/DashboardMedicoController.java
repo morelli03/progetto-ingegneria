@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class DashboardMedicoController {
@@ -225,14 +226,33 @@ public class DashboardMedicoController {
 
             VBox condizioniBox = new VBox(5);
             for (CondizioniPaziente condizione : datiPazienteCorrente.getElencoCondizioni()) {
-                Label label = new Label(condizione.getTipo() + ": " + condizione.getDescrizione());
-                condizioniBox.getChildren().add(label);
+
+                if(Objects.equals(condizione.getTipo(), "FattoriRischio")) {
+                    Label label = new Label("Fattore di rischio: " + condizione.getDescrizione());
+                    label.getStyleClass().add("black-text");
+                    condizioniBox.getChildren().add(label);
+                } else if(Objects.equals(condizione.getTipo(), "Patologia")) {
+                    Label label = new Label("Patologia: " + condizione.getDescrizione());
+                    label.getStyleClass().add("black-text");
+                    condizioniBox.getChildren().add(label);
+                } else if(Objects.equals(condizione.getTipo(), "Comorbidita")) {
+                    Label label = new Label("Comorbidità: " + condizione.getDescrizione());
+                    label.getStyleClass().add("black-text");
+                    condizioniBox.getChildren().add(label);
+                }
             }
             informazioniPazienteContainer.getChildren().add(condizioniBox);
 
             VBox terapieBox = new VBox(5);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             for (Terapia terapia : datiPazienteCorrente.getElencoTerapie()) {
-                Label label = new Label(terapia.getNomeFarmaco() + " - " + terapia.getQuantita());
+                String dataFineText = (terapia.getDataFine() != null) ? terapia.getDataFine().format(formatter) : "N/A";
+
+                Label label = new Label(terapia.getNomeFarmaco() + " | " +
+                        terapia.getQuantita() + " | " +
+                        "freq. giornaliera: " + terapia.getFrequenzaGiornaliera() + " | " +
+                        terapia.getDataInizio().format(formatter) + " - " + dataFineText);
+                label.getStyleClass().add("black-text");
                 terapieBox.getChildren().add(label);
             }
             terapiePrescritteContainer.getChildren().add(terapieBox);
