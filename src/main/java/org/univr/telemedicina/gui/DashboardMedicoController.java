@@ -5,12 +5,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import org.univr.telemedicina.dao.*;
 import org.univr.telemedicina.exception.MedicoServiceException;
 import org.univr.telemedicina.exception.TherapyException;
@@ -632,5 +634,29 @@ public class DashboardMedicoController {
         alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    public void handleLogout(ActionEvent actionEvent) {
+
+        // chiede conferma per il logout
+        if(!showConfirmationDialog("Sei sicuro di voler effettuare il logout?")) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/univr/telemedicina/gui/fxml/login.fxml"));
+            Parent root = loader.load();
+            LoginController loginController = loader.getController();
+
+            //imposta la scena di login
+            Stage stage = (Stage) nameLable.getScene().getWindow();
+            Scene scene = new Scene(root, 1440, 1024); // Imposta dimensioni iniziali
+            stage.setScene(scene);
+            stage.setTitle("Login");
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -100,7 +100,7 @@
                                 </DropShadow>
                             </effect>
                         </Button>
-                        <Button maxWidth="85.0" mnemonicParsing="false" styleClass="top-buttons" text="Log Out" textAlignment="CENTER">
+                        <Button fx:id="logoutButton" maxWidth="85.0" mnemonicParsing="false" onAction="#handleLogout" styleClass="top-buttons" text="Log Out" textAlignment="CENTER">
                             <opaqueInsets>
                                 <Insets />
                             </opaqueInsets>
