@@ -410,6 +410,21 @@
                                 </Button>
                             </children>
                         </AnchorPane>
+                        <Button fx:id="deleteButton" layoutX="1090.0" layoutY="13.0" maxHeight="150.0" maxWidth="142.0" minWidth="131.0" mnemonicParsing="false" onAction="#handleDeleteButton" prefWidth="131.0" styleClass="top-buttons" text="Elimina" textAlignment="CENTER">
+                            <opaqueInsets>
+                                <Insets />
+                            </opaqueInsets>
+                            <font>
+                                <Font name="Inter 24pt Regular" size="16.0" />
+                            </font>
+                            <effect>
+                                <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
+                                    <color>
+                                        <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.5299999713897705" />
+                                    </color>
+                                </DropShadow>
+                            </effect>
+                        </Button>
                         <Button fx:id="saveButton" layoutX="1237.0" layoutY="13.0" maxHeight="150.0" maxWidth="142.0" minWidth="131.0" mnemonicParsing="false" onAction="#handleSaveButton" prefWidth="131.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
                             <opaqueInsets>
                                 <Insets />

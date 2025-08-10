@@ -141,6 +141,16 @@ public class MedicoService {
         }
     }
 
+    public void eliminaCondizione(int idCondizione, int idMedicoOperante, int idPaziente) throws MedicoServiceException {
+        try {
+            condizioniPazienteDAO.delete(idCondizione);
+            String descrizioneLog = "Eliminata condizione ID " + idCondizione;
+            logOperazione(idMedicoOperante, idPaziente, "AGGIORNAMENTO_CONDIZIONI", descrizioneLog);
+        } catch (DataAccessException e) {
+            throw new MedicoServiceException("Errore durante l'eliminazione della condizione ID " + idCondizione, e);
+        }
+    }
+
     /**
      * registra un'operazione effettuata da un medico su un paziente
      */

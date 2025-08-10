@@ -109,4 +109,24 @@ public class CondizioniPazienteDAO {
             throw new DataAccessException("Errore durante l'aggiornamento della condizione nel database", e);
         }
     }
+
+    public void delete(int idCondizione) throws DataAccessException {
+        String sql = "DELETE FROM CondizioniPaziente WHERE IDCondizione = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idCondizione);
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new DataAccessException("Eliminazione condizione fallita, non è stata trovata nessuna condizione con ID " + idCondizione, null);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Errore durante l'eliminazione della condizione: " + e.getMessage());
+            throw new DataAccessException("Errore durante l'eliminazione della condizione con ID " + idCondizione, e);
+        }
+    }
 }

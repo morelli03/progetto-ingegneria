@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 public class DashboardMedicoController {
 
@@ -60,6 +61,8 @@ public class DashboardMedicoController {
     private Button creaModificaCondizioniButton;
     @FXML
     private Button saveButton;
+    @FXML
+    private Button deleteButton;
     @FXML
     private VBox formContainer;
     @FXML
@@ -158,6 +161,7 @@ public class DashboardMedicoController {
             // Imposta stato iniziale
             dataFineCheckBox.setSelected(false);
             dataFinePicker.setDisable(true);
+            deleteButton.setDisable(true);
 
             tipoCondizioneComboBox.setItems(FXCollections.observableArrayList("FattoriRischio", "Patologia", "Comorbidita"));
 
@@ -353,6 +357,20 @@ public class DashboardMedicoController {
         }
     }
 
+    @FXML
+    private void handleDeleteButton(ActionEvent event) {
+        if (pazienteSelezionato == null) {
+            showAlert("Errore", "Nessun paziente selezionato.");
+            return;
+        }
+
+        if ("terapia".equals(formCorrente)) {
+            eliminaTerapia();
+        } else if ("condizioni".equals(formCorrente)) {
+            eliminaCondizione();
+        }
+    }
+
     private void caricaTerapiePaziente() {
         terapiaComboBox.getItems().clear();
         terapiaComboBox.getItems().add("Nuova terapia");
@@ -424,6 +442,7 @@ public class DashboardMedicoController {
     }
 
     private void mostraDettagliTerapia(Object terapiaObj) {
+        deleteButton.setDisable(!(terapiaObj instanceof Terapia));
         if (terapiaObj instanceof Terapia) {
             Terapia terapia = (Terapia) terapiaObj;
             farmacoTextField.setText(terapia.getNomeFarmaco());
@@ -444,6 +463,7 @@ public class DashboardMedicoController {
     }
 
     private void mostraDettagliCondizione(Object condizioneObj) {
+        deleteButton.setDisable(!(condizioneObj instanceof CondizioniPaziente));
         if (condizioneObj instanceof CondizioniPaziente) {
             CondizioniPaziente condizione = (CondizioniPaziente) condizioneObj;
             tipoCondizioneComboBox.setValue(condizione.getTipo());
@@ -475,19 +495,20 @@ public class DashboardMedicoController {
     private void salvaTerapia() {
         String nomeFarmaco = farmacoTextField.getText();
         String quantita = quantitaTextField.getText();
-        int frequenza;
-        try {
-            frequenza = Integer.parseInt(frequenzaTextField.getText());
-        } catch (NumberFormatException e) {
-            showAlert("Errore", "La frequenza deve essere un numero.");
-            return;
-        }
         String indicazioni = indicazioniTextArea.getText();
         LocalDate dataInizio = dataInizioPicker.getValue();
         LocalDate dataFine = dataFinePicker.getValue();
 
         if (nomeFarmaco.isEmpty() || quantita.isEmpty() || dataInizio == null) {
             showAlert("Errore", "Compilare tutti i campi obbligatori.");
+            return;
+        }
+
+        int frequenza;
+        try {
+            frequenza = Integer.parseInt(frequenzaTextField.getText());
+        } catch (NumberFormatException e) {
+            showAlert("Errore", "La frequenza deve essere un numero.");
             return;
         }
 
@@ -540,6 +561,49 @@ public class DashboardMedicoController {
             showAlert("Errore", "Errore durante il salvataggio della condizione.");
             e.printStackTrace();
         }
+    }
+
+    private void eliminaTerapia() {
+        Object selected = terapiaComboBox.getSelectionModel().getSelectedItem();
+        if (selected instanceof Terapia) {
+            Terapia terapia = (Terapia) selected;
+            if (showConfirmationDialog("Sei sicuro di voler eliminare questa terapia?")) {
+                try {
+                    terapiaService.eliminaTerapia(terapia.getIDTerapia(), medicoLoggato.getIDUtente(), pazienteSelezionato.getIDUtente());
+                    showAlert("Successo", "Terapia eliminata con successo.");
+                    pazienteSelezionato(pazienteSelezionato); // Ricarica i dati
+                } catch (TherapyException e) {
+                    showAlert("Errore", "Errore durante l'eliminazione della terapia.");
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private void eliminaCondizione() {
+        Object selected = condizioneComboBox.getSelectionModel().getSelectedItem();
+        if (selected instanceof CondizioniPaziente) {
+            CondizioniPaziente condizione = (CondizioniPaziente) selected;
+            if (showConfirmationDialog("Sei sicuro di voler eliminare questa condizione?")) {
+                try {
+                    medicoService.eliminaCondizione(condizione.getIDCondizione(), medicoLoggato.getIDUtente(), pazienteSelezionato.getIDUtente());
+                    showAlert("Successo", "Condizione eliminata con successo.");
+                    pazienteSelezionato(pazienteSelezionato); // Ricarica i dati
+                } catch (MedicoServiceException e) {
+                    showAlert("Errore", "Errore durante l'eliminazione della condizione.");
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private boolean showConfirmationDialog(String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Conferma");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        Optional<ButtonType> result = alert.showAndWait();
+        return result.isPresent() && result.get() == ButtonType.OK;
     }
 
     private void showAlert(String title, String content) {

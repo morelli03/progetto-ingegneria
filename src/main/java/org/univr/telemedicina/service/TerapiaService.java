@@ -62,6 +62,16 @@ public class TerapiaService {
         }
     }
 
+    public void eliminaTerapia(int idTerapia, int idMedicoOperante, int idPaziente) throws TherapyException {
+        try {
+            terapiaDAO.delete(idTerapia);
+            String descrizione = "Eliminata la terapia ID " + idTerapia + " per il paziente ID " + idPaziente;
+            registraOperazione(idMedicoOperante, idPaziente, "elimina terapia", descrizione);
+        } catch (DataAccessException e) {
+            throw new TherapyException("Errore durante l'eliminazione della terapia: " + e.getMessage(), e);
+        }
+    }
+
     /**
      * registra un'operazione nel log delle operazioni
      */
