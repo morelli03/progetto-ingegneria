@@ -38,7 +38,7 @@ public class NotificheDAO {
     }
 
     /**
-     * Legge le notifiche lette = 0 per un determinato destinatario.
+     * Legge le notifiche per un determinato destinatario.
      * Le ordina per priorità e timestamp in ordine decrescente.
      * @param idDestinatario L'ID del destinatario per cui leggere le notifiche.
      * @return Una lista di notifiche non lette per il destinatario specificato.
@@ -48,8 +48,8 @@ public class NotificheDAO {
 
         // La query SQL per recuperare le notifiche non lette per un determinato destinatario.
         String sql = "SELECT * FROM Notifiche " +
-                "WHERE Letta = 0 AND IDDestinatario = ?" +
-                "ORDER BY Priorita DESC, Timestamp DESC";
+                "WHERE IDDestinatario = ?" +
+                "ORDER BY Letta ASC, Priorita DESC, Timestamp DESC";
 
 
 

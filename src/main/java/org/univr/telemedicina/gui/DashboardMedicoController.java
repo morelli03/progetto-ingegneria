@@ -6,13 +6,18 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
@@ -29,13 +34,13 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class DashboardMedicoController {
 
@@ -114,7 +119,7 @@ public class DashboardMedicoController {
     private final TerapiaService terapiaService = new TerapiaService(terapiaDAO, logOperazioniDAO);
     private final NotificheService notificheService = new NotificheService(new NotificheDAO());
     private ScheduledExecutorService notificationScheduler;
-    private List<Notifica> unreadNotifications;
+    private List<Notifica> allNotifications;
 
 
     private Parent formTerapia;
@@ -687,22 +692,23 @@ public class DashboardMedicoController {
             return;
         }
         try {
-            List<Notifica> newUnread = notificheService.read(medicoLoggato.getIDUtente());
-            Platform.runLater(() -> updateNotificationBell(newUnread));
+            List<Notifica> newNotifications = notificheService.read(medicoLoggato.getIDUtente());
+            Platform.runLater(() -> updateNotificationBell(newNotifications));
         } catch (DataAccessException e) {
             e.printStackTrace();
         }
     }
 
-    private void updateNotificationBell(List<Notifica> unreadNotifications) {
-        this.unreadNotifications = unreadNotifications;
+    private void updateNotificationBell(List<Notifica> notifications) {
+        this.allNotifications = notifications;
         notificationButton.getStyleClass().removeAll("notification-yellow", "notification-orange", "notification-red");
 
-        if (unreadNotifications == null || unreadNotifications.isEmpty()) {
+        if (notifications == null || notifications.isEmpty()) {
             return;
         }
 
-        int maxPriority = unreadNotifications.stream()
+        int maxPriority = notifications.stream()
+                .filter(n -> n.getLetta() == 0) // Considera solo le non lette
                 .mapToInt(Notifica::getPriorita)
                 .max()
                 .orElse(0);
@@ -714,7 +720,6 @@ public class DashboardMedicoController {
             case 2:
                 notificationButton.getStyleClass().add("notification-orange");
                 break;
-
             case 3:
                 notificationButton.getStyleClass().add("notification-red");
                 break;
@@ -725,8 +730,8 @@ public class DashboardMedicoController {
 
     @FXML
     private void handleNotificationClick(ActionEvent event) {
-        if (unreadNotifications == null || unreadNotifications.isEmpty()) {
-            showAlert("Notifiche", "Nessuna nuova notifica.");
+        if (allNotifications == null || allNotifications.isEmpty()) {
+            showAlert("Notifiche", "Nessuna notifica presente.");
             return;
         }
 
@@ -734,42 +739,75 @@ public class DashboardMedicoController {
         popup.setAutoHide(true);
 
         ListView<Notifica> listView = new ListView<>();
-        listView.setItems(FXCollections.observableArrayList(unreadNotifications));
+        listView.setItems(FXCollections.observableArrayList(allNotifications));
         listView.setCellFactory(param -> new ListCell<>() {
+            private final HBox topHBox = new HBox(5);
+            private final Circle priorityCircle = new Circle(5);
+            private final Label titleLabel = new Label();
+            private final Label messageLabel = new Label();
+            private final Label timestampLabel = new Label();
+            private final VBox contentVBox = new VBox(5);
+
+            {
+                titleLabel.getStyleClass().add("notification-title");
+                messageLabel.getStyleClass().add("notification-message");
+                messageLabel.setWrapText(true);
+                timestampLabel.getStyleClass().add("notification-timestamp");
+
+                topHBox.setAlignment(Pos.CENTER_LEFT);
+                topHBox.getChildren().addAll(priorityCircle, titleLabel);
+                contentVBox.getChildren().addAll(topHBox, messageLabel, timestampLabel);
+                contentVBox.setPadding(new Insets(5));
+            }
+
             @Override
             protected void updateItem(Notifica item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
-                    setText(null);
+                    setGraphic(null);
                 } else {
-                    setText(item.getTitolo() + ": " + item.getMessaggio());
-                    // Aggiungi stile in base alla priorità
-                    switch (item.getPriorita()) {
-                        case 1: setStyle("-fx-background-color: #FFFFE0;"); break; // Giallo chiaro
-                        case 2: setStyle("-fx-background-color: #FFDDC1;"); break; // Arancione chiaro
-                        case 3: setStyle("-fx-background-color: #FFC1C1;"); break; // Rosso chiaro
+                    titleLabel.setText(item.getTitolo());
+                    messageLabel.setText(item.getMessaggio());
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                    timestampLabel.setText(item.getTimestamp().format(formatter));
+
+                    if (item.getLetta() == 0) {
+                        priorityCircle.setVisible(true);
+                        switch (item.getPriorita()) {
+                            case 1: priorityCircle.setFill(Color.YELLOW); break;
+                            case 2: priorityCircle.setFill(Color.ORANGE); break;
+                            case 3: priorityCircle.setFill(Color.RED); break;
+                            default: priorityCircle.setVisible(false); break;
+                        }
+                    } else {
+                        priorityCircle.setVisible(false);
                     }
+                    setGraphic(contentVBox);
                 }
             }
         });
 
         VBox popupContent = new VBox(listView);
-        popupContent.setPadding(new Insets(10));
-        popupContent.setStyle("-fx-background-color: white; -fx-border-color: grey; -fx-border-width: 1;");
+        popupContent.getStyleClass().add("notification-popup");
         popup.getContent().add(popupContent);
 
-        popup.show(notificationButton.getScene().getWindow());
+        Point2D buttonPos = notificationButton.localToScreen(0, notificationButton.getHeight());
+        popup.show(notificationButton.getScene().getWindow(), buttonPos.getX(), buttonPos.getY());
 
-        // Mark notifications as read
-        for (Notifica notifica : unreadNotifications) {
-            try {
-                notificheService.setNotificaLetta(notifica.getIdNotifica());
-            } catch (DataAccessException e) {
-                e.printStackTrace();
-                showAlert("Errore", "Impossibile segnare la notifica come letta: " + notifica.getTitolo());
+        List<Notifica> unread = allNotifications.stream()
+                .filter(n -> n.getLetta() == 0)
+                .collect(Collectors.toList());
+
+        if (!unread.isEmpty()) {
+            for (Notifica notifica : unread) {
+                try {
+                    notificheService.setNotificaLetta(notifica.getIdNotifica());
+                } catch (DataAccessException e) {
+                    e.printStackTrace();
+                    showAlert("Errore", "Impossibile segnare la notifica come letta: " + notifica.getTitolo());
+                }
             }
+            checkNotifications();
         }
-        // After marking them as read, clear the local list and update the bell
-        updateNotificationBell(List.of());
     }
 }
