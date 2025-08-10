@@ -3,10 +3,13 @@ package org.univr.telemedicina.gui;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import org.univr.telemedicina.dao.*;
@@ -14,11 +17,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import java.io.IOException;
 import org.univr.telemedicina.exception.MedicoServiceException;
-import org.univr.telemedicina.model.Utente;
+import org.univr.telemedicina.model.*;
 import org.univr.telemedicina.service.MedicoService;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -73,6 +77,15 @@ public class DashboardMedicoController {
 
     @FXML
     private VBox formContainer;
+
+    @FXML
+    private AnchorPane informazioniPazienteContainer;
+
+    @FXML
+    private AnchorPane terapiePrescritteContainer;
+
+    @FXML
+    private LineChart<String, Number> glicemiaChart;
 
 
     // Inizializza i DAO necessari per il servizio medico
@@ -220,6 +233,45 @@ public class DashboardMedicoController {
         LocalDate oggi = LocalDate.now();
         long eta = ChronoUnit.YEARS.between(paziente.getDataNascita(), oggi);
         ageLable.setText(String.valueOf(eta));
+
+        // Clear previous data
+        informazioniPazienteContainer.getChildren().clear();
+        terapiePrescritteContainer.getChildren().clear();
+        glicemiaChart.getData().clear();
+
+        try {
+            // Get patient dashboard data
+            PazienteDashboard datiPaziente = medicoService.getDatiPazienteDasboard(paziente);
+
+            // Populate patient conditions
+            VBox condizioniBox = new VBox(5); // Use a VBox for vertical layout
+            for (CondizioniPaziente condizione : datiPaziente.getElencoCondizioni()) {
+                Label label = new Label(condizione.getTipo() + ": " + condizione.getDescrizione());
+                condizioniBox.getChildren().add(label);
+            }
+            informazioniPazienteContainer.getChildren().add(condizioniBox);
+
+            // Populate therapies
+            VBox terapieBox = new VBox(5);
+            for (Terapia terapia : datiPaziente.getElencoTerapie()) {
+                Label label = new Label(terapia.getNomeFarmaco() + " - " + terapia.getQuantita());
+                terapieBox.getChildren().add(label);
+            }
+            terapiePrescritteContainer.getChildren().add(terapieBox);
+
+            // Populate glycemia chart
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Andamento Glicemia");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+            for (RilevazioneGlicemia rilevazione : datiPaziente.getElencoRilevazioni()) {
+                series.getData().add(new XYChart.Data<>(rilevazione.getTimestamp().format(formatter), rilevazione.getValore()));
+            }
+            glicemiaChart.getData().add(series);
+
+        } catch (MedicoServiceException e) {
+            // Handle exception (e.g., show an alert to the user)
+            e.printStackTrace();
+        }
     }
 
     //metodi per i pulsanti del grafico di glicemia
@@ -263,22 +315,22 @@ public class DashboardMedicoController {
     @FXML
     private void handleCreaModificaTerapiaButton(ActionEvent event) {
         // Logica per il pulsante Crea/Modifica Terapia
-        System.out.println("Pulsante Crea/Modifica Terapia premuto");
         creaModificaTerapiaButton.getStyleClass().remove("deactivated-button-graph");
         creaModificaTerapiaButton.getStyleClass().add("activated-button-graph");
         creaModificaCondizioniButton.getStyleClass().remove("activated-button-graph");
         creaModificaCondizioniButton.getStyleClass().add("deactivated-button-graph");
+        System.out.println("Pulsante Crea/Modifica Terapia premuto");
         formContainer.getChildren().setAll(formTerapia);
     }
 
     @FXML
     private void handleCreaModificaCondizioniButton(ActionEvent event) {
         // Logica per il pulsante Crea/Modifica Condizioni
-        System.out.println("Pulsante Crea/Modifica Condizioni premuto");
         creaModificaCondizioniButton.getStyleClass().remove("deactivated-button-graph");
         creaModificaCondizioniButton.getStyleClass().add("activated-button-graph");
         creaModificaTerapiaButton.getStyleClass().remove("activated-button-graph");
         creaModificaTerapiaButton.getStyleClass().add("deactivated-button-graph");
+        System.out.println("Pulsante Crea/Modifica Condizioni premuto");
         formContainer.getChildren().setAll(formCondizioni);
     }
 }

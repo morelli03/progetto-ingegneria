@@ -229,7 +229,7 @@
                         <Line endX="299.0" endY="-61.0" layoutX="230.0" layoutY="104.0" startX="-215.0" startY="-61.0" stroke="#e0e0e0" strokeWidth="2.0" />
                         <ScrollPane layoutX="15.0" layoutY="51.0" prefHeight="118.0" prefWidth="516.0" styleClass="root-pane">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="207.0" prefWidth="499.0" styleClass="root-pane" />
+                                <AnchorPane fx:id="informazioniPazienteContainer" minHeight="0.0" minWidth="0.0" prefHeight="207.0" prefWidth="499.0" styleClass="root-pane" />
                             </content>
                         </ScrollPane>
                     </children>
@@ -245,7 +245,7 @@
                         <Line endX="299.0" endY="-61.0" layoutX="230.0" layoutY="104.0" startX="-215.0" startY="-61.0" stroke="#e0e0e0" strokeWidth="2.0" />
                         <ScrollPane layoutX="15.0" layoutY="51.0" prefHeight="118.0" prefWidth="516.0" styleClass="root-pane">
                             <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="207.0" prefWidth="499.0" styleClass="root-pane" />
+                                <AnchorPane fx:id="terapiePrescritteContainer" minHeight="0.0" minWidth="0.0" prefHeight="207.0" prefWidth="499.0" styleClass="root-pane" />
                             </content>
                         </ScrollPane>
                     </children>
@@ -253,7 +253,7 @@
                 <AnchorPane layoutX="595.0" layoutY="245.0" prefWidth="815.0">
                     <children>
                         <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="379.0" layoutY="-1.0" stroke="#e0e0e0" strokeType="INSIDE" width="815.0" />
-                        <LineChart layoutY="48.0" prefHeight="331.0" prefWidth="815.0">
+                        <LineChart fx:id="glicemiaChart" layoutY="48.0" prefHeight="331.0" prefWidth="815.0">
                             <xAxis>
                                 <CategoryAxis />
                             </xAxis>
