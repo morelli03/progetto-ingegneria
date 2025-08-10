@@ -183,3 +183,15 @@
     -fx-font-weight: normal;
     -fx-cursor: hand; /* Cursore a manina */
 }
+
+.notification-yellow {
+    -fx-background-color: #FFD700; /* Giallo */
+}
+
+.notification-orange {
+    -fx-background-color: #FFA500; /* Arancione */
+}
+
+.notification-red {
+    -fx-background-color: #FF0000; /* Rosso */
+}

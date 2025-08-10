@@ -56,29 +56,7 @@
                 </Text>
                 <ButtonBar buttonMinWidth="1.0" prefHeight="40.0" prefWidth="789.0">
                     <buttons>
-                        <Button maxWidth="55.0" mnemonicParsing="false" styleClass="red-notification-button" textAlignment="CENTER">
-                            <opaqueInsets>
-                                <Insets />
-                            </opaqueInsets>
-                            <font>
-                                <Font name="Inter 24pt Regular" size="16.0" />
-                            </font>
-                            <graphic>
-                                <ImageView>
-                                    <image>
-                                        <Image url="@/org/univr/telemedicina/gui/icons/bell-icon.png" />
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                            <effect>
-                                <DropShadow height="41.75" offsetY="2.0" radius="13.6875" spread="0.1" width="15.0">
-                                    <color>
-                                        <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.532567024230957" />
-                                    </color>
-                                </DropShadow>
-                            </effect>
-                        </Button>
-                        <Button fx:id="bottoneNotifica" maxWidth="55.0" mnemonicParsing="false" styleClass="top-buttons" textAlignment="CENTER">
+                        <Button fx:id="notificationButton" onAction="#handleNotificationClick" maxWidth="55.0" mnemonicParsing="false" styleClass="top-buttons" textAlignment="CENTER">
                             <opaqueInsets>
                                 <Insets />
                             </opaqueInsets>

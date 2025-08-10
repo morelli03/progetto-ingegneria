@@ -1,9 +1,11 @@
 package org.univr.telemedicina.gui;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
@@ -12,21 +14,28 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import org.univr.telemedicina.dao.*;
+import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.exception.MedicoServiceException;
 import org.univr.telemedicina.exception.TherapyException;
 import org.univr.telemedicina.model.*;
 import org.univr.telemedicina.service.MedicoService;
+import org.univr.telemedicina.service.NotificheService;
 import org.univr.telemedicina.service.TerapiaService;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class DashboardMedicoController {
 
@@ -76,6 +85,8 @@ public class DashboardMedicoController {
     private LineChart<String, Number> glicemiaChart;
     @FXML
     private Label periodoLabel;
+    @FXML
+    private Button notificationButton;
 
     // Campi per il form terapia
     private ComboBox<Object> terapiaComboBox;
@@ -101,6 +112,10 @@ public class DashboardMedicoController {
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
     private final MedicoService medicoService = new MedicoService(pazientiDAO, rivelazioneGlicemiaDAO, condizioniPazienteDAO, logOperazioniDAO, terapiaDAO, assunzioneFarmaciDAO);
     private final TerapiaService terapiaService = new TerapiaService(terapiaDAO, logOperazioniDAO);
+    private final NotificheService notificheService = new NotificheService(new NotificheDAO());
+    private ScheduledExecutorService notificationScheduler;
+    private List<Notifica> unreadNotifications;
+
 
     private Parent formTerapia;
     private Parent formCondizioni;
@@ -120,6 +135,7 @@ public class DashboardMedicoController {
         ageLable.setText("");
         topTexts(medicoLoggato);
         init(medicoLoggato);
+        initializeNotifications();
 
         try {
             formTerapia = FXMLLoader.load(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_terapia.fxml"));
@@ -637,8 +653,10 @@ public class DashboardMedicoController {
     }
 
     public void handleLogout(ActionEvent actionEvent) {
+        if (notificationScheduler != null && !notificationScheduler.isShutdown()) {
+            notificationScheduler.shutdownNow();
+        }
 
-        // chiede conferma per il logout
         if(!showConfirmationDialog("Sei sicuro di voler effettuare il logout?")) {
             return;
         }
@@ -648,9 +666,8 @@ public class DashboardMedicoController {
             Parent root = loader.load();
             LoginController loginController = loader.getController();
 
-            //imposta la scena di login
             Stage stage = (Stage) nameLable.getScene().getWindow();
-            Scene scene = new Scene(root, 1440, 1024); // Imposta dimensioni iniziali
+            Scene scene = new Scene(root, 1440, 1024);
             stage.setScene(scene);
             stage.setTitle("Login");
             stage.show();
@@ -658,5 +675,101 @@ public class DashboardMedicoController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void initializeNotifications() {
+        notificationScheduler = Executors.newSingleThreadScheduledExecutor();
+        notificationScheduler.scheduleAtFixedRate(this::checkNotifications, 0, 10, TimeUnit.SECONDS);
+    }
+
+    private void checkNotifications() {
+        if (medicoLoggato == null) {
+            return;
+        }
+        try {
+            List<Notifica> newUnread = notificheService.read(medicoLoggato.getIDUtente());
+            Platform.runLater(() -> updateNotificationBell(newUnread));
+        } catch (DataAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateNotificationBell(List<Notifica> unreadNotifications) {
+        this.unreadNotifications = unreadNotifications;
+        notificationButton.getStyleClass().removeAll("notification-yellow", "notification-orange", "notification-red");
+
+        if (unreadNotifications == null || unreadNotifications.isEmpty()) {
+            return;
+        }
+
+        int maxPriority = unreadNotifications.stream()
+                .mapToInt(Notifica::getPriorita)
+                .max()
+                .orElse(0);
+
+        switch (maxPriority) {
+            case 1:
+                notificationButton.getStyleClass().add("notification-yellow");
+                break;
+            case 2:
+                notificationButton.getStyleClass().add("notification-orange");
+                break;
+
+            case 3:
+                notificationButton.getStyleClass().add("notification-red");
+                break;
+            default:
+                break;
+        }
+    }
+
+    @FXML
+    private void handleNotificationClick(ActionEvent event) {
+        if (unreadNotifications == null || unreadNotifications.isEmpty()) {
+            showAlert("Notifiche", "Nessuna nuova notifica.");
+            return;
+        }
+
+        Popup popup = new Popup();
+        popup.setAutoHide(true);
+
+        ListView<Notifica> listView = new ListView<>();
+        listView.setItems(FXCollections.observableArrayList(unreadNotifications));
+        listView.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(Notifica item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.getTitolo() + ": " + item.getMessaggio());
+                    // Aggiungi stile in base alla priorità
+                    switch (item.getPriorita()) {
+                        case 1: setStyle("-fx-background-color: #FFFFE0;"); break; // Giallo chiaro
+                        case 2: setStyle("-fx-background-color: #FFDDC1;"); break; // Arancione chiaro
+                        case 3: setStyle("-fx-background-color: #FFC1C1;"); break; // Rosso chiaro
+                    }
+                }
+            }
+        });
+
+        VBox popupContent = new VBox(listView);
+        popupContent.setPadding(new Insets(10));
+        popupContent.setStyle("-fx-background-color: white; -fx-border-color: grey; -fx-border-width: 1;");
+        popup.getContent().add(popupContent);
+
+        popup.show(notificationButton.getScene().getWindow());
+
+        // Mark notifications as read
+        for (Notifica notifica : unreadNotifications) {
+            try {
+                notificheService.setNotificaLetta(notifica.getIdNotifica());
+            } catch (DataAccessException e) {
+                e.printStackTrace();
+                showAlert("Errore", "Impossibile segnare la notifica come letta: " + notifica.getTitolo());
+            }
+        }
+        // After marking them as read, clear the local list and update the bell
+        updateNotificationBell(List.of());
     }
 }
