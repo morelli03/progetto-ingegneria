@@ -44,92 +44,62 @@ public class DashboardMedicoController {
 
     @FXML
     private Label ageLable;
-    
     @FXML
     private MenuButton pazienteMenuButton;
-    
-    //lable dati header
     @FXML
     private Text pazientiAttivi;
-
     @FXML
     private Text indiceAderenzaGlobale;
-
     @FXML
     private Text pazientiTotali;
-
-    //tasti per cambiare il grafico di glicemia
     @FXML
     private Button sinistraButton;
     @FXML
     private Button destraButton;
-
     @FXML
     private Button settimanaleButton;
     @FXML
     private Button mensileButton;
-
     @FXML
     private Button creaModificaTerapiaButton;
-
     @FXML
     private Button creaModificaCondizioniButton;
-
     @FXML
     private VBox formContainer;
-
     @FXML
     private AnchorPane informazioniPazienteContainer;
-
     @FXML
     private AnchorPane terapiePrescritteContainer;
-
     @FXML
     private LineChart<String, Number> glicemiaChart;
+    @FXML
+    private Label periodoLabel;
 
-
-    // Inizializza i DAO necessari per il servizio medico
     private final PazientiDAO pazientiDAO = new PazientiDAO();
     private final RilevazioneGlicemiaDAO rivelazioneGlicemiaDAO = new RilevazioneGlicemiaDAO();
     private final CondizioniPazienteDAO condizioniPazienteDAO = new CondizioniPazienteDAO();
     private final LogOperazioniDAO logOperazioniDAO = new LogOperazioniDAO();
     private final TerapiaDAO terapiaDAO = new TerapiaDAO();
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
-
-    // Inizializza il servizio medico con i DAO
-    private MedicoService medicoService = new MedicoService(pazientiDAO, rivelazioneGlicemiaDAO, condizioniPazienteDAO, logOperazioniDAO, terapiaDAO, assunzioneFarmaciDAO);
+    private final MedicoService medicoService = new MedicoService(pazientiDAO, rivelazioneGlicemiaDAO, condizioniPazienteDAO, logOperazioniDAO, terapiaDAO, assunzioneFarmaciDAO);
 
     private Parent formTerapia;
     private Parent formCondizioni;
+    private Utente pazienteSelezionato;
+    private String tipoVista = "mensile"; // o "settimanale"
+    private LocalDate dataCorrente = LocalDate.now();
 
-    /**
-     * Metodo per inizializzare il controller con i dati dell'utente.
-     * Questo metodo viene chiamato dal LoginController.
-     * @param medicoLoggato L'utente che ha effettuato l'accesso.
-     */
     public void initData(Utente medicoLoggato) {
         this.medicoLoggato = medicoLoggato;
-
-        // Ora puoi usare i dati dell'utente per popolare la dashboard
         System.out.println("Dashboard caricata per il medico: " + medicoLoggato.getEmail());
-
         pazienteMenuButton.getItems().clear();
-
-
-        // Imposta uno stato iniziale per le label
         nameLable.setText("Nessun paziente selezionato");
         emailLable.setText("");
         dateLable.setText("");
         ageLable.setText("");
-
-        //imposta il testo nell'header
         topTexts(medicoLoggato);
-
-        //carica i pazienti assegnati al medico
         init(medicoLoggato);
 
-        // Carica i form FXML per terapia e condizioni
-        // Questi form saranno caricati in un VBox per essere visualizzati dinamicamente
         try {
             formTerapia = FXMLLoader.load(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_terapia.fxml"));
             formCondizioni = FXMLLoader.load(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_condizioni.fxml"));
@@ -137,121 +107,67 @@ public class DashboardMedicoController {
             e.printStackTrace();
         }
 
-        // Imposta il form di default
         handleCreaModificaTerapiaButton(null);
     }
 
-    /**
-     * Metodo che aggiorna le label nell'header della dashboard del medico.
-     * @param medicoLoggato L'utente medico che ha effettuato l'accesso.
-     */
     private void topTexts(Utente medicoLoggato) {
-        // Recupera il numero totale di pazienti
-        List<Utente> pazientiTotaliCount = null;
-        String count2 = "0";
         try {
-            pazientiTotaliCount = medicoService.getPazientiAssegnati(medicoLoggato.getIDUtente());
-            count2 = String.valueOf(pazientiTotaliCount.size());
+            List<Utente> pazientiTotaliCount = medicoService.getPazientiAssegnati(medicoLoggato.getIDUtente());
+            pazientiTotali.setText(String.valueOf(pazientiTotaliCount.size()));
 
+            List<Utente> pazientiAttiviList = medicoService.getPazientiAttivi(medicoLoggato.getIDUtente());
+            pazientiAttivi.setText(String.valueOf(pazientiAttiviList.size()));
+
+            double aderenzaGlobale = medicoService.calcolaAderenzaGlobale(pazientiAttiviList);
+            indiceAderenzaGlobale.setText(String.format("%.2f", aderenzaGlobale * 100) + "%");
         } catch (MedicoServiceException e) {
             throw new RuntimeException(e);
         }
-        pazientiTotali.setText(count2);
-
-
-        // Recupera il numero di pazienti attivi
-        List<Utente> pazientiAttiviList = null;
-        String count1 = "0";
-        try {
-            pazientiAttiviList = medicoService.getPazientiAttivi(medicoLoggato.getIDUtente());
-            count1 = String.valueOf(pazientiAttiviList.size());
-        } catch (MedicoServiceException e) {
-            throw new RuntimeException(e);
-        }
-        pazientiAttivi.setText(count1);
-
-        // Calcola l'indice di aderenza globale
-        double aderenzaGlobale = 0;
-        try {
-            aderenzaGlobale = medicoService.calcolaAderenzaGlobale(pazientiAttiviList);
-        } catch (MedicoServiceException e) {
-            throw new RuntimeException(e);
-        }
-        indiceAderenzaGlobale.setText(String.format("%.2f", aderenzaGlobale * 100) + "%");
-
     }
 
-
-    /**
-     * Metodo che inizializza la dashboard del medico.
-     * Questo metodo viene chiamato per popolare il MenuButton con i pazienti assegnati al medico.
-     * @param medicoLoggato L'utente medico che ha effettuato l'accesso.
-     */
-    private void init(Utente medicoLoggato){
-        // 1. Recupera la lista dei pazienti assegnati al medico
-        List<Utente> listaPazienti;
+    private void init(Utente medicoLoggato) {
         try {
-
-            // Recupera la lista dei pazienti assegnati al medico
-            listaPazienti = medicoService.getPazientiAssegnati(medicoLoggato.getIDUtente());
-
-            // 2. Controlla se la lista è vuota
+            List<Utente> listaPazienti = medicoService.getPazientiAssegnati(medicoLoggato.getIDUtente());
             if (listaPazienti.isEmpty()) {
                 pazienteMenuButton.setText("Nessun paziente assegnato");
             }
 
+            for (Utente paziente : listaPazienti) {
+                MenuItem menuItem = new MenuItem(paziente.getNome() + " " + paziente.getCognome() + " (" + paziente.getEmail() + ")");
+                menuItem.setOnAction(event -> {
+                    pazienteSelezionato(paziente);
+                    pazienteMenuButton.setText(paziente.getNome() + " " + paziente.getCognome());
+                });
+                pazienteMenuButton.getItems().add(menuItem);
+            }
         } catch (Exception e) {
             System.err.println("Errore durante il recupero dei pazienti: " + e.getMessage());
             pazienteMenuButton.setText("Errore nel caricamento dei pazienti");
-            return; // Esce dal metodo in caso di errore
-        }
-
-        // 3. Popola il MenuButton con i pazienti
-        for (Utente paziente : listaPazienti) {
-            MenuItem menuItem = new MenuItem(paziente.getNome() + " " + paziente.getCognome() + " (" + paziente.getEmail() + ")");
-
-            // 4. Imposta l'azione da eseguire quando si clicca questo MenuItem
-            menuItem.setOnAction(event -> {
-                pazienteSelezionato(paziente);
-                pazienteMenuButton.setText(paziente.getNome() + " " + paziente.getCognome()); // Aggiorna anche il testo del bottone
-            });
-
-            pazienteMenuButton.getItems().add(menuItem);
         }
     }
 
-    /**
-     * Metodo che viene chiamato quando un paziente viene selezionato dal MenuButton.
-     * Aggiorna le label con i dati del paziente selezionato.
-     *
-     * @param paziente L'utente paziente selezionato.
-     */
     private void pazienteSelezionato(Utente paziente) {
+        this.pazienteSelezionato = paziente;
         nameLable.setText(paziente.getNome() + " " + paziente.getCognome());
         emailLable.setText(paziente.getEmail());
-        dateLable.setText(paziente.getDataNascita().toString()); // Assicurati che il formato sia corretto
+        dateLable.setText(paziente.getDataNascita().toString());
         LocalDate oggi = LocalDate.now();
         long eta = ChronoUnit.YEARS.between(paziente.getDataNascita(), oggi);
         ageLable.setText(String.valueOf(eta));
 
-        // Clear previous data
         informazioniPazienteContainer.getChildren().clear();
         terapiePrescritteContainer.getChildren().clear();
-        glicemiaChart.getData().clear();
 
         try {
-            // Get patient dashboard data
             PazienteDashboard datiPaziente = medicoService.getDatiPazienteDasboard(paziente);
 
-            // Populate patient conditions
-            VBox condizioniBox = new VBox(5); // Use a VBox for vertical layout
+            VBox condizioniBox = new VBox(5);
             for (CondizioniPaziente condizione : datiPaziente.getElencoCondizioni()) {
                 Label label = new Label(condizione.getTipo() + ": " + condizione.getDescrizione());
                 condizioniBox.getChildren().add(label);
             }
             informazioniPazienteContainer.getChildren().add(condizioniBox);
 
-            // Populate therapies
             VBox terapieBox = new VBox(5);
             for (Terapia terapia : datiPaziente.getElencoTerapie()) {
                 Label label = new Label(terapia.getNomeFarmaco() + " - " + terapia.getQuantita());
@@ -259,42 +175,81 @@ public class DashboardMedicoController {
             }
             terapiePrescritteContainer.getChildren().add(terapieBox);
 
-            // Populate glycemia chart
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            series.setName("Andamento Glicemia");
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
-            for (RilevazioneGlicemia rilevazione : datiPaziente.getElencoRilevazioni()) {
-                series.getData().add(new XYChart.Data<>(rilevazione.getTimestamp().format(formatter), rilevazione.getValore()));
-            }
-            glicemiaChart.getData().add(series);
+            updateChart();
 
         } catch (MedicoServiceException e) {
-            // Handle exception (e.g., show an alert to the user)
             e.printStackTrace();
         }
     }
 
-    //metodi per i pulsanti del grafico di glicemia
+    private void updateChart() {
+        glicemiaChart.getData().clear();
+        if (pazienteSelezionato == null) return;
+
+        try {
+            PazienteDashboard datiPaziente = medicoService.getDatiPazienteDasboard(pazienteSelezionato);
+            List<RilevazioneGlicemia> rilevazioni = datiPaziente.getElencoRilevazioni();
+
+            LocalDate inizioPeriodo;
+            LocalDate finePeriodo;
+
+            if ("settimanale".equals(tipoVista)) {
+                inizioPeriodo = dataCorrente.minusDays(dataCorrente.getDayOfWeek().getValue() - 1);
+                finePeriodo = inizioPeriodo.plusDays(6);
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd");
+                periodoLabel.setText(inizioPeriodo.format(formatter) + "-" + finePeriodo.format(formatter) + " " + dataCorrente.format(DateTimeFormatter.ofPattern("MMMM")));
+            } else { // mensile
+                inizioPeriodo = dataCorrente.withDayOfMonth(1);
+                finePeriodo = dataCorrente.withDayOfMonth(dataCorrente.lengthOfMonth());
+                periodoLabel.setText(dataCorrente.format(DateTimeFormatter.ofPattern("MMMM yyyy")));
+            }
+
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            series.setName("Andamento Glicemia");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+
+            List<XYChart.Data<String, Number>> dataPoints = new java.util.ArrayList<>();
+            for (RilevazioneGlicemia rilevazione : rilevazioni) {
+                LocalDate dataRilevazione = rilevazione.getTimestamp().toLocalDate();
+                if (!dataRilevazione.isBefore(inizioPeriodo) && !dataRilevazione.isAfter(finePeriodo)) {
+                    dataPoints.add(new XYChart.Data<>(rilevazione.getTimestamp().format(formatter), rilevazione.getValore()));
+                }
+            }
+
+            // Inverti l'ordine dei dati
+            java.util.Collections.reverse(dataPoints);
+            series.getData().addAll(dataPoints);
+            glicemiaChart.getData().add(series);
+
+        } catch (MedicoServiceException e) {
+            e.printStackTrace();
+        }
+    }
 
     @FXML
     private void handleSinistraButton(ActionEvent event) {
-        // Logica per il pulsante sinistra
-        System.out.println("Pulsante sinistra premuto");
-        // Aggiungi qui la logica per aggiornare il grafico
+        if ("settimanale".equals(tipoVista)) {
+            dataCorrente = dataCorrente.minusWeeks(1);
+        } else {
+            dataCorrente = dataCorrente.minusMonths(1);
+        }
+        updateChart();
     }
 
     @FXML
     private void handleDestraButton(ActionEvent event) {
-        // Logica per il pulsante destra
-        System.out.println("Pulsante destra premuto");
-        // Aggiungi qui la logica per aggiornare il grafico
+        if ("settimanale".equals(tipoVista)) {
+            dataCorrente = dataCorrente.plusWeeks(1);
+        } else {
+            dataCorrente = dataCorrente.plusMonths(1);
+        }
+        updateChart();
     }
 
     @FXML
     private void setMensileButton(ActionEvent event) {
-        // Logica per il pulsante destra
-        System.out.println("Pulsante mese premuto");
-        // Aggiungi qui la logica per aggiornare il grafico
+        tipoVista = "mensile";
+        updateChart();
         mensileButton.getStyleClass().remove("deactivated-button-graph");
         mensileButton.getStyleClass().add("activated-button-graph");
         settimanaleButton.getStyleClass().remove("activated-button-graph");
@@ -303,9 +258,8 @@ public class DashboardMedicoController {
 
     @FXML
     private void setSettimanaleButton(ActionEvent event) {
-        // Logica per il pulsante destra
-        System.out.println("Pulsante settimana premuto");
-        // Aggiungi qui la logica per aggiornare il grafico
+        tipoVista = "settimanale";
+        updateChart();
         settimanaleButton.getStyleClass().remove("deactivated-button-graph");
         settimanaleButton.getStyleClass().add("activated-button-graph");
         mensileButton.getStyleClass().remove("activated-button-graph");
