@@ -216,7 +216,7 @@ public class DashboardMedicoController {
         dateLable.setText(paziente.getDataNascita().toString());
         LocalDate oggi = LocalDate.now();
         long eta = ChronoUnit.YEARS.between(paziente.getDataNascita(), oggi);
-        ageLable.setText(String.valueOf(eta));
+        ageLable.setText(String.valueOf(eta) + " anni");
 
         informazioniPazienteContainer.getChildren().clear();
         terapiePrescritteContainer.getChildren().clear();
