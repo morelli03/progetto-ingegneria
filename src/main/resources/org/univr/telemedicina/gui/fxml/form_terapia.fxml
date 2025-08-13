@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane layoutX="14.0" layoutY="67.5" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Text layoutX="3.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Seleziona la terapia da aggiungere o modificare">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <ComboBox fx:id="terapiaComboBox" layoutY="20.5" prefWidth="366.0" styleClass="text-field" />
+        <Text layoutX="420.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Nome farmaco">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <Text layoutX="705.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Quantità">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <Text layoutX="948.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Frequenza giornaliera">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <TextField fx:id="farmacoTextField" layoutX="419.0" layoutY="20.5" prefWidth="245.0" styleClass="text-field" />
+        <TextField fx:id="quantitaTextField" layoutX="705.0" layoutY="20.5" prefWidth="199.0" styleClass="text-field" />
+        <TextField fx:id="frequenzaTextField" layoutX="947.0" layoutY="20.5" prefWidth="245.0" styleClass="text-field" />
+        <Text layoutX="3.0" layoutY="81.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Indicazioni">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <Text layoutX="419.0" layoutY="84.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Data inizio">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <Text layoutX="976.0" layoutY="84.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Data fine">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <CheckBox fx:id="dataFineCheckBox" layoutX="948.0" layoutY="69.5" mnemonicParsing="false" />
+        <DatePicker fx:id="dataInizioPicker" layoutX="419.0" layoutY="91.5" prefHeight="40.0" prefWidth="245.0" />
+        <DatePicker fx:id="dataFinePicker" layoutX="948.0" layoutY="91.5" prefHeight="40.0" prefWidth="245.0" />
+        <TextArea fx:id="indicazioniTextArea" layoutX="1.0" layoutY="89.0" maxHeight="85.0" minHeight="85.0" prefHeight="85.0" prefWidth="366.0" styleClass="text-field"/>
+    </children>
+</AnchorPane>

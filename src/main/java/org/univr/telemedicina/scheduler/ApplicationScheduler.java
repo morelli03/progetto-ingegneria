@@ -15,6 +15,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Classe principale per avviare lo scheduler dei task di monitoraggio.
+ * Questa classe contiene i task che vengono eseguiti periodicamente per monitorare l'aderenza ai farmaci.
+ */
 public class ApplicationScheduler {
 
     public static void main(String[] args) {

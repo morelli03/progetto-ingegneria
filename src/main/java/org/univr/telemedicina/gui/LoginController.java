@@ -4,6 +4,7 @@ import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -89,27 +90,33 @@ public class LoginController {
 
 
     /**
-     * Carica la scena della dashboard e la mostra.
-     * @param utente L'utente che ha effettuato il login.
+     * Naviga alla dashboard corretta in base al ruolo dell'utente.
+     * @param utente L'utente autenticato.
      */
     private void navigateToDashboard(Utente utente) {
         try {
-            // Carica il file FXML della dashboard (dovrai crearlo in seguito)
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/univr/telemedicina/fxml/dashboard.fxml"));
-            Scene scene = new Scene(loader.load());
+            // **PASSO 1: Carica il nuovo FXML**
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/univr/telemedicina/gui/fxml/dashboardmedico.fxml"));
+            Parent root = loader.load();
 
-            // (Opzionale ma raccomandato) Passa i dati dell'utente al controller della dashboard
-            // DashboardController controller = loader.getController();
-            // controller.initData(utente);
+            // **PASSO 2: Passa i dati al nuovo controller (FONDAMENTALE)**
+            // Prima ottieni il controller della dashboard
+            DashboardMedicoController dashboardController = loader.getController();
+            // Poi chiama un metodo per passare l'oggetto Utente
+            dashboardController.initData(utente);
 
-            // Prendi lo Stage (la finestra) corrente e imposta la nuova scena
+            // **PASSO 3: Ottieni la finestra e cambia scena**
+            // Ottieni la finestra (Stage) da un qualsiasi elemento della UI, come emailField
             Stage stage = (Stage) emailField.getScene().getWindow();
-            stage.setTitle("Dashboard");
+
+            Scene scene = new Scene(root);
             stage.setScene(scene);
-            
+            stage.setTitle("Dashboard");
+            stage.show();
+
         } catch (IOException e) {
+            showError("Errore critico: Impossibile caricare la dashboard.");
             e.printStackTrace();
-            showError("Impossibile caricare la dashboard.");
         }
     }
 

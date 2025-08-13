@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane layoutX="14.0" layoutY="68.0" prefHeight="174.0" prefWidth="1324.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Text layoutX="3.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Seleziona la condizione da aggiungere o modificare">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <ComboBox fx:id="condizioneComboBox" layoutY="20.5" prefWidth="366.0" styleClass="text-field" />
+        <Text layoutX="410.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Tipo">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <Text layoutX="898.0" layoutY="15.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Descrizione">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <ComboBox fx:id="tipoCondizioneComboBox" layoutX="410.0" layoutY="21.0" prefWidth="173.0" styleClass="text-field" />
+        <TextArea fx:id="descrizioneCondizioneTextArea" layoutX="898.0" layoutY="20.0" maxHeight="153.0" minHeight="154.0" prefHeight="153.0" prefWidth="405.0" styleClass="text-field" />
+        <Text layoutX="410.0" layoutY="89.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Periodo">
+            <font>
+                <Font name="Inter 24pt Light" size="16.0" />
+            </font>
+        </Text>
+        <TextArea fx:id="periodoCondizioneTextArea" layoutX="410.0" layoutY="95.0" minHeight="79.0" prefHeight="54.0" prefWidth="461.0" styleClass="text-field" />
+    </children>
+</AnchorPane>

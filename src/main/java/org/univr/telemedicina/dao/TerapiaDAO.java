@@ -201,5 +201,25 @@ public class TerapiaDAO {
             throw new DataAccessException("Errore durante l'aggiornamento della terapia con ID " + terapia.getIDTerapia(), e);
         }
     }
+
+    public void delete(int idTerapia) throws DataAccessException {
+        String sql = "DELETE FROM Terapie WHERE IDTerapia = ?";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, idTerapia);
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows == 0) {
+                throw new DataAccessException("Eliminazione terapia fallita, non è stata trovata nessuna terapia con ID " + idTerapia, null);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Errore durante l'eliminazione della terapia: " + e.getMessage());
+            throw new DataAccessException("Errore durante l'eliminazione della terapia con ID " + idTerapia, e);
+        }
+    }
 }
 

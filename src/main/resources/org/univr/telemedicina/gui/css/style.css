@@ -67,6 +67,45 @@
     -fx-cursor: hand; /* Cursore a manina */
 }
 
+.seleziona-paziente {
+    -fx-pref-width: 500px;
+    -fx-pref-height: 40px;
+    -fx-background-color: #ffffff; /* Sfondo nero */
+    -fx-stroke: #E0E0E0;
+    -fx-text-fill: #FFFFFF;       /* Testo bianco */
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand; /* Cursore a manina */
+}
+
+
+.top-buttons{
+    -fx-alignment: center;
+    -fx-spacing: 10px; /* Spazio tra i pulsanti */
+    -fx-pref-width: 85px;
+    -fx-pref-height: 40px;
+    -fx-background-color: #000000; /* Sfondo nero */
+    -fx-text-fill: #FFFFFF;       /* Testo bianco */
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand; /* Cursore a manina */
+}
+
+.red-notification-button{
+    -fx-alignment: center;
+    -fx-spacing: 10px; /* Spazio tra i pulsanti */
+    -fx-pref-width: 85px;
+    -fx-pref-height: 40px;
+    -fx-background-color: #d60f0f; /* Sfondo nero */
+    -fx-text-fill: #FFFFFF;       /* Testo bianco */
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand; /* Cursore a manina */
+}
+
 .login-button:hover {
     -fx-background-color: #333333; /* Un po' più chiaro al passaggio del mouse */
 }
@@ -104,3 +143,92 @@
 .link-text {
     -fx-fill: #000000;
 }
+
+.black-text{
+    -fx-text-fill: #000000;
+}
+
+
+.transparent-split-pane {
+    -fx-background-color: transparent; /* Rende trasparente lo sfondo del contenitore */
+}
+
+.transparent-split-pane > .split-pane-divider {
+    -fx-background-color: transparent; /* Rende trasparente la linea divisoria */
+    -fx-padding: 0; /* Rimuove eventuali spazi aggiuntivi */
+}
+
+.seleziona-paziente {
+    -fx-pref-height: 40px;
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #DDDDDD; /* Bordo grigio chiaro */
+    -fx-border-radius: 8px;   /* Angoli arrotondati */
+    -fx-background-radius: 8px;
+    -fx-font-size: 16px;
+}
+
+.activated-button-graph{
+    -fx-background-color: #ffffff; /* Sfondo bianco */
+    -fx-text-fill: #000000;       /* Testo bianco */
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-background-radius: 8px;
+    -fx-cursor: hand; /* Cursore a manina */
+}
+
+.deactivated-button-graph{
+    -fx-background-color: rgba(255, 255, 255, 0); /* Sfondo trasparente */
+    -fx-text-fill: #000000;       /* Testo nero */
+    -fx-font-size: 16px;
+    -fx-font-weight: normal;
+    -fx-cursor: hand; /* Cursore a manina */
+}
+
+.notification-yellow {
+    -fx-background-color: #FFD700; /* Giallo */
+}
+
+.notification-orange {
+    -fx-background-color: #FFA500; /* Arancione */
+}
+
+.notification-red {
+    -fx-background-color: #FF0000; /* Rosso */
+}
+
+.notification-read {
+    -fx-background-color: #F0F0F0; /* Grigio chiaro per le notifiche lette */
+    -fx-text-fill: #888888;
+}
+
+.notification-popup {
+    -fx-background-color: white;
+    -fx-padding: 10;
+    -fx-border-color: #E0E0E0;
+    -fx-border-width: 1;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0.1, 0, 2);
+}
+
+.notification-title {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+}
+
+.notification-message {
+    -fx-font-size: 13px;
+    -fx-text-fill: #555555;
+}
+
+.notification-timestamp {
+    -fx-font-size: 11px;
+    -fx-text-fill: #999999;
+}
+
+.split-pane-divider {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
