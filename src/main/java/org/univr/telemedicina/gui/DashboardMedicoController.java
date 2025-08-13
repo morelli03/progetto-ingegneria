@@ -735,66 +735,30 @@ public class DashboardMedicoController {
             return;
         }
 
+        Popup popup = createNotificationsPopup();
+        Point2D buttonPos = notificationButton.localToScreen(0, notificationButton.getHeight());
+        popup.show(notificationButton.getScene().getWindow(), buttonPos.getX()-150, buttonPos.getY());
+
+        markNotificationsAsRead(allNotifications);
+    }
+
+    private Popup createNotificationsPopup() {
         Popup popup = new Popup();
         popup.setAutoHide(true);
 
         ListView<Notifica> listView = new ListView<>();
         listView.setItems(FXCollections.observableArrayList(allNotifications));
-        listView.setCellFactory(param -> new ListCell<>() {
-            private final HBox topHBox = new HBox(5);
-            private final Circle priorityCircle = new Circle(5);
-            private final Label titleLabel = new Label();
-            private final Label messageLabel = new Label();
-            private final Label timestampLabel = new Label();
-            private final VBox contentVBox = new VBox(5);
-
-            {
-                titleLabel.getStyleClass().add("notification-title");
-                messageLabel.getStyleClass().add("notification-message");
-                messageLabel.setWrapText(true);
-                timestampLabel.getStyleClass().add("notification-timestamp");
-
-                topHBox.setAlignment(Pos.CENTER_LEFT);
-                topHBox.getChildren().addAll(priorityCircle, titleLabel);
-                contentVBox.getChildren().addAll(topHBox, messageLabel, timestampLabel);
-                contentVBox.setPadding(new Insets(5));
-            }
-
-            @Override
-            protected void updateItem(Notifica item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setGraphic(null);
-                } else {
-                    titleLabel.setText(item.getTitolo());
-                    messageLabel.setText(item.getMessaggio());
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-                    timestampLabel.setText(item.getTimestamp().format(formatter));
-
-                    if (item.getLetta() == 0) {
-                        priorityCircle.setVisible(true);
-                        switch (item.getPriorita()) {
-                            case 1: priorityCircle.setFill(Color.YELLOW); break;
-                            case 2: priorityCircle.setFill(Color.ORANGE); break;
-                            case 3: priorityCircle.setFill(Color.RED); break;
-                            default: priorityCircle.setVisible(false); break;
-                        }
-                    } else {
-                        priorityCircle.setVisible(false);
-                    }
-                    setGraphic(contentVBox);
-                }
-            }
-        });
+        listView.setCellFactory(param -> new NotificationListCell());
 
         VBox popupContent = new VBox(listView);
         popupContent.getStyleClass().add("notification-popup");
         popup.getContent().add(popupContent);
 
-        Point2D buttonPos = notificationButton.localToScreen(0, notificationButton.getHeight());
-        popup.show(notificationButton.getScene().getWindow(), buttonPos.getX(), buttonPos.getY());
+        return popup;
+    }
 
-        List<Notifica> unread = allNotifications.stream()
+    private void markNotificationsAsRead(List<Notifica> notifications) {
+        List<Notifica> unread = notifications.stream()
                 .filter(n -> n.getLetta() == 0)
                 .collect(Collectors.toList());
 
@@ -807,7 +771,55 @@ public class DashboardMedicoController {
                     showAlert("Errore", "Impossibile segnare la notifica come letta: " + notifica.getTitolo());
                 }
             }
+            // Ricarica le notifiche per aggiornare lo stato visivo del campanello
             checkNotifications();
+        }
+    }
+
+    private static class NotificationListCell extends ListCell<Notifica> {
+        private final HBox topHBox = new HBox(5);
+        private final Circle priorityCircle = new Circle(5);
+        private final Label titleLabel = new Label();
+        private final Label messageLabel = new Label();
+        private final Label timestampLabel = new Label();
+        private final VBox contentVBox = new VBox(5);
+
+        public NotificationListCell() {
+            titleLabel.getStyleClass().add("notification-title");
+            messageLabel.getStyleClass().add("notification-message");
+            messageLabel.setWrapText(true);
+            timestampLabel.getStyleClass().add("notification-timestamp");
+
+            topHBox.setAlignment(Pos.CENTER_LEFT);
+            topHBox.getChildren().addAll(priorityCircle, titleLabel);
+            contentVBox.getChildren().addAll(topHBox, messageLabel, timestampLabel);
+            contentVBox.setPadding(new Insets(5));
+        }
+
+        @Override
+        protected void updateItem(Notifica item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+                setGraphic(null);
+            } else {
+                titleLabel.setText(item.getTitolo());
+                messageLabel.setText(item.getMessaggio());
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+                timestampLabel.setText(item.getTimestamp().format(formatter));
+
+                if (item.getLetta() == 0) {
+                    priorityCircle.setVisible(true);
+                    switch (item.getPriorita()) {
+                        case 1: priorityCircle.setFill(Color.YELLOW); break;
+                        case 2: priorityCircle.setFill(Color.ORANGE); break;
+                        case 3: priorityCircle.setFill(Color.RED); break;
+                        default: priorityCircle.setVisible(false); break;
+                    }
+                } else {
+                    priorityCircle.setVisible(false);
+                }
+                setGraphic(contentVBox);
+            }
         }
     }
 }
