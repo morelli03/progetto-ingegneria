@@ -227,3 +227,8 @@
     -fx-text-fill: #999999;
 }
 
+.split-pane-divider {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
