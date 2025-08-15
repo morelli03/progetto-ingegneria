@@ -116,11 +116,12 @@
                             </font>
                         </Text>
                         <Line endX="434.0" endY="-61.0" layoutX="231.0" layoutY="105.0" startX="-215.0" startY="-61.0" stroke="#e0e0e0" strokeWidth="2.0" />
-                  <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sintomi, patologie, terapie concomitanti">
+                  <Text fx:id="profiloTitle" fontSmoothingType="LCD" layoutX="14.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sintomi">
                      <font>
                         <Font name="Inter 24pt Light" size="18.0" />
                      </font>
                   </Text>
+                  <ListView fx:id="profiloListView" layoutX="14.0" layoutY="90.0" prefHeight="180.0" prefWidth="655.0" styleClass="profilo-list-view" />
                   <AnchorPane layoutX="584.0" layoutY="56.0" prefHeight="45.0" prefWidth="79.0">
                      <children>
                         <Button fx:id="leftProfiloButton" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleLeftProfiloButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="&lt;" textAlignment="CENTER">
@@ -160,6 +161,31 @@
                         <Font name="Inter 24pt Light" size="18.0" />
                      </font>
                   </Text>
+                  <GridPane fx:id="terapiaDetailsPane" layoutX="14.0" layoutY="320.0" prefHeight="150.0" prefWidth="655.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="500.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Nome Farmaco:" styleClass="terapia-details-text" />
+                        <Text fx:id="nomeFarmacoText" strokeType="OUTSIDE" strokeWidth="0.0" text="-" GridPane.columnIndex="1" styleClass="terapia-details-text" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Quantità:" GridPane.rowIndex="1" styleClass="terapia-details-text" />
+                        <Text fx:id="quantitaTerapiaText" strokeType="OUTSIDE" strokeWidth="0.0" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="terapia-details-text" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Freq. Giornaliera:" GridPane.rowIndex="2" styleClass="terapia-details-text" />
+                        <Text fx:id="frequenzaText" strokeType="OUTSIDE" strokeWidth="0.0" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="terapia-details-text" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Indicazioni:" GridPane.rowIndex="3" styleClass="terapia-details-text" />
+                        <Text fx:id="indicazioniText" strokeType="OUTSIDE" strokeWidth="0.0" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="terapia-details-text" />
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Durata terapia:" GridPane.rowIndex="4" styleClass="terapia-details-text" />
+                        <Text fx:id="dateText" strokeType="OUTSIDE" strokeWidth="0.0" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="terapia-details-text" />
+                     </children>
+                  </GridPane>
                   <AnchorPane layoutX="584.0" layoutY="289.0" prefHeight="45.0" prefWidth="79.0">
                      <children>
                         <Button fx:id="leftTerapieButton" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleLeftTerapieButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="&lt;" textAlignment="CENTER">

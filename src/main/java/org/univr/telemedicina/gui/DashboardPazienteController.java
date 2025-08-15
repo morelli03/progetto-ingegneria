@@ -23,9 +23,7 @@ import org.univr.telemedicina.dao.*;
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.exception.MedicoServiceException;
 import org.univr.telemedicina.exception.WrongAssumptionException;
-import org.univr.telemedicina.model.Notifica;
-import org.univr.telemedicina.model.Terapia;
-import org.univr.telemedicina.model.Utente;
+import org.univr.telemedicina.model.*;
 import org.univr.telemedicina.service.MonitorService;
 import org.univr.telemedicina.service.NotificheService;
 
@@ -34,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executors;
@@ -52,6 +51,11 @@ public class DashboardPazienteController {
     private final PazienteService pazienteService = new PazienteService(new RilevazioneGlicemiaDAO(), monitorService, new CondizioniPazienteDAO(), new UtenteDAO(), new PazientiDAO(), new AssunzioneFarmaciDAO(), new TerapiaDAO(), new NotificheService(new NotificheDAO()));
     private ScheduledExecutorService notificationScheduler;
     private List<Notifica> allNotifications;
+    private List<String> profiloInfo;
+    private int currentProfiloIndex;
+    private PazienteDashboard pazienteDashboard;
+    private List<Terapia> terapiePaziente;
+    private int currentTerapiaIndex;
 
     @FXML
     private Button notificationButton;
@@ -78,6 +82,20 @@ public class DashboardPazienteController {
     private TextField oraField2;
     @FXML
     private TextField minutiField2;
+    @FXML
+    private ListView<CondizioniPaziente> profiloListView;
+    @FXML
+    private Text profiloTitle;
+    @FXML
+    private Text nomeFarmacoText;
+    @FXML
+    private Text quantitaTerapiaText;
+    @FXML
+    private Text frequenzaText;
+    @FXML
+    private Text indicazioniText;
+    @FXML
+    private Text dateText;
 
 
     @FXML
@@ -85,6 +103,7 @@ public class DashboardPazienteController {
         periodoChoiceBox.setItems(FXCollections.observableArrayList(
                 "Prima colazione", "Dopo colazione", "Prima pranzo",
                 "Dopo pranzo", "Prima cena", "Dopo cena"));
+        profiloListView.setCellFactory(param -> new ProfiloListCell());
     }
 
 
@@ -93,13 +112,14 @@ public class DashboardPazienteController {
         nomeCognomeLabel.setText(paziente.getNome() + " " + paziente.getCognome());
         initializeNotifications();
 
-        //riempie il campo farmaco con i farmaci associati al paziente
-        List<Terapia> terapiePaziente;
         try {
-            terapiePaziente = pazienteService.getDatiPazienteDasboard(pazienteLoggato).getElencoTerapie();
+            pazienteDashboard = pazienteService.getDatiPazienteDasboard(pazienteLoggato);
         } catch (MedicoServiceException e) {
             throw new RuntimeException(e);
         }
+
+        //riempie il campo farmaco con i farmaci associati al paziente
+        this.terapiePaziente = pazienteDashboard.getElencoTerapie();
 
         // Popola la ChoiceBox con gli OGGETTI, non con le stringhe
         if (terapiePaziente != null) {
@@ -110,23 +130,83 @@ public class DashboardPazienteController {
         farmacoChoiceBox.setConverter(new StringConverter<Terapia>() {
             @Override
             public String toString(Terapia terapia) {
-                // Questa è la parte cruciale:
-                // Se l'oggetto è null, ritorna una stringa vuota o un placeholder.
-                // Altrimenti, ritorna la stringa che vuoi far vedere all'utente (il nome del farmaco).
                 return (terapia == null) ? "" : terapia.getNomeFarmaco();
             }
 
             @Override
             public Terapia fromString(String string) {
-                // Questo metodo serve principalmente per le ComboBox editabili.
-                // Per una ChoiceBox, puoi semplicemente ritornare null, oppure, per completezza,
-                // puoi implementarlo per trovare l'oggetto corrispondente a una data stringa.
                 return farmacoChoiceBox.getItems().stream()
                         .filter(t -> t.getNomeFarmaco().equals(string))
                         .findFirst().orElse(null);
             }
         });
+
+        profiloInfo = Arrays.asList("Sintomi", "Patologie", "Terapie Concomitanti");
+        currentProfiloIndex = 0;
+        updateProfiloView();
+
+        currentTerapiaIndex = 0;
+        updateTerapiaView();
     }
+
+    private void updateProfiloView() {
+        if (profiloInfo == null || pazienteDashboard == null) {
+            return;
+        }
+
+        String currentTitle = profiloInfo.get(currentProfiloIndex);
+        profiloTitle.setText(currentTitle);
+
+        String tipoFilter;
+        switch (currentTitle) {
+            case "Sintomi":
+                tipoFilter = "Sintomo";
+                break;
+            case "Patologie":
+                tipoFilter = "Patologia";
+                break;
+            case "Terapie Concomitanti":
+                tipoFilter = "Terapia Concomitante";
+                break;
+            default:
+                tipoFilter = "";
+                break;
+        }
+
+        List<CondizioniPaziente> condizioni = pazienteDashboard.getElencoCondizioni();
+        if (condizioni != null) {
+            String finalTipoFilter = tipoFilter;
+            List<CondizioniPaziente> filteredCondizioni = condizioni.stream()
+                    .filter(c -> finalTipoFilter.equals(c.getTipo()))
+                    .collect(Collectors.toList());
+            profiloListView.setItems(FXCollections.observableArrayList(filteredCondizioni));
+        } else {
+            profiloListView.setItems(FXCollections.observableArrayList());
+        }
+    }
+
+    private void updateTerapiaView() {
+        if (terapiePaziente == null || terapiePaziente.isEmpty()) {
+            nomeFarmacoText.setText("Nessuna terapia presente");
+            quantitaTerapiaText.setText("");
+            frequenzaText.setText("");
+            indicazioniText.setText("");
+            dateText.setText("");
+            return;
+        }
+
+        Terapia terapia = terapiePaziente.get(currentTerapiaIndex);
+        nomeFarmacoText.setText(terapia.getNomeFarmaco());
+        quantitaTerapiaText.setText(terapia.getQuantita());
+        frequenzaText.setText(String.valueOf(terapia.getFrequenzaGiornaliera()));
+        indicazioniText.setText(terapia.getIndicazioni());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String dataInizio = terapia.getDataInizio() != null ? terapia.getDataInizio().format(formatter) : "N/A";
+        String dataFine = terapia.getDataFine() != null ? terapia.getDataFine().format(formatter) : "N/A";
+        dateText.setText(dataInizio + " - " + dataFine);
+    }
+
 
     @FXML
     public void handleNotificationClick(ActionEvent actionEvent) {
@@ -312,16 +392,53 @@ public class DashboardPazienteController {
         }
     }
 
+    private static class ProfiloListCell extends ListCell<CondizioniPaziente> {
+        private final VBox contentVBox = new VBox(5);
+        private final Label descrizioneLabel = new Label();
+        private final Label periodoLabel = new Label();
+
+        public ProfiloListCell() {
+            descrizioneLabel.getStyleClass().addAll("profilo-list-cell-label", "profilo-list-cell-label-bold");
+            periodoLabel.getStyleClass().add("profilo-list-cell-label");
+            contentVBox.getChildren().addAll(descrizioneLabel, periodoLabel);
+            contentVBox.setPadding(new Insets(5));
+        }
+
+        @Override
+        protected void updateItem(CondizioniPaziente item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+                setGraphic(null);
+            } else {
+                descrizioneLabel.setText(item.getDescrizione());
+                periodoLabel.setText(item.getPeriodo());
+                setGraphic(contentVBox);
+            }
+        }
+    }
+
     public void handleLeftProfiloButton(ActionEvent actionEvent) {
+        currentProfiloIndex = (currentProfiloIndex - 1 + profiloInfo.size()) % profiloInfo.size();
+        updateProfiloView();
     }
 
     public void handleRightProfiloButton(ActionEvent actionEvent) {
+        currentProfiloIndex = (currentProfiloIndex + 1) % profiloInfo.size();
+        updateProfiloView();
     }
 
     public void handleLeftTerapieButton(ActionEvent actionEvent) {
+        if (terapiePaziente != null && !terapiePaziente.isEmpty()) {
+            currentTerapiaIndex = (currentTerapiaIndex - 1 + terapiePaziente.size()) % terapiePaziente.size();
+            updateTerapiaView();
+        }
     }
 
     public void handleRightTerapieButton(ActionEvent actionEvent) {
+        if (terapiePaziente != null && !terapiePaziente.isEmpty()) {
+            currentTerapiaIndex = (currentTerapiaIndex + 1) % terapiePaziente.size();
+            updateTerapiaView();
+        }
     }
 
     public void handleSaveButtonMisurazioni(ActionEvent actionEvent) {
