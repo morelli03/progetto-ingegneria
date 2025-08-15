@@ -49,7 +49,7 @@ public class NotificheDAO {
         // La query SQL per recuperare le notifiche non lette per un determinato destinatario.
         String sql = "SELECT * FROM Notifiche " +
                 "WHERE IDDestinatario = ?" +
-                "ORDER BY Letta ASC, Priorita DESC, Timestamp DESC";
+                "ORDER BY Letta ASC, Timestamp DESC";
 
 
 
