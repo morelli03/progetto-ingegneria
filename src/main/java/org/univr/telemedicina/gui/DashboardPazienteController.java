@@ -55,6 +55,7 @@ public class DashboardPazienteController {
     private int currentProfiloIndex;
     private PazienteDashboard pazienteDashboard;
     private List<Terapia> terapiePaziente;
+    private List<CondizioniPaziente> condizioniPaziente;
     private int currentTerapiaIndex;
 
     @FXML
@@ -97,6 +98,40 @@ public class DashboardPazienteController {
     @FXML
     private Text dateText;
 
+    @FXML
+    private Button deleteButtonSintomo;
+    @FXML
+    private Button saveButtonSintomo;
+    @FXML
+    private TextArea descrizioneSintomo;
+    @FXML
+    private TextArea periodoSintomo;
+    @FXML
+    private ChoiceBox<CondizioniPaziente> sintomoChoiceBox;
+
+    @FXML
+    private Button deleteButtonPatologia;
+    @FXML
+    private Button saveButtonPatologia;
+    @FXML
+    private TextArea descrizionePatologia;
+    @FXML
+    private TextArea periodoPatologia;
+    @FXML
+    private ChoiceBox<CondizioniPaziente> patologiaChoiceBox;
+    
+    @FXML
+    private Button deleteButtonTerapiaCon;
+    @FXML
+    private Button saveButtonTerapiaCon;
+    @FXML
+    private TextArea descrizioneTerapiaCon;
+    @FXML
+    private TextArea periodoTerapiaCon;
+    @FXML
+    private ChoiceBox<CondizioniPaziente> terapiaConChoiceBox;
+    
+
 
     @FXML
     public void initialize() {
@@ -112,6 +147,7 @@ public class DashboardPazienteController {
         nomeCognomeLabel.setText(paziente.getNome() + " " + paziente.getCognome());
         initializeNotifications();
 
+        // Recupera i dati del paziente per la dashboard
         try {
             pazienteDashboard = pazienteService.getDatiPazienteDasboard(pazienteLoggato);
         } catch (MedicoServiceException e) {
@@ -119,14 +155,14 @@ public class DashboardPazienteController {
         }
 
         //riempie il campo farmaco con i farmaci associati al paziente
-        this.terapiePaziente = pazienteDashboard.getElencoTerapie();
+        terapiePaziente = pazienteDashboard.getElencoTerapie();
 
         // Popola la ChoiceBox con gli OGGETTI, non con le stringhe
         if (terapiePaziente != null) {
             farmacoChoiceBox.setItems(FXCollections.observableArrayList(terapiePaziente));
         }
 
-        // 3. Crea e imposta un StringConverter per dire alla ChoiceBox cosa mostrare
+        // Crea e imposta un StringConverter per dire alla ChoiceBox cosa mostrare
         farmacoChoiceBox.setConverter(new StringConverter<Terapia>() {
             @Override
             public String toString(Terapia terapia) {
@@ -141,6 +177,11 @@ public class DashboardPazienteController {
             }
         });
 
+        condizioniPaziente = pazienteDashboard.getElencoCondizioni();
+
+        //riempie il boxchoice di sintomi
+
+        // Inizializza i campi di testo per la terapia
         profiloInfo = Arrays.asList("Sintomi", "Patologie", "Terapie Concomitanti");
         currentProfiloIndex = 0;
         updateProfiloView();
@@ -551,20 +592,29 @@ public class DashboardPazienteController {
         minutiField2.clear();
     }
 
+    public void handleDeleteButtonSintomo(ActionEvent actionEvent) {
+        showAlert("delete", "sintomo");
+    }
+    public void handleSaveButtonSintomo(ActionEvent actionEvent) {
+        showAlert("save", "sintomo");
 
-
-    public void handleAggModSintomoButton(ActionEvent actionEvent) {
     }
 
-    public void handleAggModPatologiaButton(ActionEvent actionEvent) {
+    public void handleDeleteButtonPatologia(ActionEvent actionEvent) {
+        showAlert("delete", "patologia");
+
+    }
+    public void handleSaveButtonPatologia(ActionEvent actionEvent) {
+        showAlert("save", "patologia");
+
     }
 
-    public void handleAggModTerapiaConcomButton(ActionEvent actionEvent) {
-    }
+    public void handleDeleteButtonTerapiaCon(ActionEvent actionEvent) {
+        showAlert("delete", "terapia con");
 
-    public void handleDeleteButtonAzioni(ActionEvent actionEvent) {
     }
+    public void handleSaveButtonTerapiaCon(ActionEvent actionEvent) {
+        showAlert("save", "terapia con");
 
-    public void handleSaveButtonAzioni(ActionEvent actionEvent) {
     }
 }

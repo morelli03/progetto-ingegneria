@@ -32,16 +32,31 @@
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.effect.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.paint.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<VBox maxHeight="1024.0" maxWidth="1440.0" minHeight="1024.0" minWidth="1440.0" prefHeight="1024.0" prefWidth="1440.0" styleClass="root-pane" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.univr.telemedicina.gui.DashboardPazienteController">
+<VBox maxHeight="1024.0" maxWidth="1440.0" minHeight="1024.0" minWidth="1440.0" prefHeight="1024.0" prefWidth="1440.0" styleClass="root-pane" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.univr.telemedicina.gui.DashboardPazienteController">
     <children>
         <SplitPane dividerPositions="0.5" prefHeight="62.0" prefWidth="1383.0" styleClass="root-pane">
             <VBox.margin>
@@ -116,239 +131,15 @@
                             </font>
                         </Text>
                         <Line endX="434.0" endY="-61.0" layoutX="231.0" layoutY="105.0" startX="-215.0" startY="-61.0" stroke="#e0e0e0" strokeWidth="2.0" />
-                  <Text fx:id="profiloTitle" fontSmoothingType="LCD" layoutX="14.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sintomi">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <ListView fx:id="profiloListView" layoutX="14.0" layoutY="90.0" prefHeight="180.0" prefWidth="655.0" styleClass="profilo-list-view" />
-                  <AnchorPane layoutX="584.0" layoutY="56.0" prefHeight="45.0" prefWidth="79.0">
-                     <children>
-                        <Button fx:id="leftProfiloButton" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleLeftProfiloButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="&lt;" textAlignment="CENTER">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <font>
-                              <Font name="Inter 24pt Regular" size="16.0" />
-                           </font>
-                           <effect>
-                              <DropShadow height="18.35" offsetY="2.0" radius="7.8375" spread="0.1" width="15.0">
-                                 <color>
-                                    <Color red="0.3100000023841858" green="0.3100000023841858" blue="0.3100000023841858" opacity="0.4300000071525574" />
-                                 </color>
-                              </DropShadow>
-                           </effect>
-                        </Button>
-                        <Button fx:id="rightProfiloButton" layoutX="46.0" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleRightProfiloButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="&gt;" textAlignment="CENTER">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <font>
-                              <Font name="Inter 24pt Regular" size="16.0" />
-                           </font>
-                           <effect>
-                              <DropShadow height="18.35" offsetY="2.0" radius="7.8375" spread="0.1" width="15.0">
-                                 <color>
-                                    <Color red="0.3100000023841858" green="0.3100000023841858" blue="0.3100000023841858" opacity="0.4329501986503601" />
-                                 </color>
-                              </DropShadow>
-                           </effect>
-                        </Button>
-                     </children>
-                  </AnchorPane>
-                  <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="306.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Terapie">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <GridPane fx:id="terapiaDetailsPane" layoutX="14.0" layoutY="320.0" prefHeight="150.0" prefWidth="655.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="500.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Nome Farmaco:" styleClass="terapia-details-text" />
-                        <Text fx:id="nomeFarmacoText" strokeType="OUTSIDE" strokeWidth="0.0" text="-" GridPane.columnIndex="1" styleClass="terapia-details-text" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Quantità:" GridPane.rowIndex="1" styleClass="terapia-details-text" />
-                        <Text fx:id="quantitaTerapiaText" strokeType="OUTSIDE" strokeWidth="0.0" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="terapia-details-text" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Freq. Giornaliera:" GridPane.rowIndex="2" styleClass="terapia-details-text" />
-                        <Text fx:id="frequenzaText" strokeType="OUTSIDE" strokeWidth="0.0" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" styleClass="terapia-details-text" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Indicazioni:" GridPane.rowIndex="3" styleClass="terapia-details-text" />
-                        <Text fx:id="indicazioniText" strokeType="OUTSIDE" strokeWidth="0.0" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" styleClass="terapia-details-text" />
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Durata terapia:" GridPane.rowIndex="4" styleClass="terapia-details-text" />
-                        <Text fx:id="dateText" strokeType="OUTSIDE" strokeWidth="0.0" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" styleClass="terapia-details-text" />
-                     </children>
-                  </GridPane>
-                  <AnchorPane layoutX="584.0" layoutY="289.0" prefHeight="45.0" prefWidth="79.0">
-                     <children>
-                        <Button fx:id="leftTerapieButton" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleLeftTerapieButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="&lt;" textAlignment="CENTER">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <font>
-                              <Font name="Inter 24pt Regular" size="16.0" />
-                           </font>
-                           <effect>
-                              <DropShadow height="18.35" offsetY="2.0" radius="7.8375" spread="0.1" width="15.0">
-                                 <color>
-                                    <Color red="0.3100000023841858" green="0.3100000023841858" blue="0.3100000023841858" opacity="0.4300000071525574" />
-                                 </color>
-                              </DropShadow>
-                           </effect>
-                        </Button>
-                        <Button fx:id="rightTerapieButton" layoutX="46.0" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleRightTerapieButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="&gt;" textAlignment="CENTER">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <font>
-                              <Font name="Inter 24pt Regular" size="16.0" />
-                           </font>
-                           <effect>
-                              <DropShadow height="18.35" offsetY="2.0" radius="7.8375" spread="0.1" width="15.0">
-                                 <color>
-                                    <Color red="0.3100000023841858" green="0.3100000023841858" blue="0.3100000023841858" opacity="0.4329501986503601" />
-                                 </color>
-                              </DropShadow>
-                           </effect>
-                        </Button>
-                     </children>
-                  </AnchorPane>
-                    </children>
-                </AnchorPane>
-            <AnchorPane layoutX="727.0" layoutY="78.0" prefHeight="163.0" prefWidth="683.0">
-               <children>
-                  <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="239.0" layoutX="-1.0" layoutY="-1.0" stroke="#e0e0e0" strokeType="INSIDE" width="683.0" />
-                  <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Aggiungi misurazioni">
-                     <font>
-                        <Font name="Inter 24pt Medium" size="18.0" />
-                     </font>
-                  </Text>
-                  <Line endX="434.0" endY="-61.0" layoutX="231.0" layoutY="105.0" startX="-215.0" startY="-61.0" stroke="#e0e0e0" strokeWidth="2.0" />
-                  <TextField fx:id="valoreGlicemicoField" layoutX="14.0" layoutY="89.0" prefWidth="83.0" styleClass="password-field" />
-                  <Text fontSmoothingType="LCD" layoutX="15.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Valore glicemico">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <Text fontSmoothingType="LCD" layoutX="103.0" layoutY="116.0" strokeType="OUTSIDE" strokeWidth="0.0" text="mg/dL">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <Button fx:id="saveButtonMisurazioni" layoutX="578.0" layoutY="180.0" maxHeight="150.0" maxWidth="142.0" minWidth="85.0" mnemonicParsing="false" onAction="#handleSaveButtonMisurazioni" prefWidth="131.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <font>
-                        <Font name="Inter 24pt Regular" size="16.0" />
-                     </font>
-                     <effect>
-                        <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
-                           <color>
-                              <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.5299999713897705" />
-                           </color>
-                        </DropShadow>
-                     </effect>
-                  </Button>
-                  <ChoiceBox fx:id="periodoChoiceBox" layoutX="270.0" layoutY="89.0" prefWidth="216.0" styleClass="text-field" />
-                  <Text fontSmoothingType="LCD" layoutX="270.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Periodo">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <Text fontSmoothingType="LCD" layoutX="15.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Data">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <DatePicker fx:id="dataPicker" layoutX="14.0" layoutY="180.0" prefHeight="40.0" prefWidth="216.0" />
-                  <Text fontSmoothingType="LCD" layoutX="270.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ora">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <TextField fx:id="oraField" layoutX="270.0" layoutY="180.0" prefWidth="72.0" />
-                  <TextField fx:id="minutiField" layoutX="356.0" layoutY="180.0" prefWidth="72.0" />
-               </children>
-            </AnchorPane>
-            <AnchorPane layoutX="727.0" layoutY="338.0" prefHeight="212.0" prefWidth="683.0">
-               <children>
-                  <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="239.0" layoutX="-1.0" layoutY="-6.0" stroke="#e0e0e0" strokeType="INSIDE" width="683.0" />
-                  <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Aggiungi assunzione farmaci">
-                     <font>
-                        <Font name="Inter 24pt Medium" size="18.0" />
-                     </font>
-                  </Text>
-                  <Line endX="434.0" endY="-61.0" layoutX="231.0" layoutY="105.0" startX="-215.0" startY="-61.0" stroke="#e0e0e0" strokeWidth="2.0" />
-                  <Button fx:id="saveButtonAssunzioneFarmaci" layoutX="578.0" layoutY="180.0" maxHeight="150.0" maxWidth="142.0" minWidth="85.0" mnemonicParsing="false" onAction="#handleSaveButtonAssunzioneFarmaci" prefWidth="131.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                     <font>
-                        <Font name="Inter 24pt Regular" size="16.0" />
-                     </font>
-                     <effect>
-                        <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
-                           <color>
-                              <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.5299999713897705" />
-                           </color>
-                        </DropShadow>
-                     </effect>
-                  </Button>
-                  <ChoiceBox fx:id="farmacoChoiceBox" layoutX="15.0" layoutY="89.0" prefWidth="216.0" styleClass="text-field" />
-                  <Text fontSmoothingType="LCD" layoutX="15.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Farmaco">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <DatePicker fx:id="datePicker2" layoutX="14.0" layoutY="180.0" prefHeight="40.0" prefWidth="216.0" />
-                  <Text fontSmoothingType="LCD" layoutX="15.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Data">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <Text fontSmoothingType="LCD" layoutX="271.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ora">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <TextField fx:id="quantitaField" layoutX="270.0" layoutY="88.0" prefWidth="173.0" styleClass="password-field" />
-                  <Text fontSmoothingType="LCD" layoutX="271.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Quantità">
-                     <font>
-                        <Font name="Inter 24pt Light" size="18.0" />
-                     </font>
-                  </Text>
-                  <TextField fx:id="oraField2" layoutX="271.0" layoutY="180.0" prefWidth="72.0" />
-                  <TextField fx:id="minutiField2" layoutX="357.0" layoutY="180.0" prefWidth="72.0" />
-               </children>
-            </AnchorPane>
-                <Text layoutX="30.0" layoutY="606.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Azioni">
-                    <font>
-                        <Font name="Inter 24pt Medium" size="20.0" />
-                    </font>
-                </Text>
-                <AnchorPane layoutX="30.0" layoutY="614.0" prefHeight="309.0" prefWidth="1380.0">
-                    <children>
-                        <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="309.0" stroke="#e0e0e0" strokeType="INSIDE" width="1380.0" />
-                        <AnchorPane layoutX="12.0" layoutY="12.0" minWidth="86.0" prefHeight="45.0" prefWidth="836.0">
+                        <Text fx:id="profiloTitle" fontSmoothingType="LCD" layoutX="14.0" layoutY="73.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Sintomi">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <ListView fx:id="profiloListView" layoutX="14.0" layoutY="90.0" prefHeight="180.0" prefWidth="655.0" styleClass="profilo-list-view" />
+                        <AnchorPane layoutX="584.0" layoutY="56.0" prefHeight="45.0" prefWidth="79.0">
                             <children>
-                                <Rectangle arcHeight="15.0" arcWidth="15.0" fill="#ffffffbd" height="45.0" stroke="#e0e0e0" strokeType="INSIDE" width="834.0">
-                                    <effect>
-                                        <InnerShadow height="15.08" offsetY="4.0" radius="4.8125" width="6.17">
-                                            <color>
-                                                <Color red="0.8299999833106995" green="0.8299999833106995" blue="0.8299999833106995" />
-                                            </color>
-                                        </InnerShadow>
-                                    </effect>
-                                </Rectangle>
-                                <Button fx:id="aggModSintomoButton" layoutX="3.0" layoutY="3.0" maxHeight="37.0" minHeight="0.0" mnemonicParsing="false" onAction="#handleAggModSintomoButton" prefHeight="48.0" styleClass="activated-button-graph" text="Aggiungi / modifica sintomo" textAlignment="CENTER">
+                                <Button fx:id="leftProfiloButton" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleLeftProfiloButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="&lt;" textAlignment="CENTER">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
@@ -363,7 +154,7 @@
                                         </DropShadow>
                                     </effect>
                                 </Button>
-                                <Button fx:id="aggModPatologiaButton" layoutX="248.0" layoutY="3.0" maxHeight="37.0" minHeight="0.0" mnemonicParsing="false" onAction="#handleAggModPatologiaButton" prefHeight="48.0" styleClass="deactivated-button-graph" text="Aggiungi / modifica patologia" textAlignment="CENTER">
+                                <Button fx:id="rightProfiloButton" layoutX="46.0" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleRightProfiloButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="&gt;" textAlignment="CENTER">
                                     <opaqueInsets>
                                         <Insets />
                                     </opaqueInsets>
@@ -378,24 +169,95 @@
                                         </DropShadow>
                                     </effect>
                                 </Button>
-                        <Button fx:id="aggModTerapiaConcomButton" layoutX="504.0" layoutY="3.0" maxHeight="37.0" minHeight="0.0" mnemonicParsing="false" onAction="#handleAggModTerapiaConcomButton" prefHeight="48.0" styleClass="deactivated-button-graph" text="Aggiungi / modifica terapia concomitante" textAlignment="CENTER">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <font>
-                              <Font name="Inter 24pt Regular" size="16.0" />
-                           </font>
-                           <effect>
-                              <DropShadow height="18.35" offsetY="2.0" radius="7.8375" spread="0.1" width="15.0">
-                                 <color>
-                                    <Color red="0.3100000023841858" green="0.3100000023841858" blue="0.3100000023841858" opacity="0.4329501986503601" />
-                                 </color>
-                              </DropShadow>
-                           </effect>
-                        </Button>
                             </children>
                         </AnchorPane>
-                        <Button fx:id="deleteButtonAzioni" layoutX="1090.0" layoutY="13.0" maxHeight="150.0" maxWidth="142.0" minWidth="131.0" mnemonicParsing="false" onAction="#handleDeleteButtonAzioni" prefWidth="131.0" styleClass="top-buttons" text="Elimina" textAlignment="CENTER">
+                        <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="306.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Terapie">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <GridPane fx:id="terapiaDetailsPane" layoutX="14.0" layoutY="320.0" prefHeight="150.0" prefWidth="655.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="500.0" />
+                            </columnConstraints>
+                            <rowConstraints>
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            </rowConstraints>
+                            <children>
+                                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="terapia-details-text" text="Nome Farmaco:" />
+                                <Text fx:id="nomeFarmacoText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="terapia-details-text" text="-" GridPane.columnIndex="1" />
+                                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="terapia-details-text" text="Quantità:" GridPane.rowIndex="1" />
+                                <Text fx:id="quantitaTerapiaText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="terapia-details-text" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="terapia-details-text" text="Freq. Giornaliera:" GridPane.rowIndex="2" />
+                                <Text fx:id="frequenzaText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="terapia-details-text" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="terapia-details-text" text="Indicazioni:" GridPane.rowIndex="3" />
+                                <Text fx:id="indicazioniText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="terapia-details-text" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                <Text strokeType="OUTSIDE" strokeWidth="0.0" styleClass="terapia-details-text" text="Durata terapia:" GridPane.rowIndex="4" />
+                                <Text fx:id="dateText" strokeType="OUTSIDE" strokeWidth="0.0" styleClass="terapia-details-text" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                            </children>
+                        </GridPane>
+                        <AnchorPane layoutX="584.0" layoutY="289.0" prefHeight="45.0" prefWidth="79.0">
+                            <children>
+                                <Button fx:id="leftTerapieButton" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleLeftTerapieButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="&lt;" textAlignment="CENTER">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                    <font>
+                                        <Font name="Inter 24pt Regular" size="16.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow height="18.35" offsetY="2.0" radius="7.8375" spread="0.1" width="15.0">
+                                            <color>
+                                                <Color red="0.3100000023841858" green="0.3100000023841858" blue="0.3100000023841858" opacity="0.4300000071525574" />
+                                            </color>
+                                        </DropShadow>
+                                    </effect>
+                                </Button>
+                                <Button fx:id="rightTerapieButton" layoutX="46.0" layoutY="4.0" maxHeight="37.0" maxWidth="37.0" minHeight="0.0" minWidth="0.0" mnemonicParsing="false" onAction="#handleRightTerapieButton" prefHeight="48.0" prefWidth="55.0" styleClass="activated-button-graph" text="&gt;" textAlignment="CENTER">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                    <font>
+                                        <Font name="Inter 24pt Regular" size="16.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow height="18.35" offsetY="2.0" radius="7.8375" spread="0.1" width="15.0">
+                                            <color>
+                                                <Color red="0.3100000023841858" green="0.3100000023841858" blue="0.3100000023841858" opacity="0.4329501986503601" />
+                                            </color>
+                                        </DropShadow>
+                                    </effect>
+                                </Button>
+                            </children>
+                        </AnchorPane>
+                    </children>
+                </AnchorPane>
+                <AnchorPane layoutX="727.0" layoutY="78.0" prefHeight="163.0" prefWidth="683.0">
+                    <children>
+                        <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="239.0" layoutX="-1.0" layoutY="-1.0" stroke="#e0e0e0" strokeType="INSIDE" width="683.0" />
+                        <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Aggiungi misurazioni">
+                            <font>
+                                <Font name="Inter 24pt Medium" size="18.0" />
+                            </font>
+                        </Text>
+                        <Line endX="434.0" endY="-61.0" layoutX="231.0" layoutY="105.0" startX="-215.0" startY="-61.0" stroke="#e0e0e0" strokeWidth="2.0" />
+                        <TextField fx:id="valoreGlicemicoField" layoutX="14.0" layoutY="89.0" prefWidth="83.0" styleClass="password-field" />
+                        <Text fontSmoothingType="LCD" layoutX="15.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Valore glicemico">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <Text fontSmoothingType="LCD" layoutX="103.0" layoutY="116.0" strokeType="OUTSIDE" strokeWidth="0.0" text="mg/dL">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <Button fx:id="saveButtonMisurazioni" layoutX="578.0" layoutY="180.0" maxHeight="150.0" maxWidth="142.0" minWidth="85.0" mnemonicParsing="false" onAction="#handleSaveButtonMisurazioni" prefWidth="131.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
                             <opaqueInsets>
                                 <Insets />
                             </opaqueInsets>
@@ -410,13 +272,43 @@
                                 </DropShadow>
                             </effect>
                         </Button>
-                        <Button fx:id="saveButtonAzioni" layoutX="1237.0" layoutY="13.0" maxHeight="150.0" maxWidth="142.0" minWidth="131.0" mnemonicParsing="false" onAction="#handleSaveButtonAzioni" prefWidth="131.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
+                        <ChoiceBox fx:id="periodoChoiceBox" layoutX="270.0" layoutY="89.0" prefWidth="216.0" styleClass="text-field" />
+                        <Text fontSmoothingType="LCD" layoutX="270.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Periodo">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <Text fontSmoothingType="LCD" layoutX="15.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Data">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <DatePicker fx:id="dataPicker" layoutX="14.0" layoutY="180.0" prefHeight="40.0" prefWidth="216.0" />
+                        <Text fontSmoothingType="LCD" layoutX="270.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ora">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <TextField fx:id="oraField" layoutX="270.0" layoutY="180.0" prefWidth="72.0" />
+                        <TextField fx:id="minutiField" layoutX="356.0" layoutY="180.0" prefWidth="72.0" />
+                    </children>
+                </AnchorPane>
+                <AnchorPane layoutX="727.0" layoutY="338.0" prefHeight="212.0" prefWidth="683.0">
+                    <children>
+                        <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="239.0" layoutX="-1.0" layoutY="-6.0" stroke="#e0e0e0" strokeType="INSIDE" width="683.0" />
+                        <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Aggiungi assunzione farmaci">
+                            <font>
+                                <Font name="Inter 24pt Medium" size="18.0" />
+                            </font>
+                        </Text>
+                        <Line endX="434.0" endY="-61.0" layoutX="231.0" layoutY="105.0" startX="-215.0" startY="-61.0" stroke="#e0e0e0" strokeWidth="2.0" />
+                        <Button fx:id="saveButtonAssunzioneFarmaci" layoutX="578.0" layoutY="180.0" maxHeight="150.0" maxWidth="142.0" minWidth="85.0" mnemonicParsing="false" onAction="#handleSaveButtonAssunzioneFarmaci" prefWidth="131.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
                             <opaqueInsets>
                                 <Insets />
                             </opaqueInsets>
                             <font>
                                 <Font name="Inter 24pt Regular" size="16.0" />
-                            </font>/
+                            </font>
                             <effect>
                                 <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
                                     <color>
@@ -425,7 +317,194 @@
                                 </DropShadow>
                             </effect>
                         </Button>
-                        <VBox fx:id="formContainer" layoutX="12.0" layoutY="66.0" prefHeight="237.0" prefWidth="1360.0" />
+                        <ChoiceBox fx:id="farmacoChoiceBox" layoutX="15.0" layoutY="89.0" prefWidth="216.0" styleClass="text-field" />
+                        <Text fontSmoothingType="LCD" layoutX="15.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Farmaco">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <DatePicker fx:id="datePicker2" layoutX="14.0" layoutY="180.0" prefHeight="40.0" prefWidth="216.0" />
+                        <Text fontSmoothingType="LCD" layoutX="15.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Data">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <Text fontSmoothingType="LCD" layoutX="271.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Ora">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <TextField fx:id="quantitaField" layoutX="270.0" layoutY="88.0" prefWidth="173.0" styleClass="password-field" />
+                        <Text fontSmoothingType="LCD" layoutX="271.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Quantità">
+                            <font>
+                                <Font name="Inter 24pt Light" size="18.0" />
+                            </font>
+                        </Text>
+                        <TextField fx:id="oraField2" layoutX="271.0" layoutY="180.0" prefWidth="72.0" />
+                        <TextField fx:id="minutiField2" layoutX="357.0" layoutY="180.0" prefWidth="72.0" />
+                    </children>
+                </AnchorPane>
+                <Text layoutX="30.0" layoutY="606.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Aggiungi / modifica sintomo">
+                    <font>
+                        <Font name="Inter 24pt Medium" size="20.0" />
+                    </font>
+                </Text>
+                <Text layoutX="496.0" layoutY="606.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Aggiungi / modifica patologia">
+                    <font>
+                        <Font name="Inter 24pt Medium" size="20.0" />
+                    </font>
+                </Text>
+                <Text layoutX="961.0" layoutY="606.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Aggiungi / modifica terapia concomitante">
+                    <font>
+                        <Font name="Inter 24pt Medium" size="20.0" />
+                    </font>
+                </Text>
+                <AnchorPane layoutX="30.0" layoutY="614.0" prefHeight="309.0" prefWidth="1380.0">
+                    <children>
+                        <AnchorPane prefHeight="309.0" prefWidth="451.0">
+                            <children>
+                                <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="309.0" stroke="#e0e0e0" strokeType="INSIDE" width="451.0" />
+                                <Button fx:id="deleteButtonSintomo" layoutX="260.0" layoutY="15.0" maxHeight="150.0" maxWidth="142.0" minWidth="83.0" mnemonicParsing="false" onAction="#handleDeleteButtonSintomo" prefWidth="83.0" styleClass="top-buttons" text="Elimina" textAlignment="CENTER">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                    <font>
+                                        <Font name="Inter 24pt Regular" size="16.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
+                                            <color>
+                                                <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.5299999713897705" />
+                                            </color>
+                                        </DropShadow>
+                                    </effect>
+                                </Button>
+                                <Button fx:id="saveButtonSintomo" layoutX="352.0" layoutY="15.0" maxHeight="150.0" maxWidth="142.0" minWidth="86.0" mnemonicParsing="false" onAction="#handleSaveButtonSintomo" prefWidth="86.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                    <font>
+                                        <Font name="Inter 24pt Regular" size="16.0" />
+                                    </font>/
+                                    <effect>
+                                        <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
+                                            <color>
+                                                <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.5299999713897705" />
+                                            </color>
+                                        </DropShadow>
+                                    </effect>
+                                </Button>
+                                <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="84.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Descrizione">
+                                    <font>
+                                        <Font name="Inter 24pt Light" size="18.0" />
+                                    </font>
+                                </Text>
+                                <TextArea fx:id="descrizioneSintomo" layoutX="14.0" layoutY="89.0" maxHeight="118.0" minHeight="118.0" prefHeight="118.0" prefWidth="424.0" styleClass="password-field" />
+                                <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="234.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Periodo">
+                                    <font>
+                                        <Font name="Inter 24pt Light" size="18.0" />
+                                    </font>
+                                </Text>
+                                <TextArea fx:id="periodoSintomo" layoutX="14.0" layoutY="239.0" maxHeight="60.0" minHeight="60.0" prefHeight="60.0" prefWidth="424.0" styleClass="password-field" />
+                                <ChoiceBox fx:id="sintomoChoiceBox" layoutX="14.0" layoutY="15.0" prefWidth="239.0" styleClass="text-field" />
+                            </children>
+                        </AnchorPane>
+                        <AnchorPane layoutX="465.0" prefHeight="309.0" prefWidth="451.0">
+                            <children>
+                                <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="309.0" stroke="#e0e0e0" strokeType="INSIDE" width="451.0" />
+                                <Button fx:id="deleteButtonPatologia" onAction="#handleDeleteButtonPatologia" layoutX="260.0" layoutY="15.0" maxHeight="150.0" maxWidth="142.0" minWidth="83.0" mnemonicParsing="false" prefWidth="83.0" styleClass="top-buttons" text="Elimina" textAlignment="CENTER">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                    <font>
+                                        <Font name="Inter 24pt Regular" size="16.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
+                                            <color>
+                                                <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.5299999713897705" />
+                                            </color>
+                                        </DropShadow>
+                                    </effect>
+                                </Button>
+                                <Button fx:id="saveButtonPatologia" onAction="#handleSaveButtonPatologia" layoutX="352.0" layoutY="15.0" maxHeight="150.0" maxWidth="142.0" minWidth="86.0" mnemonicParsing="false" prefWidth="86.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                    <font>
+                                        <Font name="Inter 24pt Regular" size="16.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
+                                            <color>
+                                                <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.5299999713897705" />
+                                            </color>
+                                        </DropShadow>
+                                    </effect>
+                                </Button>
+                                <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="84.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Descrizione">
+                                    <font>
+                                        <Font name="Inter 24pt Light" size="18.0" />
+                                    </font>
+                                </Text>
+                                <TextArea fx:id="descrizionePatologia" layoutX="14.0" layoutY="89.0" maxHeight="118.0" minHeight="118.0" prefHeight="118.0" prefWidth="424.0" styleClass="password-field" />
+                                <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="234.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Periodo">
+                                    <font>
+                                        <Font name="Inter 24pt Light" size="18.0" />
+                                    </font>
+                                </Text>
+                                <TextArea fx:id="periodoPatologia" layoutX="14.0" layoutY="239.0" maxHeight="60.0" minHeight="60.0" prefHeight="60.0" prefWidth="424.0" styleClass="password-field" />
+                                <ChoiceBox fx:id="patologiaChoiceBox" layoutX="14.0" layoutY="15.0" prefWidth="239.0" styleClass="text-field" />
+                            </children>
+                        </AnchorPane>
+                        <AnchorPane layoutX="929.0" prefHeight="309.0" prefWidth="451.0">
+                            <children>
+                                <Rectangle arcHeight="12.0" arcWidth="12.0" fill="TRANSPARENT" height="309.0" stroke="#e0e0e0" strokeType="INSIDE" width="451.0" />
+                                <Button fx:id="deleteButtonTerapiaCon" onAction="#handleDeleteButtonTerapiaCon" layoutX="260.0" layoutY="15.0" maxHeight="150.0" maxWidth="142.0" minWidth="83.0" mnemonicParsing="false" prefWidth="83.0" styleClass="top-buttons" text="Elimina" textAlignment="CENTER">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                    <font>
+                                        <Font name="Inter 24pt Regular" size="16.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
+                                            <color>
+                                                <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.5299999713897705" />
+                                            </color>
+                                        </DropShadow>
+                                    </effect>
+                                </Button>
+                                <Button fx:id="saveButtonTerapiaCon" onAction="#handleSaveButtonTerapiaCon" layoutX="352.0" layoutY="15.0" maxHeight="150.0" maxWidth="142.0" minWidth="86.0" mnemonicParsing="false" prefWidth="86.0" styleClass="top-buttons" text="Salva" textAlignment="CENTER">
+                                    <opaqueInsets>
+                                        <Insets />
+                                    </opaqueInsets>
+                                    <font>
+                                        <Font name="Inter 24pt Regular" size="16.0" />
+                                    </font>
+                                    <effect>
+                                        <DropShadow height="21.689999999999998" offsetY="2.0" radius="8.6725" spread="0.1" width="15.0">
+                                            <color>
+                                                <Color red="0.3199999928474426" green="0.3199999928474426" blue="0.3199999928474426" opacity="0.5299999713897705" />
+                                            </color>
+                                        </DropShadow>
+                                    </effect>
+                                </Button>
+                                <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="84.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Descrizione">
+                                    <font>
+                                        <Font name="Inter 24pt Light" size="18.0" />
+                                    </font>
+                                </Text>
+                                <TextArea fx:id="descrizioneTerapiaCon" layoutX="14.0" layoutY="89.0" maxHeight="118.0" minHeight="118.0" prefHeight="118.0" prefWidth="424.0" styleClass="password-field" />
+                                <Text fontSmoothingType="LCD" layoutX="14.0" layoutY="234.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Periodo">
+                                    <font>
+                                        <Font name="Inter 24pt Light" size="18.0" />
+                                    </font>
+                                </Text>
+                                <TextArea fx:id="periodoTerapiaCon" layoutX="14.0" layoutY="239.0" maxHeight="60.0" minHeight="60.0" prefHeight="60.0" prefWidth="424.0" styleClass="password-field" />
+                                <ChoiceBox fx:id="terapiaConChoiceBox" layoutX="14.0" layoutY="15.0" prefWidth="239.0" styleClass="text-field" />
+                            </children>
+                        </AnchorPane>
                     </children>
                 </AnchorPane>
             </children>
