@@ -106,7 +106,7 @@ public class MonitorService {
             System.out.println("Nessun paziente con terapie attive trovato. Controllo terminato.");
             return;
         }
-                                            // motliplico per 3 perche pèer tre giorni
+        // motliplico per 3 perche pèer tre giorni
         Map<Integer, Integer> frequenzeRichieste = terapiaDAO.getFrequenzeGiornalierePerPazienti(pazientiAttivi);
 
 
@@ -116,7 +116,7 @@ public class MonitorService {
 
             // somma tutte le assunzioni degli ultimi 3 giorni
             for(int i =0; i < 3; i++) {
-                                                                                                                                            //prende dalla mappa il conteggio per il paziente
+                //prende dalla mappa il conteggio per il paziente
                 numeroAssunzioni += assunzioneFarmaciDAO.getConteggioAssunzioniGiornoPerPazienti(List.of(idPaziente), LocalDate.now().minusDays(i)).getOrDefault(idPaziente, 0);
             }
 

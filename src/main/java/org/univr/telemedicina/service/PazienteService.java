@@ -24,9 +24,10 @@ public class PazienteService {
     private final PazientiDAO pazienteDAO;
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO;
     private final TerapiaDAO teratpiaDAO;
+    private final NotificheService notificheService;
 
 
-    public PazienteService(RilevazioneGlicemiaDAO rilevazioneDAO, MonitorService monitorService, CondizioniPazienteDAO condizioniDAO, UtenteDAO utenteDAO, PazientiDAO pazienteDAO, AssunzioneFarmaciDAO assunzioneFarmaciDAO, TerapiaDAO terapiaDAO) {
+    public PazienteService(RilevazioneGlicemiaDAO rilevazioneDAO, MonitorService monitorService, CondizioniPazienteDAO condizioniDAO, UtenteDAO utenteDAO, PazientiDAO pazienteDAO, AssunzioneFarmaciDAO assunzioneFarmaciDAO, TerapiaDAO terapiaDAO, NotificheService notificheService) {
         this.rilevazioneDAO = rilevazioneDAO;
         this.monitorService = monitorService;
         this.condizioniDAO = condizioniDAO;
@@ -34,6 +35,7 @@ public class PazienteService {
         this.pazienteDAO = pazienteDAO;
         this.assunzioneFarmaciDAO = assunzioneFarmaciDAO;
         this.teratpiaDAO = terapiaDAO;
+        this.notificheService = notificheService;
     }
 
     /**
@@ -85,7 +87,14 @@ public class PazienteService {
                 assunzioneFarmaciDAO.aggiungiAssunzione(assunzione);
             }
             else {
-                throw new WrongAssumptionException("Quantita' assunta non corrisponde con quantita' da assumere");
+
+                // Se la quantità assunta non corrisponde a quella prescritta, registra comunque l'assunzione e notifica il medico
+                AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), LocalDateTime.now(), quantitaAssunta);
+
+                // usavi un istanza generica di assunzionefarmaci, per il test dobbiamo usare dependency injection
+                assunzioneFarmaciDAO.aggiungiAssunzione(assunzione);
+                notificheService.send(terapia.getIDMedico(), 2, "Assunzione di farmaci non corretta", "Il paziente " + pazienteDAO.findNameById(terapia.getIDPaziente()) + " ha assunto una quantità di farmaco diversa da quella prescritta. Quantità assunta: " + quantitaAssunta, "Assunzione Farmaci");
+                throw new WrongAssumptionException("Quantita' assunta non corrisponde con quantita' da assumere, assunzione registrata comunque.");
             }
 
         } catch (WrongAssumptionException e) {
