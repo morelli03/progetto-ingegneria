@@ -76,12 +76,12 @@ public class PazienteService {
      * @param terapia la terapia per cui si sta registrando l'assunzione
      * @param quantitaAssunta Quantità di farmaco assunta
      */
-    public void registraAssunzioneFarmaci(Terapia terapia, String quantitaAssunta) throws WrongAssumptionException, DataAccessException {
+    public void registraAssunzioneFarmaci(Terapia terapia, String quantitaAssunta, LocalDateTime timestamp) throws WrongAssumptionException, DataAccessException {
 
         // Verifica se la terapia esiste per il paziente
         try {
             if(terapia.getQuantita().equals(quantitaAssunta)) {
-                AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), LocalDateTime.now(), quantitaAssunta);
+                AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), timestamp, quantitaAssunta);
 
                 // usavi un istanza generica di assunzionefarmaci, per il test dobbiamo usare dependency injection
                 assunzioneFarmaciDAO.aggiungiAssunzione(assunzione);
@@ -89,7 +89,7 @@ public class PazienteService {
             else {
 
                 // Se la quantità assunta non corrisponde a quella prescritta, registra comunque l'assunzione e notifica il medico
-                AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), LocalDateTime.now(), quantitaAssunta);
+                AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), timestamp, quantitaAssunta);
 
                 // usavi un istanza generica di assunzionefarmaci, per il test dobbiamo usare dependency injection
                 assunzioneFarmaciDAO.aggiungiAssunzione(assunzione);

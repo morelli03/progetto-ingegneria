@@ -276,13 +276,13 @@
                         </DropShadow>
                      </effect>
                   </Button>
-                  <ChoiceBox layoutX="15.0" layoutY="89.0" prefWidth="216.0" styleClass="text-field" />
+                  <ChoiceBox fx:id="farmacoChoiceBox" layoutX="15.0" layoutY="89.0" prefWidth="216.0" styleClass="text-field" />
                   <Text fontSmoothingType="LCD" layoutX="15.0" layoutY="78.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Farmaco">
                      <font>
                         <Font name="Inter 24pt Light" size="18.0" />
                      </font>
                   </Text>
-                  <DatePicker layoutX="14.0" layoutY="180.0" prefHeight="40.0" prefWidth="216.0" />
+                  <DatePicker fx:id="datePicker2" layoutX="14.0" layoutY="180.0" prefHeight="40.0" prefWidth="216.0" />
                   <Text fontSmoothingType="LCD" layoutX="15.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Data">
                      <font>
                         <Font name="Inter 24pt Light" size="18.0" />
@@ -293,14 +293,14 @@
                         <Font name="Inter 24pt Light" size="18.0" />
                      </font>
                   </Text>
-                  <TextField layoutX="270.0" layoutY="88.0" prefWidth="173.0" styleClass="password-field" />
+                  <TextField fx:id="quantitaField" layoutX="270.0" layoutY="88.0" prefWidth="173.0" styleClass="password-field" />
                   <Text fontSmoothingType="LCD" layoutX="271.0" layoutY="77.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Quantità">
                      <font>
                         <Font name="Inter 24pt Light" size="18.0" />
                      </font>
                   </Text>
-                  <TextField layoutX="271.0" layoutY="180.0" prefWidth="72.0" />
-                  <TextField layoutX="357.0" layoutY="180.0" prefWidth="72.0" />
+                  <TextField fx:id="oraField2" layoutX="271.0" layoutY="180.0" prefWidth="72.0" />
+                  <TextField fx:id="minutiField2" layoutX="357.0" layoutY="180.0" prefWidth="72.0" />
                </children>
             </AnchorPane>
                 <Text layoutX="30.0" layoutY="606.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Azioni">

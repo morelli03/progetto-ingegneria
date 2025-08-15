@@ -18,9 +18,13 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import org.univr.telemedicina.dao.*;
 import org.univr.telemedicina.exception.DataAccessException;
+import org.univr.telemedicina.exception.MedicoServiceException;
+import org.univr.telemedicina.exception.WrongAssumptionException;
 import org.univr.telemedicina.model.Notifica;
+import org.univr.telemedicina.model.Terapia;
 import org.univr.telemedicina.model.Utente;
 import org.univr.telemedicina.service.MonitorService;
 import org.univr.telemedicina.service.NotificheService;
@@ -45,7 +49,7 @@ public class DashboardPazienteController {
     private Utente pazienteLoggato;
     private final NotificheService notificheService = new NotificheService(new NotificheDAO());
     private final MonitorService monitorService = new MonitorService(new TerapiaDAO(), new AssunzioneFarmaciDAO(), notificheService, new PazientiDAO());
-    private final PazienteService pazienteService = new PazienteService(new RilevazioneGlicemiaDAO(), monitorService, new CondizioniPazienteDAO(), new UtenteDAO(), new PazientiDAO(), new AssunzioneFarmaciDAO(), new TerapiaDAO());
+    private final PazienteService pazienteService = new PazienteService(new RilevazioneGlicemiaDAO(), monitorService, new CondizioniPazienteDAO(), new UtenteDAO(), new PazientiDAO(), new AssunzioneFarmaciDAO(), new TerapiaDAO(), new NotificheService(new NotificheDAO()));
     private ScheduledExecutorService notificationScheduler;
     private List<Notifica> allNotifications;
 
@@ -65,6 +69,18 @@ public class DashboardPazienteController {
     private TextField minutiField;
 
     @FXML
+    private ChoiceBox<Terapia> farmacoChoiceBox;
+    @FXML
+    private DatePicker datePicker2;
+    @FXML
+    private TextField quantitaField;
+    @FXML
+    private TextField oraField2;
+    @FXML
+    private TextField minutiField2;
+
+
+    @FXML
     public void initialize() {
         periodoChoiceBox.setItems(FXCollections.observableArrayList(
                 "Prima colazione", "Dopo colazione", "Prima pranzo",
@@ -76,6 +92,40 @@ public class DashboardPazienteController {
         this.pazienteLoggato = paziente;
         nomeCognomeLabel.setText(paziente.getNome() + " " + paziente.getCognome());
         initializeNotifications();
+
+        //riempie il campo farmaco con i farmaci associati al paziente
+        List<Terapia> terapiePaziente;
+        try {
+            terapiePaziente = pazienteService.getDatiPazienteDasboard(pazienteLoggato).getElencoTerapie();
+        } catch (MedicoServiceException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Popola la ChoiceBox con gli OGGETTI, non con le stringhe
+        if (terapiePaziente != null) {
+            farmacoChoiceBox.setItems(FXCollections.observableArrayList(terapiePaziente));
+        }
+
+        // 3. Crea e imposta un StringConverter per dire alla ChoiceBox cosa mostrare
+        farmacoChoiceBox.setConverter(new StringConverter<Terapia>() {
+            @Override
+            public String toString(Terapia terapia) {
+                // Questa è la parte cruciale:
+                // Se l'oggetto è null, ritorna una stringa vuota o un placeholder.
+                // Altrimenti, ritorna la stringa che vuoi far vedere all'utente (il nome del farmaco).
+                return (terapia == null) ? "" : terapia.getNomeFarmaco();
+            }
+
+            @Override
+            public Terapia fromString(String string) {
+                // Questo metodo serve principalmente per le ComboBox editabili.
+                // Per una ChoiceBox, puoi semplicemente ritornare null, oppure, per completezza,
+                // puoi implementarlo per trovare l'oggetto corrispondente a una data stringa.
+                return farmacoChoiceBox.getItems().stream()
+                        .filter(t -> t.getNomeFarmaco().equals(string))
+                        .findFirst().orElse(null);
+            }
+        });
     }
 
     @FXML
@@ -324,7 +374,53 @@ public class DashboardPazienteController {
     }
 
     public void handleSaveButtonAssunzioneFarmaci(ActionEvent actionEvent) {
+
+
+        try{
+            if (farmacoChoiceBox.getValue() == null || quantitaField.getText().isEmpty() || datePicker2.getValue() == null || oraField2.getText().isEmpty() || minutiField2.getText().isEmpty()) {
+                showAlert("Errore", "Tutti i campi devono essere compilati.");
+                return;
+            }
+
+            Terapia terapia = farmacoChoiceBox.getValue();
+            String quantita = quantitaField.getText();
+            LocalDate localDate = datePicker2.getValue();
+            int ora = Integer.parseInt(oraField2.getText());
+            int minuti = Integer.parseInt(minutiField2.getText());
+
+            // Time validation
+            if (ora < 0 || ora > 23 || minuti < 0 || minuti > 59) {
+                showAlert("Errore", "Ora o minuti non validi.");
+                return;
+            }
+
+            //converto in LocalDateTime
+            LocalDateTime dataOra = LocalDateTime.of(localDate, LocalTime.of(ora, minuti));
+
+            pazienteService.registraAssunzioneFarmaci(terapia, quantita, dataOra);
+
+            showAlert("Successo", "Assunzione di farmaci salvata con successo.");
+            clearAssunzioneFarmaciFields();
+
+        } catch (WrongAssumptionException e) {
+            showAlert("Errore", "La quantità assunta non è coerente con la terapia prescritta. Assunzione salvata lo stesso, medico notificato.");
+        } catch (DataAccessException e) {
+            showAlert("Errore", "Errore durante il salvataggio della misurazione nel database.");
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            showAlert("Errore", "Il valore glicemico, l'ora e i minuti devono essere numeri validi.");
+        }
     }
+
+    private void clearAssunzioneFarmaciFields() {
+        farmacoChoiceBox.getSelectionModel().clearSelection();
+        quantitaField.clear();
+        datePicker2.setValue(null);
+        oraField2.clear();
+        minutiField2.clear();
+    }
+
+
 
     public void handleAggModSintomoButton(ActionEvent actionEvent) {
     }
