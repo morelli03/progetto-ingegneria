@@ -158,18 +158,23 @@ public class DashboardPazienteController {
         profiloTitle.setText(currentTitle);
 
         String tipoFilter;
+        String placeholderText;
         switch (currentTitle) {
             case "Sintomi":
                 tipoFilter = "Sintomo";
+                placeholderText = "Nessun Sintomo";
                 break;
             case "Patologie":
                 tipoFilter = "Patologia";
+                placeholderText = "Nessuna Patologia";
                 break;
             case "Terapie Concomitanti":
                 tipoFilter = "Terapia Concomitante";
+                placeholderText = "Nessuna Terapia Concomitante";
                 break;
             default:
                 tipoFilter = "";
+                placeholderText = "";
                 break;
         }
 
@@ -180,8 +185,17 @@ public class DashboardPazienteController {
                     .filter(c -> finalTipoFilter.equals(c.getTipo()))
                     .collect(Collectors.toList());
             profiloListView.setItems(FXCollections.observableArrayList(filteredCondizioni));
+
+            if (filteredCondizioni.isEmpty()) {
+                Label placeholder = new Label(placeholderText);
+                placeholder.setStyle("-fx-text-fill: grey;");
+                profiloListView.setPlaceholder(placeholder);
+            }
         } else {
             profiloListView.setItems(FXCollections.observableArrayList());
+            Label placeholder = new Label(placeholderText);
+            placeholder.setStyle("-fx-text-fill: grey;");
+            profiloListView.setPlaceholder(placeholder);
         }
     }
 
