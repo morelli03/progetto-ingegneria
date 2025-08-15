@@ -15,17 +15,20 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import org.univr.telemedicina.dao.NotificheDAO;
+import org.univr.telemedicina.dao.*;
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Notifica;
 import org.univr.telemedicina.model.Utente;
+import org.univr.telemedicina.service.MonitorService;
 import org.univr.telemedicina.service.NotificheService;
 
-import javafx.scene.text.Text;
-
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +37,16 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.univr.telemedicina.model.RilevazioneGlicemia;
+import org.univr.telemedicina.service.PazienteService;
+
+
 public class DashboardPazienteController {
 
     private Utente pazienteLoggato;
     private final NotificheService notificheService = new NotificheService(new NotificheDAO());
+    private final MonitorService monitorService = new MonitorService(new TerapiaDAO(), new AssunzioneFarmaciDAO(), notificheService, new PazientiDAO());
+    private final PazienteService pazienteService = new PazienteService(new RilevazioneGlicemiaDAO(), monitorService, new CondizioniPazienteDAO(), new UtenteDAO(), new PazientiDAO(), new AssunzioneFarmaciDAO());
     private ScheduledExecutorService notificationScheduler;
     private List<Notifica> allNotifications;
 
@@ -45,6 +54,24 @@ public class DashboardPazienteController {
     private Button notificationButton;
     @FXML
     private Text nomeCognomeLabel;
+    @FXML
+    private TextField valoreGlicemicoField;
+    @FXML
+    private ChoiceBox<String> periodoChoiceBox;
+    @FXML
+    private DatePicker dataPicker;
+    @FXML
+    private TextField oraField;
+    @FXML
+    private TextField minutiField;
+
+    @FXML
+    public void initialize() {
+        periodoChoiceBox.setItems(FXCollections.observableArrayList(
+                "Prima colazione", "Dopo colazione", "Prima pranzo",
+                "Dopo pranzo", "Prima cena", "Dopo cena"));
+    }
+
 
     public void initData(Utente paziente){
         this.pazienteLoggato = paziente;
@@ -249,6 +276,52 @@ public class DashboardPazienteController {
     }
 
     public void handleSaveButtonMisurazioni(ActionEvent actionEvent) {
+        try {
+            // Input validation
+            if (valoreGlicemicoField.getText().isEmpty() ||
+                periodoChoiceBox.getValue() == null ||
+                dataPicker.getValue() == null ||
+                oraField.getText().isEmpty() ||
+                minutiField.getText().isEmpty()) {
+                showAlert("Errore", "Tutti i campi devono essere compilati.");
+                return;
+            }
+
+            int valoreGlicemico = Integer.parseInt(valoreGlicemicoField.getText());
+            String periodo = periodoChoiceBox.getValue();
+            LocalDate localDate = dataPicker.getValue();
+            int ora = Integer.parseInt(oraField.getText());
+            int minuti = Integer.parseInt(minutiField.getText());
+
+            // Time validation
+            if (ora < 0 || ora > 23 || minuti < 0 || minuti > 59) {
+                showAlert("Errore", "Ora o minuti non validi.");
+                return;
+            }
+
+            // Converto in LocalDateTime
+            LocalDateTime dataOra = LocalDateTime.of(localDate, LocalTime.of(ora, minuti));
+
+            // Using the "note" field to store the "periodo"
+            pazienteService.registraRilevazioneGlicemia(pazienteLoggato.getIDUtente(), valoreGlicemico, dataOra, periodo);
+
+
+            showAlert("Successo", "Misurazione salvata con successo.");
+            clearMisurazioniFields();
+        } catch (NumberFormatException e) {
+            showAlert("Errore", "Il valore glicemico, l'ora e i minuti devono essere numeri validi.");
+        } catch (DataAccessException e) {
+            showAlert("Errore", "Errore durante il salvataggio della misurazione nel database.");
+            e.printStackTrace();
+        }
+    }
+
+    private void clearMisurazioniFields() {
+        valoreGlicemicoField.clear();
+        periodoChoiceBox.getSelectionModel().clearSelection();
+        dataPicker.setValue(null);
+        oraField.clear();
+        minutiField.clear();
     }
 
     public void handleSaveButtonAssunzioneFarmaci(ActionEvent actionEvent) {
