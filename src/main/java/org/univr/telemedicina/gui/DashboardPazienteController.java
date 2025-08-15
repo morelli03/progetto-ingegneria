@@ -23,6 +23,8 @@ import org.univr.telemedicina.model.Notifica;
 import org.univr.telemedicina.model.Utente;
 import org.univr.telemedicina.service.NotificheService;
 
+import javafx.scene.text.Text;
+
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -41,9 +43,12 @@ public class DashboardPazienteController {
 
     @FXML
     private Button notificationButton;
+    @FXML
+    private Text nomeCognomeLabel;
 
     public void initData(Utente paziente){
         this.pazienteLoggato = paziente;
+        nomeCognomeLabel.setText(paziente.getNome() + " " + paziente.getCognome());
         initializeNotifications();
     }
 
