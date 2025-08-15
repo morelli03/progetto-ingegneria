@@ -37,7 +37,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import org.univr.telemedicina.model.RilevazioneGlicemia;
 import org.univr.telemedicina.service.PazienteService;
 
 
@@ -46,7 +45,7 @@ public class DashboardPazienteController {
     private Utente pazienteLoggato;
     private final NotificheService notificheService = new NotificheService(new NotificheDAO());
     private final MonitorService monitorService = new MonitorService(new TerapiaDAO(), new AssunzioneFarmaciDAO(), notificheService, new PazientiDAO());
-    private final PazienteService pazienteService = new PazienteService(new RilevazioneGlicemiaDAO(), monitorService, new CondizioniPazienteDAO(), new UtenteDAO(), new PazientiDAO(), new AssunzioneFarmaciDAO());
+    private final PazienteService pazienteService = new PazienteService(new RilevazioneGlicemiaDAO(), monitorService, new CondizioniPazienteDAO(), new UtenteDAO(), new PazientiDAO(), new AssunzioneFarmaciDAO(), new TerapiaDAO());
     private ScheduledExecutorService notificationScheduler;
     private List<Notifica> allNotifications;
 

@@ -2,19 +2,18 @@ package org.univr.telemedicina.service;
 
 import org.univr.telemedicina.dao.*;
 
-import org.univr.telemedicina.model.Terapia;
+import org.univr.telemedicina.exception.MedicoServiceException;
+import org.univr.telemedicina.model.*;
 
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.exception.WrongAssumptionException;
-import org.univr.telemedicina.model.AssunzioneFarmaci;
-import org.univr.telemedicina.model.CondizioniPaziente;
-import org.univr.telemedicina.model.RilevazioneGlicemia;
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class PazienteService {
     
@@ -24,16 +23,17 @@ public class PazienteService {
     private final UtenteDAO utenteDAO;
     private final PazientiDAO pazienteDAO;
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO;
+    private final TerapiaDAO teratpiaDAO;
 
 
-    public PazienteService(RilevazioneGlicemiaDAO rilevazioneDAO, MonitorService monitorService, CondizioniPazienteDAO condizioniDAO, UtenteDAO utenteDAO, PazientiDAO pazienteDAO, AssunzioneFarmaciDAO assunzioneFarmaciDAO) {
+    public PazienteService(RilevazioneGlicemiaDAO rilevazioneDAO, MonitorService monitorService, CondizioniPazienteDAO condizioniDAO, UtenteDAO utenteDAO, PazientiDAO pazienteDAO, AssunzioneFarmaciDAO assunzioneFarmaciDAO, TerapiaDAO terapiaDAO) {
         this.rilevazioneDAO = rilevazioneDAO;
         this.monitorService = monitorService;
         this.condizioniDAO = condizioniDAO;
         this.utenteDAO = utenteDAO;
         this.pazienteDAO = pazienteDAO;
         this.assunzioneFarmaciDAO = assunzioneFarmaciDAO;
-
+        this.teratpiaDAO = terapiaDAO;
     }
 
     /**
@@ -152,5 +152,24 @@ public class PazienteService {
 
         // Crea l'URL per aprire il client di posta elettronica
         return "mailto:" + emailMedico + "?subject=" + encodedSubject + "&body=" + encodedBody;
+    }
+
+    /**
+     * raccoglie dati necessari per la dashboard del singolo paziente
+     */
+    public PazienteDashboard getDatiPazienteDasboard(Utente utente) throws MedicoServiceException {
+        try{
+
+            //recupera liste di informazioni dai DAO
+            List<RilevazioneGlicemia> elencoRilevazioni = rilevazioneDAO.getRilevazioniByPaziente(utente.getIDUtente());
+            List<Terapia> elencoTerapie = teratpiaDAO.listTherapiesByPatId(utente.getIDUtente());
+            List<CondizioniPaziente> elencoCondizioni = condizioniDAO.listByIDPatId(utente.getIDUtente());
+            List<AssunzioneFarmaci> elencoAssunzioni = assunzioneFarmaciDAO.leggiAssunzioniFarmaci(utente.getIDUtente());
+
+            return new PazienteDashboard(utente, elencoRilevazioni, elencoTerapie, elencoCondizioni, elencoAssunzioni);
+        }catch (DataAccessException e){
+            throw new MedicoServiceException("Errore durante il recupero dei dati del paziente: " + e.getMessage(), e);
+        }
+
     }
 }
