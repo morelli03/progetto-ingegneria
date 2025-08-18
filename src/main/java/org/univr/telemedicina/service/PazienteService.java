@@ -126,6 +126,34 @@ public class PazienteService {
             throw new DataAccessException("Errore durante la registrazione della condizione del paziente: ", e);
         }
     }
+
+    /**
+     * Modifica una condizione esistente per un paziente.
+     * @param condizione L'oggetto CondizioniPaziente contenente i dati aggiornati della condizione
+     * @throws DataAccessException se si verifica un errore durante l'accesso ai dati
+     */
+    public void modificaCondizione(CondizioniPaziente condizione) throws DataAccessException {
+        try {
+            condizioniDAO.update(condizione);
+        } catch (DataAccessException e) {
+            System.err.println("Errore durante la modifica della condizione: " + e.getMessage());
+            throw new DataAccessException("Errore durante la modifica della condizione: ", e);
+        }
+    }
+
+    /**
+     * Elimina una condizione esistente per un paziente.
+     * @param idCondizione ID della condizione da eliminare
+     * @throws DataAccessException se si verifica un errore durante l'accesso ai dati
+     */
+    public void eliminaCondizione(int idCondizione) throws DataAccessException {
+        try {
+            condizioniDAO.delete(idCondizione);
+        } catch (DataAccessException e) {
+            System.err.println("Errore during l'eliminazione della condizione: " + e.getMessage());
+            throw new DataAccessException("Errore during l'eliminazione della condizione: ", e);
+        }
+    }
     
     /**
      * Invia un'email al medico di riferimento del paziente con un oggetto e un corpo specificati.
@@ -204,32 +232,5 @@ public class PazienteService {
             throw new MedicoServiceException("Errore durante il recupero dei dati del paziente: " + e.getMessage(), e);
         }
 
-    }
-
-    public void registraNuovaCondizione(CondizioniPaziente condizione) throws DataAccessException {
-        try {
-            condizioniDAO.create(condizione);
-        } catch (DataAccessException e) {
-            System.err.println("Errore durante la registrazione della nuova condizione: " + e.getMessage());
-            throw new DataAccessException("Errore durante la registrazione della nuova condizione: ", e);
-        }
-    }
-
-    public void modificaCondizione(CondizioniPaziente condizione) throws DataAccessException {
-        try {
-            condizioniDAO.update(condizione);
-        } catch (DataAccessException e) {
-            System.err.println("Errore durante la modifica della condizione: " + e.getMessage());
-            throw new DataAccessException("Errore durante la modifica della condizione: ", e);
-        }
-    }
-
-    public void eliminaCondizione(int idCondizione) throws DataAccessException {
-        try {
-            condizioniDAO.delete(idCondizione);
-        } catch (DataAccessException e) {
-            System.err.println("Errore during l'eliminazione della condizione: " + e.getMessage());
-            throw new DataAccessException("Errore during l'eliminazione della condizione: ", e);
-        }
     }
 }
