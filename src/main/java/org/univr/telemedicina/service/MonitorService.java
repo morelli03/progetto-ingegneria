@@ -9,7 +9,6 @@ import org.univr.telemedicina.model.RilevazioneGlicemia;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
@@ -136,23 +135,17 @@ public class MonitorService {
      * @param rilevazione L'oggetto RilevazioneGlicemia contenente i dati della rilevazione.
      */
     public void checkGlicemia(RilevazioneGlicemia rilevazione) throws DataAccessException {
-
-        LocalTime oraRilevazione = rilevazione.getTimestamp().toLocalTime();
-
-        //check due ore dopo i pasti
-        if( oraRilevazione.isAfter(LocalTime.of(8, 0)) && oraRilevazione.isBefore(LocalTime.of(11, 0)) ||
-                oraRilevazione.isAfter(LocalTime.of(12, 30)) && oraRilevazione.isBefore(LocalTime.of(14, 0)) ||
-                oraRilevazione.isAfter(LocalTime.of(19, 30)) && oraRilevazione.isBefore(LocalTime.of(21, 0))) {
-            //entra se è due ore dopo i pasti
-            if(rilevazione.getValore() <= 100 || rilevazione.getValore() >= 180){
-                //System.out.println("NOTIFICA a Paziente ID " + rilevazione.getIdPaziente() + ": Valore glicemico anormale dopo i pasti: " + rilevazione.getValore() + " mg/dL. Controlla la tua dieta.");
-                notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(rilevazione.getIdPaziente()).orElseThrow(), 3, "Glicemia Anormale", "Il paziente " + pazientiDAO.findNameById(rilevazione.getIdPaziente()) + " ha registrato un valore glicemico anormale dopo i pasti: " + rilevazione.getValore() + " mg/dL.", "Glicemia");
-            }
-        } else {
+        if(rilevazione.getNote().equals("Prima colazione") || rilevazione.getNote().equals("Prima pranzo") || rilevazione.getNote().equals("Prima cena")){
             //entra se è prima dei pasti
             if(rilevazione.getValore() <= 80 || rilevazione.getValore() >= 130){
                 //System.out.println("NOTIFICA a Paziente ID " + rilevazione.getIdPaziente() + ": Valore glicemico anormale prima dei pasti: " + rilevazione.getValore() + " mg/dL. Controlla la tua dieta.");
                 notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(rilevazione.getIdPaziente()).orElseThrow(), 3, "Glicemia Anormale", "Il paziente " + pazientiDAO.findNameById(rilevazione.getIdPaziente()) + " ha registrato un valore glicemico anormale prima dei pasti: " + rilevazione.getValore() + " mg/dL.", "Glicemia");
+            }
+        } else {
+            //entra se è due ore dopo i pasti
+            if(rilevazione.getValore() >= 180){
+                //System.out.println("NOTIFICA a Paziente ID " + rilevazione.getIdPaziente() + ": Valore glicemico anormale dopo i pasti: " + rilevazione.getValore() + " mg/dL. Controlla la tua dieta.");
+                notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(rilevazione.getIdPaziente()).orElseThrow(), 3, "Glicemia Anormale", "Il paziente " + pazientiDAO.findNameById(rilevazione.getIdPaziente()) + " ha registrato un valore glicemico anormale dopo i pasti: " + rilevazione.getValore() + " mg/dL.", "Glicemia");
             }
         }
 

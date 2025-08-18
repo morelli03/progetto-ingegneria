@@ -60,7 +60,7 @@ class MonitorServiceTest {
         // ARRANGE
         // Valore basso (<= 80) in un orario pre-pasto (es. 12:00)
         LocalDateTime orarioPrePranzo = LocalDateTime.of(LocalDate.now(), LocalTime.of(12, 5));
-        RilevazioneGlicemia rilevazione = new RilevazioneGlicemia(1, 1, 70, orarioPrePranzo, "Pre-pranzo");
+        RilevazioneGlicemia rilevazione = new RilevazioneGlicemia(1, 1, 70, orarioPrePranzo, "Prima pranzo");
         when(pazientiDAO.getMedicoRiferimentoByPazienteId(1)).thenReturn(Optional.of(10));
         when(pazientiDAO.findNameById(1)).thenReturn("Mario Rossi");
 
@@ -93,9 +93,7 @@ class MonitorServiceTest {
 
         // ACT & ASSERT
         // Il metodo orElseThrow() nel service lancerà un'eccezione, che è il comportamento atteso
-        assertThrows(Exception.class, () -> {
-            monitorService.checkGlicemia(rilevazione);
-        });
+        assertThrows(Exception.class, () -> monitorService.checkGlicemia(rilevazione));
 
         // In questo caso, nessuna notifica deve essere inviata
         verifyNoInteractions(notificheService);
