@@ -277,6 +277,9 @@ public class DashboardPazienteController {
                 }
             });
             
+            // Select "Nuovo sintomo" by default
+            sintomoChoiceBox.getSelectionModel().selectFirst();
+            
             // Add listener to handle selection changes
             sintomoChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
                 if (newSelection != null) {
@@ -324,6 +327,9 @@ public class DashboardPazienteController {
                 }
             });
             
+            // Select "Nuova patologia" by default
+            patologiaChoiceBox.getSelectionModel().selectFirst();
+            
             // Add listener to handle selection changes
             patologiaChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
                 if (newSelection != null) {
@@ -348,7 +354,7 @@ public class DashboardPazienteController {
             CondizioniPaziente nuovaTerapiaCon = new CondizioniPaziente();
             nuovaTerapiaCon.setIDPaziente(0);
             nuovaTerapiaCon.setTipo("Terapia Concomitante");
-            nuovaTerapiaCon.setDescrizione("Nuova terapia concomitante");
+            nuovaTerapiaCon.setDescrizione("Nuova terapia concom.");
             nuovaTerapiaCon.setPeriodo("");
             nuovaTerapiaCon.setDataRegistrazione(LocalDate.now());
             terapieConWithNew.add(nuovaTerapiaCon);
@@ -370,6 +376,9 @@ public class DashboardPazienteController {
                             .findFirst().orElse(null);
                 }
             });
+            
+            // Select "Nuova terapia concomitante" by default
+            terapiaConChoiceBox.getSelectionModel().selectFirst();
             
             // Add listener to handle selection changes
             terapiaConChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -743,14 +752,9 @@ public class DashboardPazienteController {
     public void handleDeleteButtonSintomo(ActionEvent actionEvent) {
         CondizioniPaziente selectedSintomo = sintomoChoiceBox.getSelectionModel().getSelectedItem();
         
-        if (selectedSintomo == null) {
-            showAlert("Errore", "Seleziona un sintomo da eliminare.");
-            return;
-        }
-        
         // Check if it's "Nuovo sintomo"
         if ("Nuovo sintomo".equals(selectedSintomo.getDescrizione())) {
-            showAlert("Errore", "Non puoi eliminare 'Nuovo sintomo'.");
+            showAlert("Errore", "Seleziona un sintomo esistente da eliminare.");
             return;
         }
         
@@ -811,15 +815,11 @@ public class DashboardPazienteController {
 
     public void handleDeleteButtonPatologia(ActionEvent actionEvent) {
         CondizioniPaziente selectedPatologia = patologiaChoiceBox.getSelectionModel().getSelectedItem();
-        
-        if (selectedPatologia == null) {
-            showAlert("Errore", "Seleziona una patologia da eliminare.");
-            return;
-        }
+
         
         // Check if it's "Nuova patologia"
         if ("Nuova patologia".equals(selectedPatologia.getDescrizione())) {
-            showAlert("Errore", "Non puoi eliminare 'Nuova patologia'.");
+            showAlert("Errore", "Seleziona una patologia esistente da eliminare.");
             return;
         }
         
@@ -880,15 +880,11 @@ public class DashboardPazienteController {
 
     public void handleDeleteButtonTerapiaCon(ActionEvent actionEvent) {
         CondizioniPaziente selectedTerapiaCon = terapiaConChoiceBox.getSelectionModel().getSelectedItem();
-        
-        if (selectedTerapiaCon == null) {
-            showAlert("Errore", "Seleziona una terapia concomitante da eliminare.");
-            return;
-        }
+
         
         // Check if it's "Nuova terapia concomitante"
         if ("Nuova terapia concomitante".equals(selectedTerapiaCon.getDescrizione())) {
-            showAlert("Errore", "Non puoi eliminare 'Nuova terapia concomitante'.");
+            showAlert("Errore", "Seleziona una terapia concomitante esistente da eliminare.");
             return;
         }
         
