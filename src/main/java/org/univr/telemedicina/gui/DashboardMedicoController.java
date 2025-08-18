@@ -47,6 +47,43 @@ public class DashboardMedicoController {
     // Aggiungi un campo per memorizzare l'utente che ha fatto il login
     private Utente medicoLoggato;
 
+    // Campi per il form terapia
+    private ComboBox<Object> terapiaComboBox;
+    private TextField farmacoTextField;
+    private TextField quantitaTextField;
+    private TextField frequenzaTextField;
+    private TextArea indicazioniTextArea;
+    private DatePicker dataInizioPicker;
+    private DatePicker dataFinePicker;
+    private CheckBox dataFineCheckBox;
+
+    // Campi per il form condizioni
+    private ComboBox<Object> condizioneComboBox;
+    private ComboBox<String> tipoCondizioneComboBox;
+    private TextArea descrizioneCondizioneTextArea;
+    private TextArea periodoCondizioneTextArea;
+
+    private final PazientiDAO pazientiDAO = new PazientiDAO();
+    private final RilevazioneGlicemiaDAO rivelazioneGlicemiaDAO = new RilevazioneGlicemiaDAO();
+    private final CondizioniPazienteDAO condizioniPazienteDAO = new CondizioniPazienteDAO();
+    private final LogOperazioniDAO logOperazioniDAO = new LogOperazioniDAO();
+    private final TerapiaDAO terapiaDAO = new TerapiaDAO();
+    private final AssunzioneFarmaciDAO assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
+    private final MedicoService medicoService = new MedicoService(pazientiDAO, rivelazioneGlicemiaDAO, condizioniPazienteDAO, logOperazioniDAO, terapiaDAO, assunzioneFarmaciDAO);
+    private final TerapiaService terapiaService = new TerapiaService(terapiaDAO, logOperazioniDAO);
+    private final NotificheService notificheService = new NotificheService(new NotificheDAO());
+    private ScheduledExecutorService notificationScheduler;
+    private List<Notifica> allNotifications;
+
+
+    private Parent formTerapia;
+    private Parent formCondizioni;
+    private Utente pazienteSelezionato;
+    private PazienteDashboard datiPazienteCorrente;
+    private String tipoVista = "mensile"; // o "settimanale"
+    private LocalDate dataCorrente = LocalDate.now();
+    private String formCorrente;
+
     // Dichiarazione delle label collegate tramite @FXML
     @FXML
     private Label nameLable;
@@ -93,43 +130,6 @@ public class DashboardMedicoController {
     @FXML
     private Button notificationButton;
 
-    // Campi per il form terapia
-    private ComboBox<Object> terapiaComboBox;
-    private TextField farmacoTextField;
-    private TextField quantitaTextField;
-    private TextField frequenzaTextField;
-    private TextArea indicazioniTextArea;
-    private DatePicker dataInizioPicker;
-    private DatePicker dataFinePicker;
-    private CheckBox dataFineCheckBox;
-
-    // Campi per il form condizioni
-    private ComboBox<Object> condizioneComboBox;
-    private ComboBox<String> tipoCondizioneComboBox;
-    private TextArea descrizioneCondizioneTextArea;
-    private TextArea periodoCondizioneTextArea;
-
-    private final PazientiDAO pazientiDAO = new PazientiDAO();
-    private final RilevazioneGlicemiaDAO rivelazioneGlicemiaDAO = new RilevazioneGlicemiaDAO();
-    private final CondizioniPazienteDAO condizioniPazienteDAO = new CondizioniPazienteDAO();
-    private final LogOperazioniDAO logOperazioniDAO = new LogOperazioniDAO();
-    private final TerapiaDAO terapiaDAO = new TerapiaDAO();
-    private final AssunzioneFarmaciDAO assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
-    private final MedicoService medicoService = new MedicoService(pazientiDAO, rivelazioneGlicemiaDAO, condizioniPazienteDAO, logOperazioniDAO, terapiaDAO, assunzioneFarmaciDAO);
-    private final TerapiaService terapiaService = new TerapiaService(terapiaDAO, logOperazioniDAO);
-    private final NotificheService notificheService = new NotificheService(new NotificheDAO());
-    private ScheduledExecutorService notificationScheduler;
-    private List<Notifica> allNotifications;
-
-
-    private Parent formTerapia;
-    private Parent formCondizioni;
-    private Utente pazienteSelezionato;
-    private PazienteDashboard datiPazienteCorrente;
-    private String tipoVista = "mensile"; // o "settimanale"
-    private LocalDate dataCorrente = LocalDate.now();
-    private String formCorrente;
-
     public void initData(Utente medicoLoggato) {
         this.medicoLoggato = medicoLoggato;
         System.out.println("Dashboard caricata per il medico: " + medicoLoggato.getEmail());
@@ -143,8 +143,8 @@ public class DashboardMedicoController {
         initializeNotifications();
 
         try {
-            formTerapia = FXMLLoader.load(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_terapia.fxml"));
-            formCondizioni = FXMLLoader.load(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_condizioni.fxml"));
+            formTerapia = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_terapia.fxml")));
+            formCondizioni = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/org/univr/telemedicina/gui/fxml/form_condizioni.fxml")));
 
             // Inizializzazione campi form terapia
             terapiaComboBox = (ComboBox<Object>) formTerapia.lookup("#terapiaComboBox");

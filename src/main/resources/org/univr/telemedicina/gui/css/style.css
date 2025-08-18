@@ -232,3 +232,25 @@
     -fx-padding: 0;
 }
 
+.profilo-list-view {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-color: transparent;
+}
+
+.profilo-list-cell-label {
+    -fx-text-fill: black;
+}
+
+.profilo-list-cell-label-bold {
+    -fx-font-weight: bold;
+}
+
+.terapia-details-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+}
+
+.terapia-details-text {
+    -fx-font-size: 16px;
+}

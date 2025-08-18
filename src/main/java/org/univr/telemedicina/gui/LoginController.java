@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 import java.util.Optional;
 
 public class LoginController {
@@ -94,36 +95,61 @@ public class LoginController {
      * @param utente L'utente autenticato.
      */
     private void navigateToDashboard(Utente utente) {
-        try {
-            // **PASSO 1: Carica il nuovo FXML**
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/univr/telemedicina/gui/fxml/dashboardmedico.fxml"));
-            Parent root = loader.load();
 
-            // **PASSO 2: Passa i dati al nuovo controller (FONDAMENTALE)**
-            // Prima ottieni il controller della dashboard
-            DashboardMedicoController dashboardController = loader.getController();
-            // Poi chiama un metodo per passare l'oggetto Utente
-            dashboardController.initData(utente);
+        // Controlla il ruolo dell'utente e carica la dashboard appropriata
+        if(Objects.equals(utente.getRuolo(), "Medico")){
+            try{
+                // **PASSO 1: Carica il nuovo FXML**
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/univr/telemedicina/gui/fxml/dashboardmedico.fxml"));
+                Parent root = loader.load();
 
-            // **PASSO 3: Ottieni la finestra e cambia scena**
-            // Ottieni la finestra (Stage) da un qualsiasi elemento della UI, come emailField
-            Stage stage = (Stage) emailField.getScene().getWindow();
+                // **PASSO 2: Passa i dati al nuovo controller (FONDAMENTALE)**
+                // Prima ottieni il controller della dashboard
+                DashboardMedicoController dashboardController = loader.getController();
+                // Poi chiama un metodo per passare l'oggetto Utente
+                dashboardController.initData(utente);
 
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Dashboard");
-            stage.show();
+                // **PASSO 3: Ottieni la finestra e cambia scena**
+                // Ottieni la finestra (Stage) da un qualsiasi elemento della UI, come emailField
+                Stage stage = (Stage) emailField.getScene().getWindow();
 
-        } catch (IOException e) {
-            showError("Errore critico: Impossibile caricare la dashboard.");
-            e.printStackTrace();
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.setTitle("Dashboard");
+                stage.show();
+            } catch (IOException e) {
+                showError("Errore critico: Impossibile caricare la dashboard.");
+                e.printStackTrace();
+            }
+        } else if (Objects.equals(utente.getRuolo(), "Paziente")){
+            try{
+                // **PASSO 1: Carica il nuovo FXML**
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/univr/telemedicina/gui/fxml/dashboardpaziente.fxml"));
+                Parent root = loader.load();
+
+                // **PASSO 2: Passa i dati al nuovo controller (FONDAMENTALE)**
+                // Prima ottieni il controller della dashboard
+                DashboardPazienteController dashboardController = loader.getController();
+                // Poi chiama un metodo per passare l'oggetto Utente
+                dashboardController.initData(utente);
+
+                // **PASSO 3: Ottieni la finestra e cambia scena**
+                // Ottieni la finestra (Stage) da un qualsiasi elemento della UI, come emailField
+                Stage stage = (Stage) emailField.getScene().getWindow();
+
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.setTitle("Dashboard");
+                stage.show();
+            } catch (IOException e) {
+                showError("Errore critico: Impossibile caricare la dashboard.");
+                e.printStackTrace();
+            }
         }
+
+
     }
 
-    /**
-     * Gestisce il click sul pulsante "Contatta amministrazione".
-     * Apre il client di posta predefinito dell'utente con una mail precompilata.
-     */
     /**
      * Gestisce il click sul pulsante "Contatta amministrazione".
      * Apre il client di posta predefinito su un thread separato per non bloccare la UI.

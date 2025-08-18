@@ -1,20 +1,19 @@
 package org.univr.telemedicina.service;
 
+import javafx.application.Platform;
 import org.univr.telemedicina.dao.*;
 
-import org.univr.telemedicina.model.Terapia;
+import org.univr.telemedicina.exception.*;
+import org.univr.telemedicina.model.*;
 
-import org.univr.telemedicina.exception.DataAccessException;
-import org.univr.telemedicina.exception.WrongAssumptionException;
-import org.univr.telemedicina.model.AssunzioneFarmaci;
-import org.univr.telemedicina.model.CondizioniPaziente;
-import org.univr.telemedicina.model.RilevazioneGlicemia;
-
+import java.awt.*;
+import java.net.URI;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public class PazienteService {
     
@@ -24,16 +23,19 @@ public class PazienteService {
     private final UtenteDAO utenteDAO;
     private final PazientiDAO pazienteDAO;
     private final AssunzioneFarmaciDAO assunzioneFarmaciDAO;
+    private final TerapiaDAO teratpiaDAO;
+    private final NotificheService notificheService;
 
 
-    public PazienteService(RilevazioneGlicemiaDAO rilevazioneDAO, MonitorService monitorService, CondizioniPazienteDAO condizioniDAO, UtenteDAO utenteDAO, PazientiDAO pazienteDAO, AssunzioneFarmaciDAO assunzioneFarmaciDAO) {
+    public PazienteService(RilevazioneGlicemiaDAO rilevazioneDAO, MonitorService monitorService, CondizioniPazienteDAO condizioniDAO, UtenteDAO utenteDAO, PazientiDAO pazienteDAO, AssunzioneFarmaciDAO assunzioneFarmaciDAO, TerapiaDAO terapiaDAO, NotificheService notificheService) {
         this.rilevazioneDAO = rilevazioneDAO;
         this.monitorService = monitorService;
         this.condizioniDAO = condizioniDAO;
         this.utenteDAO = utenteDAO;
         this.pazienteDAO = pazienteDAO;
         this.assunzioneFarmaciDAO = assunzioneFarmaciDAO;
-
+        this.teratpiaDAO = terapiaDAO;
+        this.notificheService = notificheService;
     }
 
     /**
@@ -74,18 +76,25 @@ public class PazienteService {
      * @param terapia la terapia per cui si sta registrando l'assunzione
      * @param quantitaAssunta Quantità di farmaco assunta
      */
-    public void registraAssunzioneFarmaci(Terapia terapia, String quantitaAssunta) throws WrongAssumptionException, DataAccessException {
+    public void registraAssunzioneFarmaci(Terapia terapia, String quantitaAssunta, LocalDateTime timestamp) throws WrongAssumptionException, DataAccessException {
 
         // Verifica se la terapia esiste per il paziente
         try {
             if(terapia.getQuantita().equals(quantitaAssunta)) {
-                AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), LocalDateTime.now(), quantitaAssunta);
+                AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), timestamp, quantitaAssunta);
 
                 // usavi un istanza generica di assunzionefarmaci, per il test dobbiamo usare dependency injection
                 assunzioneFarmaciDAO.aggiungiAssunzione(assunzione);
             }
             else {
-                throw new WrongAssumptionException("Quantita' assunta non corrisponde con quantita' da assumere");
+
+                // Se la quantità assunta non corrisponde a quella prescritta, registra comunque l'assunzione e notifica il medico
+                AssunzioneFarmaci assunzione = new AssunzioneFarmaci(terapia.getIDTerapia(), terapia.getIDPaziente(), timestamp, quantitaAssunta);
+
+                // usavi un istanza generica di assunzionefarmaci, per il test dobbiamo usare dependency injection
+                assunzioneFarmaciDAO.aggiungiAssunzione(assunzione);
+                notificheService.send(terapia.getIDMedico(), 2, "Assunzione di farmaci non corretta", "Il paziente " + pazienteDAO.findNameById(terapia.getIDPaziente()) + " ha assunto una quantità di farmaco diversa da quella prescritta. Quantità assunta: " + quantitaAssunta, "Assunzione Farmaci");
+                throw new WrongAssumptionException("Quantita' assunta non corrisponde con quantita' da assumere, assunzione registrata comunque.");
             }
 
         } catch (WrongAssumptionException e) {
@@ -117,6 +126,34 @@ public class PazienteService {
             throw new DataAccessException("Errore durante la registrazione della condizione del paziente: ", e);
         }
     }
+
+    /**
+     * Modifica una condizione esistente per un paziente.
+     * @param condizione L'oggetto CondizioniPaziente contenente i dati aggiornati della condizione
+     * @throws DataAccessException se si verifica un errore durante l'accesso ai dati
+     */
+    public void modificaCondizione(CondizioniPaziente condizione) throws DataAccessException {
+        try {
+            condizioniDAO.update(condizione);
+        } catch (DataAccessException e) {
+            System.err.println("Errore durante la modifica della condizione: " + e.getMessage());
+            throw new DataAccessException("Errore durante la modifica della condizione: ", e);
+        }
+    }
+
+    /**
+     * Elimina una condizione esistente per un paziente.
+     * @param idCondizione ID della condizione da eliminare
+     * @throws DataAccessException se si verifica un errore durante l'accesso ai dati
+     */
+    public void eliminaCondizione(int idCondizione) throws DataAccessException {
+        try {
+            condizioniDAO.delete(idCondizione);
+        } catch (DataAccessException e) {
+            System.err.println("Errore during l'eliminazione della condizione: " + e.getMessage());
+            throw new DataAccessException("Errore during l'eliminazione della condizione: ", e);
+        }
+    }
     
     /**
      * Invia un'email al medico di riferimento del paziente con un oggetto e un corpo specificati.
@@ -124,11 +161,10 @@ public class PazienteService {
      * @param idPaziente ID del paziente per cui si vuole inviare l'email
      * @param subject Oggetto dell'email
      * @param body Corpo dell'email
-     * @return URL per aprire il client di posta elettronica con i campi precompilati
      * @throws DataAccessException Se si verifica un errore durante l'accesso ai dati
      * @throws SQLException Se si verifica un errore SQL durante la ricerca dell'email del medico
      */
-    public String inviaEmailMedicoRiferimento(int idPaziente, String subject, String body) throws DataAccessException, SQLException {
+    public void inviaEmailMedicoRiferimento(int idPaziente, String subject, String body) throws DataAccessException, SQLException {
 
         String emailMedico;
 
@@ -146,11 +182,55 @@ public class PazienteService {
             throw new DataAccessException("Nessun medico di riferimento trovato per il paziente con ID: " + idPaziente);
         }
 
-        // Codifica l'oggetto e il corpo dell'email per l'URL
-        String encodedSubject = URLEncoder.encode(subject, StandardCharsets.UTF_8);
-        String encodedBody = URLEncoder.encode(body, StandardCharsets.UTF_8);
+        // Eseguiamo tutta l'operazione in un nuovo thread.
+        new Thread(() -> {
 
-        // Crea l'URL per aprire il client di posta elettronica
-        return "mailto:" + emailMedico + "?subject=" + encodedSubject + "&body=" + encodedBody;
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.MAIL)) {
+                try {
+                    String uriString = String.format("mailto:%s?subject=%s&body=%s",
+                            emailMedico,
+                            URLEncoder.encode(subject, StandardCharsets.UTF_8).replace("+", "%20"),
+                            URLEncoder.encode(body, StandardCharsets.UTF_8).replace("+", "%20")
+                    );
+
+                    URI mailto = new URI(uriString);
+                    Desktop.getDesktop().mail(mailto);
+
+                } catch (Exception e) {
+                    final String messaggioErrore = "Impossibile aprire il client di posta: " + e.getMessage();
+                    Platform.runLater(() -> mostraErroreInUI(messaggioErrore));
+                }
+            } else {
+                final String messaggioErrore = "Funzionalità di invio email non supportata su questo sistema.";
+                Platform.runLater(() -> mostraErroreInUI(messaggioErrore));
+            }
+        }).start(); // Avvia il thread
+    }
+
+    /**
+     * Mostra un messaggio di errore.
+     * @param messaggio Il messaggio di errore da visualizzare
+     */
+    private void mostraErroreInUI(String messaggio) {
+        System.out.println("Errore ui: " + messaggio);
+    }
+
+    /**
+     * raccoglie dati necessari per la dashboard del singolo paziente
+     */
+    public PazienteDashboard getDatiPazienteDasboard(Utente utente) throws MedicoServiceException {
+        try{
+
+            //recupera liste di informazioni dai DAO
+            List<RilevazioneGlicemia> elencoRilevazioni = rilevazioneDAO.getRilevazioniByPaziente(utente.getIDUtente());
+            List<Terapia> elencoTerapie = teratpiaDAO.listTherapiesByPatId(utente.getIDUtente());
+            List<CondizioniPaziente> elencoCondizioni = condizioniDAO.listByIDPatId(utente.getIDUtente());
+            List<AssunzioneFarmaci> elencoAssunzioni = assunzioneFarmaciDAO.leggiAssunzioniFarmaci(utente.getIDUtente());
+
+            return new PazienteDashboard(utente, elencoRilevazioni, elencoTerapie, elencoCondizioni, elencoAssunzioni);
+        }catch (DataAccessException e){
+            throw new MedicoServiceException("Errore durante il recupero dei dati del paziente: " + e.getMessage(), e);
+        }
+
     }
 }
