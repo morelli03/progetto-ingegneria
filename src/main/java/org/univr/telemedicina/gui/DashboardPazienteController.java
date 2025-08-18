@@ -2,6 +2,7 @@ package org.univr.telemedicina.gui;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -180,6 +181,7 @@ public class DashboardPazienteController {
         condizioniPaziente = pazienteDashboard.getElencoCondizioni();
 
         //riempie il boxchoice di sintomi
+        updateSintomiChoiceBox();
 
         // Inizializza i campi di testo per la terapia
         profiloInfo = Arrays.asList("Sintomi", "Patologie", "Terapie Concomitanti");
@@ -210,7 +212,7 @@ public class DashboardPazienteController {
                 placeholderText = "Nessuna Patologia";
                 break;
             case "Terapie Concomitanti":
-                tipoFilter = "Terapia Concomitante";
+                tipoFilter = "TerapiaConcomitante";
                 placeholderText = "Nessuna Terapia Concomitante";
                 break;
             default:
@@ -237,6 +239,152 @@ public class DashboardPazienteController {
             Label placeholder = new Label(placeholderText);
             placeholder.setStyle("-fx-text-fill: grey;");
             profiloListView.setPlaceholder(placeholder);
+        }
+    }
+
+    private void updateSintomiChoiceBox() {
+        if (condizioniPaziente != null) {
+            // Filter only symptoms for this patient
+            List<CondizioniPaziente> sintomi = condizioniPaziente.stream()
+                    .filter(c -> "Sintomo".equals(c.getTipo()))
+                    .collect(Collectors.toList());
+            
+            // Create a list with "Nuovo sintomo" at the beginning
+            ObservableList<CondizioniPaziente> sintomiWithNew = FXCollections.observableArrayList();
+            CondizioniPaziente nuovoSintomo = new CondizioniPaziente();
+            nuovoSintomo.setIDPaziente(0);
+            nuovoSintomo.setTipo("Sintomo");
+            nuovoSintomo.setDescrizione("Nuovo sintomo");
+            nuovoSintomo.setPeriodo("");
+            nuovoSintomo.setDataRegistrazione(LocalDate.now());
+            sintomiWithNew.add(nuovoSintomo);
+            sintomiWithNew.addAll(sintomi);
+            
+            sintomoChoiceBox.setItems(sintomiWithNew);
+            
+            // Set converter to display description
+            sintomoChoiceBox.setConverter(new StringConverter<CondizioniPaziente>() {
+                @Override
+                public String toString(CondizioniPaziente condizione) {
+                    return (condizione == null) ? "" : condizione.getDescrizione();
+                }
+
+                @Override
+                public CondizioniPaziente fromString(String string) {
+                    return sintomoChoiceBox.getItems().stream()
+                            .filter(c -> c.getDescrizione().equals(string))
+                            .findFirst().orElse(null);
+                }
+            });
+            
+            // Add listener to handle selection changes
+            sintomoChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                if (newSelection != null) {
+                    // If "Nuovo sintomo" is selected, clear fields for new input
+                    if ("Nuovo sintomo".equals(newSelection.getDescrizione())) {
+                        descrizioneSintomo.clear();
+                        periodoSintomo.clear();
+                    } else {
+                        // Otherwise, populate fields with existing data
+                        descrizioneSintomo.setText(newSelection.getDescrizione());
+                        periodoSintomo.setText(newSelection.getPeriodo());
+                    }
+                }
+            });
+            
+            // Similarly populate patologie choice box
+            List<CondizioniPaziente> patologie = condizioniPaziente.stream()
+                    .filter(c -> "Patologia".equals(c.getTipo()))
+                    .collect(Collectors.toList());
+            
+            ObservableList<CondizioniPaziente> patologieWithNew = FXCollections.observableArrayList();
+            CondizioniPaziente nuovaPatologia = new CondizioniPaziente();
+            nuovaPatologia.setIDPaziente(0);
+            nuovaPatologia.setTipo("Patologia");
+            nuovaPatologia.setDescrizione("Nuova patologia");
+            nuovaPatologia.setPeriodo("");
+            nuovaPatologia.setDataRegistrazione(LocalDate.now());
+            patologieWithNew.add(nuovaPatologia);
+            patologieWithNew.addAll(patologie);
+            
+            patologiaChoiceBox.setItems(patologieWithNew);
+            
+            // Set converter to display description
+            patologiaChoiceBox.setConverter(new StringConverter<CondizioniPaziente>() {
+                @Override
+                public String toString(CondizioniPaziente condizione) {
+                    return (condizione == null) ? "" : condizione.getDescrizione();
+                }
+
+                @Override
+                public CondizioniPaziente fromString(String string) {
+                    return patologiaChoiceBox.getItems().stream()
+                            .filter(c -> c.getDescrizione().equals(string))
+                            .findFirst().orElse(null);
+                }
+            });
+            
+            // Add listener to handle selection changes
+            patologiaChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                if (newSelection != null) {
+                    // If "Nuova patologia" is selected, clear fields for new input
+                    if ("Nuova patologia".equals(newSelection.getDescrizione())) {
+                        descrizionePatologia.clear();
+                        periodoPatologia.clear();
+                    } else {
+                        // Otherwise, populate fields with existing data
+                        descrizionePatologia.setText(newSelection.getDescrizione());
+                        periodoPatologia.setText(newSelection.getPeriodo());
+                    }
+                }
+            });
+            
+            // Similarly populate terapie concomitanti choice box
+            List<CondizioniPaziente> terapieCon = condizioniPaziente.stream()
+                    .filter(c -> "TerapiaConcomitante".equals(c.getTipo()))
+                    .collect(Collectors.toList());
+            
+            ObservableList<CondizioniPaziente> terapieConWithNew = FXCollections.observableArrayList();
+            CondizioniPaziente nuovaTerapiaCon = new CondizioniPaziente();
+            nuovaTerapiaCon.setIDPaziente(0);
+            nuovaTerapiaCon.setTipo("Terapia Concomitante");
+            nuovaTerapiaCon.setDescrizione("Nuova terapia concomitante");
+            nuovaTerapiaCon.setPeriodo("");
+            nuovaTerapiaCon.setDataRegistrazione(LocalDate.now());
+            terapieConWithNew.add(nuovaTerapiaCon);
+            terapieConWithNew.addAll(terapieCon);
+            
+            terapiaConChoiceBox.setItems(terapieConWithNew);
+            
+            // Set converter to display description
+            terapiaConChoiceBox.setConverter(new StringConverter<CondizioniPaziente>() {
+                @Override
+                public String toString(CondizioniPaziente condizione) {
+                    return (condizione == null) ? "" : condizione.getDescrizione();
+                }
+
+                @Override
+                public CondizioniPaziente fromString(String string) {
+                    return terapiaConChoiceBox.getItems().stream()
+                            .filter(c -> c.getDescrizione().equals(string))
+                            .findFirst().orElse(null);
+                }
+            });
+            
+            // Add listener to handle selection changes
+            terapiaConChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                if (newSelection != null) {
+                    // If "Nuova terapia concomitante" is selected, clear fields for new input
+                    if ("Nuova terapia concomitante".equals(newSelection.getDescrizione())) {
+                        descrizioneTerapiaCon.clear();
+                        periodoTerapiaCon.clear();
+                    } else {
+                        // Otherwise, populate fields with existing data
+                        descrizioneTerapiaCon.setText(newSelection.getDescrizione());
+                        periodoTerapiaCon.setText(newSelection.getPeriodo());
+                    }
+                }
+            });
         }
     }
 
@@ -593,28 +741,209 @@ public class DashboardPazienteController {
     }
 
     public void handleDeleteButtonSintomo(ActionEvent actionEvent) {
-        showAlert("delete", "sintomo");
+        CondizioniPaziente selectedSintomo = sintomoChoiceBox.getSelectionModel().getSelectedItem();
+        
+        if (selectedSintomo == null) {
+            showAlert("Errore", "Seleziona un sintomo da eliminare.");
+            return;
+        }
+        
+        // Check if it's "Nuovo sintomo"
+        if ("Nuovo sintomo".equals(selectedSintomo.getDescrizione())) {
+            showAlert("Errore", "Non puoi eliminare 'Nuovo sintomo'.");
+            return;
+        }
+        
+        try {
+            pazienteService.eliminaCondizione(selectedSintomo.getIDCondizione());
+            showAlert("Successo", "Sintomo eliminato con successo.");
+            
+            // Refresh the data
+            pazienteDashboard = pazienteService.getDatiPazienteDasboard(pazienteLoggato);
+            condizioniPaziente = pazienteDashboard.getElencoCondizioni();
+            updateSintomiChoiceBox();
+            updateProfiloView();
+        } catch (DataAccessException | MedicoServiceException e) {
+            showAlert("Errore", "Errore durante l'eliminazione del sintomo: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+    
     public void handleSaveButtonSintomo(ActionEvent actionEvent) {
-        showAlert("save", "sintomo");
-
+        String descrizione = descrizioneSintomo.getText();
+        String periodo = periodoSintomo.getText();
+        
+        if (descrizione.isEmpty()) {
+            showAlert("Errore", "La descrizione del sintomo non può essere vuota.");
+            return;
+        }
+        
+        CondizioniPaziente selectedSintomo = sintomoChoiceBox.getSelectionModel().getSelectedItem();
+        
+        try {
+            if (selectedSintomo != null && !"Nuovo sintomo".equals(selectedSintomo.getDescrizione())) {
+                // Update existing symptom
+                selectedSintomo.setDescrizione(descrizione);
+                selectedSintomo.setPeriodo(periodo);
+                pazienteService.modificaCondizione(selectedSintomo);
+                showAlert("Successo", "Sintomo aggiornato con successo.");
+            } else {
+                // Add new symptom
+                pazienteService.segnalaCondizionePaziente(
+                    pazienteLoggato.getIDUtente(),
+                    "Sintomo",
+                    descrizione,
+                    periodo
+                );
+                showAlert("Successo", "Nuovo sintomo aggiunto con successo.");
+            }
+            
+            // Refresh the data
+            pazienteDashboard = pazienteService.getDatiPazienteDasboard(pazienteLoggato);
+            condizioniPaziente = pazienteDashboard.getElencoCondizioni();
+            updateSintomiChoiceBox();
+            updateProfiloView();
+        } catch (DataAccessException | MedicoServiceException e) {
+            showAlert("Errore", "Errore durante il salvataggio del sintomo: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void handleDeleteButtonPatologia(ActionEvent actionEvent) {
-        showAlert("delete", "patologia");
-
+        CondizioniPaziente selectedPatologia = patologiaChoiceBox.getSelectionModel().getSelectedItem();
+        
+        if (selectedPatologia == null) {
+            showAlert("Errore", "Seleziona una patologia da eliminare.");
+            return;
+        }
+        
+        // Check if it's "Nuova patologia"
+        if ("Nuova patologia".equals(selectedPatologia.getDescrizione())) {
+            showAlert("Errore", "Non puoi eliminare 'Nuova patologia'.");
+            return;
+        }
+        
+        try {
+            pazienteService.eliminaCondizione(selectedPatologia.getIDCondizione());
+            showAlert("Successo", "Patologia eliminata con successo.");
+            
+            // Refresh the data
+            pazienteDashboard = pazienteService.getDatiPazienteDasboard(pazienteLoggato);
+            condizioniPaziente = pazienteDashboard.getElencoCondizioni();
+            updateSintomiChoiceBox();
+            updateProfiloView();
+        } catch (DataAccessException | MedicoServiceException e) {
+            showAlert("Errore", "Errore durante l'eliminazione della patologia: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+    
     public void handleSaveButtonPatologia(ActionEvent actionEvent) {
-        showAlert("save", "patologia");
-
+        String descrizione = descrizionePatologia.getText();
+        String periodo = periodoPatologia.getText();
+        
+        if (descrizione.isEmpty()) {
+            showAlert("Errore", "La descrizione della patologia non può essere vuota.");
+            return;
+        }
+        
+        CondizioniPaziente selectedPatologia = patologiaChoiceBox.getSelectionModel().getSelectedItem();
+        
+        try {
+            if (selectedPatologia != null && !"Nuova patologia".equals(selectedPatologia.getDescrizione())) {
+                // Update existing patologia
+                selectedPatologia.setDescrizione(descrizione);
+                selectedPatologia.setPeriodo(periodo);
+                pazienteService.modificaCondizione(selectedPatologia);
+                showAlert("Successo", "Patologia aggiornata con successo.");
+            } else {
+                // Add new patologia
+                pazienteService.segnalaCondizionePaziente(
+                    pazienteLoggato.getIDUtente(),
+                    "Patologia",
+                    descrizione,
+                    periodo
+                );
+                showAlert("Successo", "Nuova patologia aggiunta con successo.");
+            }
+            
+            // Refresh the data
+            pazienteDashboard = pazienteService.getDatiPazienteDasboard(pazienteLoggato);
+            condizioniPaziente = pazienteDashboard.getElencoCondizioni();
+            updateSintomiChoiceBox();
+            updateProfiloView();
+        } catch (DataAccessException | MedicoServiceException e) {
+            showAlert("Errore", "Errore durante il salvataggio della patologia: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void handleDeleteButtonTerapiaCon(ActionEvent actionEvent) {
-        showAlert("delete", "terapia con");
-
+        CondizioniPaziente selectedTerapiaCon = terapiaConChoiceBox.getSelectionModel().getSelectedItem();
+        
+        if (selectedTerapiaCon == null) {
+            showAlert("Errore", "Seleziona una terapia concomitante da eliminare.");
+            return;
+        }
+        
+        // Check if it's "Nuova terapia concomitante"
+        if ("Nuova terapia concomitante".equals(selectedTerapiaCon.getDescrizione())) {
+            showAlert("Errore", "Non puoi eliminare 'Nuova terapia concomitante'.");
+            return;
+        }
+        
+        try {
+            pazienteService.eliminaCondizione(selectedTerapiaCon.getIDCondizione());
+            showAlert("Successo", "Terapia concomitante eliminata con successo.");
+            
+            // Refresh the data
+            pazienteDashboard = pazienteService.getDatiPazienteDasboard(pazienteLoggato);
+            condizioniPaziente = pazienteDashboard.getElencoCondizioni();
+            updateSintomiChoiceBox();
+            updateProfiloView();
+        } catch (DataAccessException | MedicoServiceException e) {
+            showAlert("Errore", "Errore durante l'eliminazione della terapia concomitante: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
+    
     public void handleSaveButtonTerapiaCon(ActionEvent actionEvent) {
-        showAlert("save", "terapia con");
-
+        String descrizione = descrizioneTerapiaCon.getText();
+        String periodo = periodoTerapiaCon.getText();
+        
+        if (descrizione.isEmpty()) {
+            showAlert("Errore", "La descrizione della terapia concomitante non può essere vuota.");
+            return;
+        }
+        
+        CondizioniPaziente selectedTerapiaCon = terapiaConChoiceBox.getSelectionModel().getSelectedItem();
+        
+        try {
+            if (selectedTerapiaCon != null && !"Nuova terapia concomitante".equals(selectedTerapiaCon.getDescrizione())) {
+                // Update existing terapia concomitante
+                selectedTerapiaCon.setDescrizione(descrizione);
+                selectedTerapiaCon.setPeriodo(periodo);
+                pazienteService.modificaCondizione(selectedTerapiaCon);
+                showAlert("Successo", "Terapia concomitante aggiornata con successo.");
+            } else {
+                // Add new terapia concomitante
+                pazienteService.segnalaCondizionePaziente(
+                    pazienteLoggato.getIDUtente(),
+                    "TerapiaConcomitante",
+                    descrizione,
+                    periodo
+                );
+                showAlert("Successo", "Nuova terapia concomitante aggiunta con successo.");
+            }
+            
+            // Refresh the data
+            pazienteDashboard = pazienteService.getDatiPazienteDasboard(pazienteLoggato);
+            condizioniPaziente = pazienteDashboard.getElencoCondizioni();
+            updateSintomiChoiceBox();
+            updateProfiloView();
+        } catch (DataAccessException | MedicoServiceException e) {
+            showAlert("Errore", "Errore durante il salvataggio della terapia concomitante: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }
