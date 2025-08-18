@@ -12,6 +12,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -28,7 +32,9 @@ import org.univr.telemedicina.model.*;
 import org.univr.telemedicina.service.MonitorService;
 import org.univr.telemedicina.service.NotificheService;
 
+import java.awt.*;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -940,6 +946,16 @@ public class DashboardPazienteController {
         } catch (DataAccessException | MedicoServiceException e) {
             showAlert("Errore", "Errore durante il salvataggio della terapia concomitante: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    public void handleContattaMedicoButton(ActionEvent actionEvent){
+        try {
+            pazienteService.inviaEmailMedicoRiferimento(pazienteLoggato.getIDUtente(), "", "");
+        } catch (DataAccessException e) {
+            showAlert("Errore", e.getMessage());
+        } catch (SQLException e) {
+            showAlert("Errore", "Errore di connessione al database. Riprova più tardi.");
         }
     }
 }

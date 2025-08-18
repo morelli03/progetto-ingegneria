@@ -152,10 +152,6 @@ public class LoginController {
 
     /**
      * Gestisce il click sul pulsante "Contatta amministrazione".
-     * Apre il client di posta predefinito dell'utente con una mail precompilata.
-     */
-    /**
-     * Gestisce il click sul pulsante "Contatta amministrazione".
      * Apre il client di posta predefinito su un thread separato per non bloccare la UI.
      */
     @FXML

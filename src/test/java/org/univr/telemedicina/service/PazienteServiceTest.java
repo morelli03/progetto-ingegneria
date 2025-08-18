@@ -64,7 +64,7 @@ class PazienteServiceTest {
         String quantitaAssunta = "10mg";
 
         // ACT
-        pazienteService.registraAssunzioneFarmaci(terapia, quantitaAssunta);
+        pazienteService.registraAssunzioneFarmaci(terapia, quantitaAssunta, LocalDateTime.now());
 
         // ASSERT
         // Verifica che il metodo aggiungiAssunzione sia stato chiamato una volta con un oggetto AssunzioneFarmaci
@@ -79,7 +79,7 @@ class PazienteServiceTest {
 
         // ACT & ASSERT
         assertThrows(WrongAssumptionException.class, () -> {
-            pazienteService.registraAssunzioneFarmaci(terapia, quantitaAssunta);
+            pazienteService.registraAssunzioneFarmaci(terapia, quantitaAssunta, LocalDateTime.now());
         });
 
         verifyNoInteractions(assunzioneFarmaciDAO);
@@ -126,34 +126,6 @@ class PazienteServiceTest {
     }
 
     // --- TEST PER inviaEmailMedicoRiferimento ---
-
-    @Test
-    void inviaEmailMedicoRiferimento_Successo_RitornaUrlMailto() throws DataAccessException, SQLException {
-        // ARRANGE
-        int idPaziente = 1;
-        int idMedico = 10;
-        String emailMedico = "dottore@test.com";
-        String subject = "Domanda Urgente";
-        String body = "Buongiorno dottore, ho una domanda.";
-
-        // Definisci il comportamento dei mock in cascata
-        when(pazientiDAO.findMedByIDPaziente(idPaziente)).thenReturn(idMedico);
-        when(utenteDAO.findEmailById(idMedico)).thenReturn(Optional.of(emailMedico));
-
-        // ACT
-        String result = pazienteService.inviaEmailMedicoRiferimento(idPaziente, subject, body);
-
-        // ASSERT
-        assertNotNull(result);
-        assertTrue(result.startsWith("mailto:"));
-        assertTrue(result.contains(emailMedico));
-        assertTrue(result.contains("subject=Domanda+Urgente")); // Lo spazio viene codificato come '+'
-        assertTrue(result.contains("body=Buongiorno+dottore"));
-
-        // Verifica che i DAO siano stati chiamati
-        verify(pazientiDAO, times(1)).findMedByIDPaziente(idPaziente);
-        verify(utenteDAO, times(1)).findEmailById(idMedico);
-    }
 
     @Test
     void inviaEmailMedicoRiferimento_MedicoNonTrovato_LanciaEccezione() throws DataAccessException, SQLException {

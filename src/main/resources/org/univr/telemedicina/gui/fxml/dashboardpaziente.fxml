@@ -492,7 +492,7 @@
                         </AnchorPane>
                     </children>
                 </AnchorPane>
-            <Button fx:id="contattaMedicoButton" layoutX="1260.0" layoutY="17.0" maxWidth="150.0" minWidth="149.0" mnemonicParsing="false" prefWidth="150.0" styleClass="top-buttons" text="Contatta medico" textAlignment="CENTER">
+            <Button fx:id="contattaMedicoButton" onAction="#handleContattaMedicoButton" layoutX="1260.0" layoutY="17.0" maxWidth="150.0" minWidth="149.0" mnemonicParsing="false" prefWidth="150.0" styleClass="top-buttons" text="Contatta medico" textAlignment="CENTER">
                <effect>
                   <DropShadow height="16.68" offsetY="2.0" radius="7.42" spread="0.1" width="15.0">
                      <color>

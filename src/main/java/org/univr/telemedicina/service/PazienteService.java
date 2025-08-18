@@ -1,13 +1,13 @@
 package org.univr.telemedicina.service;
 
+import javafx.application.Platform;
 import org.univr.telemedicina.dao.*;
 
-import org.univr.telemedicina.exception.MedicoServiceException;
+import org.univr.telemedicina.exception.*;
 import org.univr.telemedicina.model.*;
 
-import org.univr.telemedicina.exception.DataAccessException;
-import org.univr.telemedicina.exception.WrongAssumptionException;
-
+import java.awt.*;
+import java.net.URI;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
@@ -133,11 +133,10 @@ public class PazienteService {
      * @param idPaziente ID del paziente per cui si vuole inviare l'email
      * @param subject Oggetto dell'email
      * @param body Corpo dell'email
-     * @return URL per aprire il client di posta elettronica con i campi precompilati
      * @throws DataAccessException Se si verifica un errore durante l'accesso ai dati
      * @throws SQLException Se si verifica un errore SQL durante la ricerca dell'email del medico
      */
-    public String inviaEmailMedicoRiferimento(int idPaziente, String subject, String body) throws DataAccessException, SQLException {
+    public void inviaEmailMedicoRiferimento(int idPaziente, String subject, String body) throws DataAccessException, SQLException {
 
         String emailMedico;
 
@@ -155,12 +154,37 @@ public class PazienteService {
             throw new DataAccessException("Nessun medico di riferimento trovato per il paziente con ID: " + idPaziente);
         }
 
-        // Codifica l'oggetto e il corpo dell'email per l'URL
-        String encodedSubject = URLEncoder.encode(subject, StandardCharsets.UTF_8);
-        String encodedBody = URLEncoder.encode(body, StandardCharsets.UTF_8);
+        // Eseguiamo tutta l'operazione in un nuovo thread.
+        new Thread(() -> {
 
-        // Crea l'URL per aprire il client di posta elettronica
-        return "mailto:" + emailMedico + "?subject=" + encodedSubject + "&body=" + encodedBody;
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.MAIL)) {
+                try {
+                    String uriString = String.format("mailto:%s?subject=%s&body=%s",
+                            emailMedico,
+                            URLEncoder.encode(subject, StandardCharsets.UTF_8).replace("+", "%20"),
+                            URLEncoder.encode(body, StandardCharsets.UTF_8).replace("+", "%20")
+                    );
+
+                    URI mailto = new URI(uriString);
+                    Desktop.getDesktop().mail(mailto);
+
+                } catch (Exception e) {
+                    final String messaggioErrore = "Impossibile aprire il client di posta: " + e.getMessage();
+                    Platform.runLater(() -> mostraErroreInUI(messaggioErrore));
+                }
+            } else {
+                final String messaggioErrore = "Funzionalità di invio email non supportata su questo sistema.";
+                Platform.runLater(() -> mostraErroreInUI(messaggioErrore));
+            }
+        }).start(); // Avvia il thread
+    }
+
+    /**
+     * Mostra un messaggio di errore.
+     * @param messaggio Il messaggio di errore da visualizzare
+     */
+    private void mostraErroreInUI(String messaggio) {
+        System.out.println("Errore ui: " + messaggio);
     }
 
     /**
