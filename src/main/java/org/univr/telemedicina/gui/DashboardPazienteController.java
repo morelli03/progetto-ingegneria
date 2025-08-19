@@ -359,7 +359,7 @@ public class DashboardPazienteController {
             ObservableList<CondizioniPaziente> terapieConWithNew = FXCollections.observableArrayList();
             CondizioniPaziente nuovaTerapiaCon = new CondizioniPaziente();
             nuovaTerapiaCon.setIDPaziente(0);
-            nuovaTerapiaCon.setTipo("Terapia Concomitante");
+            nuovaTerapiaCon.setTipo("TerapiaConcomitante");
             nuovaTerapiaCon.setDescrizione("Nuova terapia concom.");
             nuovaTerapiaCon.setPeriodo("");
             nuovaTerapiaCon.setDataRegistrazione(LocalDate.now());
@@ -390,7 +390,7 @@ public class DashboardPazienteController {
             terapiaConChoiceBox.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
                 if (newSelection != null) {
                     // If "Nuova terapia concomitante" is selected, clear fields for new input
-                    if ("Nuova terapia concomitante".equals(newSelection.getDescrizione())) {
+                    if ("Nuova terapia concom.".equals(newSelection.getDescrizione())) {
                         descrizioneTerapiaCon.clear();
                         periodoTerapiaCon.clear();
                     } else {
@@ -889,7 +889,7 @@ public class DashboardPazienteController {
 
         
         // Check if it's "Nuova terapia concomitante"
-        if ("Nuova terapia concomitante".equals(selectedTerapiaCon.getDescrizione())) {
+        if ("Nuova terapia concom.".equals(selectedTerapiaCon.getDescrizione())) {
             showAlert("Errore", "Seleziona una terapia concomitante esistente da eliminare.");
             return;
         }
@@ -921,7 +921,7 @@ public class DashboardPazienteController {
         CondizioniPaziente selectedTerapiaCon = terapiaConChoiceBox.getSelectionModel().getSelectedItem();
         
         try {
-            if (selectedTerapiaCon != null && !"Nuova terapia concomitante".equals(selectedTerapiaCon.getDescrizione())) {
+            if (selectedTerapiaCon != null && !"Nuova terapia concom.".equals(selectedTerapiaCon.getDescrizione())) {
                 // Update existing terapia concomitante
                 selectedTerapiaCon.setDescrizione(descrizione);
                 selectedTerapiaCon.setPeriodo(periodo);
