@@ -88,7 +88,6 @@ public class MonitorService {
     // questo metodo deve essere runnato la sera verso le 18:00
     // @throws dataaccessexception se si verifica un errore durante l'accesso ai dati
     public void checkFarmaci3Daily() throws DataAccessException {
-        // !!! !!! !!! importante !!! !!! !!! metodo non ottimizzato dovrei creare altri due metodi in dao chiedere a g
 
         // prende gli id di tutti i pazienti con una terapia in corso
         List<Integer> pazientiAttivi = terapiaDAO.getActivePatientIds();

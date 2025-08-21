@@ -106,10 +106,6 @@ public class DashboardPazienteController {
     private Text dateText;
 
     @FXML
-    private Button deleteButtonSintomo;
-    @FXML
-    private Button saveButtonSintomo;
-    @FXML
     private TextArea descrizioneSintomo;
     @FXML
     private TextArea periodoSintomo;
@@ -117,20 +113,12 @@ public class DashboardPazienteController {
     private ChoiceBox<CondizioniPaziente> sintomoChoiceBox;
 
     @FXML
-    private Button deleteButtonPatologia;
-    @FXML
-    private Button saveButtonPatologia;
-    @FXML
     private TextArea descrizionePatologia;
     @FXML
     private TextArea periodoPatologia;
     @FXML
     private ChoiceBox<CondizioniPaziente> patologiaChoiceBox;
-    
-    @FXML
-    private Button deleteButtonTerapiaCon;
-    @FXML
-    private Button saveButtonTerapiaCon;
+
     @FXML
     private TextArea descrizioneTerapiaCon;
     @FXML
@@ -249,6 +237,7 @@ public class DashboardPazienteController {
         }
     }
 
+    @SuppressWarnings("D")
     private void updateSintomiChoiceBox() {
         if (condizioniPaziente != null) {
             // Filter only symptoms for this patient
