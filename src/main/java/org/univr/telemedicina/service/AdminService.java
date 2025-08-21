@@ -26,71 +26,69 @@ public class AdminService {
         this.pazientiDAO = pazientiDao;
     }
 
-    /**
-     * Guides the user through the process of creating a new user in the system.
-     * This method is now stateless and more robust.
-     */
+    // guida l'utente attraverso il processo di creazione di un nuovo utente nel sistema
+    // questo metodo è ora stateless e più robusto
     public void creaUtente() {
-        System.out.println("\n--- Creazione di un nuovo utente ---");
+        System.out.println("\n--- creazione di un nuovo utente ---");
 
-        // Utilizziamo un try-with-resources per chiudere automaticamente lo Scanner
+        // utilizziamo un try-with-resources per chiudere automaticamente lo scanner
         try (Scanner sc = new Scanner(System.in)) {
 
-            // Acquisizione e validazione degli input
+            // acquisizione e validazione degli input
             String email = leggiEmailValida(sc);
             String hashedPassword = leggiPasswordHash(sc);
-            String nome = leggiStringaNonVuota(sc, "Inserisci il nome dell'utente:", "Errore: il nome non può essere vuoto. Riprova.");
-            String cognome = leggiStringaNonVuota(sc, "Inserisci il cognome dell'utente:", "Errore: il cognome non può essere vuoto. Riprova.");
+            String nome = leggiStringaNonVuota(sc, "inserisci il nome dell'utente:", "errore il nome non può essere vuoto riprova");
+            String cognome = leggiStringaNonVuota(sc, "inserisci il cognome dell'utente:", "errore il cognome non può essere vuoto riprova");
             String ruolo = leggiRuoloValido(sc);
-            LocalDate dataNascita = leggiDataValida(sc).toLocalDate(); // ho modificato per incapsulare in localdate, non come si comporta la funzione ho preferito non toccarla.
+            LocalDate dataNascita = leggiDataValida(sc).toLocalDate(); // ho modificato per incapsulare in localdate non come si comporta la funzione ho preferito non toccarla
 
             //se è un paziente
             if(ruolo.equalsIgnoreCase("Paziente")) {
                 try{
                     int idMedico = leggiIdMedicoDiRiferimento(sc);
 
-                    // Crea e salva l'utente
+                    // crea e salva l'utente
                     Utente nuovoUtente = new Utente(0, email, hashedPassword, nome, cognome, ruolo, dataNascita);
-                    Utente utenteCreato = utenteDAO.create(nuovoUtente); // Variabile locale, non di istanza
+                    Utente utenteCreato = utenteDAO.create(nuovoUtente); // variabile locale non di istanza
 
-                    System.out.println("Utente creato con successo. ID Utente: " + utenteCreato.getIDUtente());
+                    System.out.println("utente creato con successo id utente " + utenteCreato.getIDUtente());
 
-                    // Crea e salva l'associazione paziente-medico
+                    // crea e salva l'associazione paziente-medico
                     Paziente paziente = new Paziente(utenteCreato.getIDUtente(), idMedico);
                     pazientiDAO.create(paziente);
-                    System.out.println("Associazione medico-paziente creata con successo.");// Chiede l'ID del medico di riferimento e lo salva in idMedico
+                    System.out.println("associazione medico-paziente creata con successo");// chiede l'id del medico di riferimento e lo salva in idmedico
                 } catch (DataAccessException e) {
-                    System.err.println("Si è verificato un errore inaspettato: " + e.getMessage());
+                    System.err.println("si è verificato un errore inaspettato " + e.getMessage());
                 } catch (MedicoNotFound e) {
-                    System.err.println("Errore: " + e.getMessage());
+                    System.err.println("errore " + e.getMessage());
                 }
             } else { // se è un medico
-                // Crea e salva l'utente
+                // crea e salva l'utente
                 Utente nuovoUtente = new Utente(0, email, hashedPassword, nome, cognome, ruolo, dataNascita);
-                Utente utenteCreato = utenteDAO.create(nuovoUtente); // Variabile locale, non di istanza
+                Utente utenteCreato = utenteDAO.create(nuovoUtente); // variabile locale non di istanza
 
-                System.out.println("Utente creato con successo. ID Utente: " + utenteCreato.getIDUtente());
+                System.out.println("utente creato con successo id utente " + utenteCreato.getIDUtente());
             }
 
 
         }
         catch (DataAccessException | AuthServiceException e) {
-            System.err.println("Si è verificato un errore inaspettato: " + e.getMessage());
+            System.err.println("si è verificato un errore inaspettato " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // --- Metodi di supporto per la validazione (rimasti invariati) ---
+    // --- metodi di supporto per la validazione (rimasti invariati) ---
 
     private String leggiEmailValida(Scanner sc) {
         String email;
         while (true) {
-            System.out.println("Inserisci l'email dell'utente:");
+            System.out.println("inserisci l'email dell'utente:");
             email = sc.nextLine();
             if (!email.trim().isEmpty() && email.contains("@")) {
                 return email;
             } else {
-                System.out.println("Errore: l'email non può essere vuota e deve contenere '@'. Riprova.");
+                System.out.println("errore l'email non può essere vuota e deve contenere '@' riprova");
             }
         }
     }
@@ -111,12 +109,12 @@ public class AdminService {
     private String leggiRuoloValido(Scanner sc) {
         String ruolo;
         while (true) {
-            System.out.println("Inserisci il ruolo dell'utente (Medico/Paziente) ():");
+            System.out.println("inserisci il ruolo dell'utente (medico/paziente) ():");
             ruolo = sc.nextLine();
             if (ruolo.equals("Medico") || ruolo.equals("Paziente")) {
                 return ruolo;
             } else {
-                System.out.println("Errore: il ruolo deve essere 'Medico' o 'Paziente'. Riprova.");
+                System.out.println("errore il ruolo deve essere 'medico' o 'paziente' riprova");
             }
         }
     }
@@ -124,32 +122,29 @@ public class AdminService {
     private Date leggiDataValida(Scanner sc) {
         Date dataNascita = null;
         while (dataNascita == null) {
-            System.out.println("Inserisci la data di nascita dell'utente (YYYY-MM-DD):");
+            System.out.println("inserisci la data di nascita dell'utente (yyyy-mm-dd):");
             String dataNascitaInput = sc.nextLine();
             try {
                 dataNascita = Date.valueOf(dataNascitaInput);
             } catch (IllegalArgumentException e) {
-                System.out.println("Errore: il formato della data non è valido. Utilizza il formato `YYYY-MM-DD`. Riprova.");
+                System.out.println("errore il formato della data non è valido utilizza il formato `yyyy-mm-dd` riprova");
             }
         }
         return dataNascita;
     }
 
-    /**
-     * Legge l'ID del medico di riferimento dall'input dell'utente.
-     * Questo metodo richiede che l'utente inserisca un'email valida di un medico esistente.
-     *
-     * @param sc lo Scanner per leggere l'input dell'utente
-     * @return l'ID del medico di riferimento
-     * @throws DataAccessException se si verifica un errore durante l'accesso ai dati
-     * @throws MedicoNotFound se il medico non viene trovato nel database
-     */
+    // legge l'id del medico di riferimento dall'input dell'utente
+    // questo metodo richiede che l'utente inserisca un'email valida di un medico esistente
+    // @param sc lo scanner per leggere l'input dell'utente
+    // @return l'id del medico di riferimento
+    // @throws dataaccessexception se si verifica un errore durante l'accesso ai dati
+    // @throws mediconotfound se il medico non viene trovato nel database
     private int leggiIdMedicoDiRiferimento(Scanner sc) throws DataAccessException, MedicoNotFound {
         while (true) {
-            System.out.println("Inserisci l'email del medico di riferimento:");
+            System.out.println("inserisci l'email del medico di riferimento:");
             String emailMedico = sc.nextLine();
 
-            // Cerca il medico nel database usando il DAO iniettato
+            // cerca il medico nel database usando il dao iniettato
             Optional<Utente> medicoOptional = utenteDAO.findByEmail(emailMedico);
 
             if (medicoOptional.isPresent()) {
@@ -157,27 +152,24 @@ public class AdminService {
                 if (medico.getRuolo().equalsIgnoreCase("Medico")) {
                     return medico.getIDUtente();
                 } else {
-                    System.out.println("Errore: l'email inserita non corrisponde a un utente con ruolo 'Medico'. Riprova.");
+                    System.out.println("errore l'email inserita non corrisponde a un utente con ruolo 'medico' riprova");
                 }
             } else { // se il medico non esiste
-                //System.err.println("Errore: nessun utente trovato con questa email. Riprova.");
-                throw new MedicoNotFound("Nessun medico trovato con l'email: " + emailMedico);
+                //system.err.println("errore nessun utente trovato con questa email riprova");
+                throw new MedicoNotFound("nessun medico trovato con l'email " + emailMedico);
             }
         }
     }
 
-    /**
-     * Legge una password dall'input dell'utente e la converte in un hash sicuro.
-     * Utilizza BCrypt per l'hashing della password.
-     *
-     * @param sc lo Scanner per leggere l'input dell'utente
-     * @return l'hash della password
-     * @throws AuthServiceException se si verifica un errore durante la lettura della password
-     */
+    // legge una password dall'input dell'utente e la converte in un hash sicuro
+    // utilizza bcrypt per l'hashing della password
+    // @param sc lo scanner per leggere l'input dell'utente
+    // @return l'hash della password
+    // @throws authserviceexception se si verifica un errore durante la lettura della password
     private String leggiPasswordHash(Scanner sc) throws AuthServiceException {
-        String in = leggiStringaNonVuota(sc, "Inserisci la password dell'utente:", "Errore: la password non può essere vuota. Riprova.");
+        String in = leggiStringaNonVuota(sc, "inserisci la password dell'utente:", "errore la password non può essere vuota riprova");
 
-        // Utilizza BCrypt per generare un hash della password
+        // utilizza bcrypt per generare un hash della password
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         return passwordEncoder.encode(in);
 

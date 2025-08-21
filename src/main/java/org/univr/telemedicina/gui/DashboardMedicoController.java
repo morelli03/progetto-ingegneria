@@ -44,10 +44,10 @@ import java.util.stream.Collectors;
 
 public class DashboardMedicoController {
 
-    // Aggiungi un campo per memorizzare l'utente che ha fatto il login
+    // aggiungi un campo per memorizzare l'utente che ha fatto il login
     private Utente medicoLoggato;
 
-    // Campi per il form terapia
+    // campi per il form terapia
     private ComboBox<Object> terapiaComboBox;
     private TextField farmacoTextField;
     private TextField quantitaTextField;

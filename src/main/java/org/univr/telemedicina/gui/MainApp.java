@@ -12,11 +12,11 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            // Carica la vista di login dal file FXML
+            // carica la vista di login dal file fxml
             FXMLLoader fxmlLoader = new FXMLLoader(MainApp.class.getResource("/org/univr/telemedicina/gui/fxml/login.fxml"));
-            Scene scene = new Scene(fxmlLoader.load(), 1440, 1024); // Imposta dimensioni iniziali
+            Scene scene = new Scene(fxmlLoader.load(), 1440, 1024); // imposta dimensioni iniziali
 
-            primaryStage.setTitle("TeleMedicina - Login");
+            primaryStage.setTitle("telemedicina - login");
             primaryStage.setScene(scene);
             primaryStage.show();
 

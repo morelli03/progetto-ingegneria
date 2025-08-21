@@ -2,18 +2,28 @@ package org.univr.telemedicina.model;
 
 import java.time.LocalDate;
 
+// rappresenta un utente del sistema
 public class Utente {
+    // identificativo univoco dell'utente
     private int IDUtente;
+    // email dell'utente
     private String email;
+    // password dell'utente (hash)
     private String hashedPassword;
+    // nome dell'utente
     private String nome;
+    // cognome dell'utente
     private String cognome;
+    // ruolo dell'utente
     private String Ruolo;
-    private LocalDate DataNascita;  //importante che sia di tipo java.sql.Date per compatibilità con il database
+    // data di nascita dell'utente
+    private LocalDate DataNascita;
 
-    public Utente() {} //costruttore vuoto per poter aggiungere un utente senza parametri
+    // costruttore vuoto per creare un oggetto senza parametri
+    public Utente() {}
 
-    public Utente(int IDUtente, String email, String hashedPassword, String nome, String cognome, String ruolo, LocalDate dataNascita) { //costruttore con parametri
+    // costruttore con parametri
+    public Utente(int IDUtente, String email, String hashedPassword, String nome, String cognome, String ruolo, LocalDate dataNascita) {
         this.IDUtente = IDUtente;
         this.email = email;
         this.hashedPassword = hashedPassword;
@@ -23,7 +33,7 @@ public class Utente {
         this.DataNascita = dataNascita;
     }
 
-    //metodi getter e setter
+    // metodi getter e setter per i campi della classe
     public int getIDUtente() {
         return IDUtente;
     }

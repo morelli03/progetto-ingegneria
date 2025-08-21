@@ -1,16 +1,23 @@
 package org.univr.telemedicina.model;
 import java.time.LocalDateTime;
 
+// rappresenta una rilevazione di glicemia
 public class RilevazioneGlicemia {
+    // identificativo univoco della rilevazione
     private int idRilevazione;
+    // identificativo del paziente a cui si riferisce la rilevazione
     private int idPaziente;
+    // valore della glicemia
     private int valore;
-    private LocalDateTime timestamp; // Timestamp per registrare la data e l'ora della rilevazione
+    // data e ora della rilevazione
+    private LocalDateTime timestamp;
+    // note sulla rilevazione
     private String note;
 
-    //costruttore vuoto
+    // costruttore vuoto per creare un oggetto senza parametri
     public RilevazioneGlicemia() {}
 
+    // costruttore per leggere una rilevazione dal database
     public RilevazioneGlicemia(int idRilevazione, int idPaziente, int valore, LocalDateTime timestamp, String note) {
         this.idRilevazione = idRilevazione;
         this.idPaziente = idPaziente;
@@ -19,7 +26,7 @@ public class RilevazioneGlicemia {
         this.note = note;
     }
 
-    //costruttore senza idRilevazione, se idRilevazione viene genrerato automaticamente dal database
+    // costruttore per inserire una nuova rilevazione non serve idrilevazione perché è auto-incrementato
     public RilevazioneGlicemia(int idPaziente, int valore, LocalDateTime timestamp, String note) {
         this.idPaziente = idPaziente;
         this.valore = valore;
@@ -27,7 +34,7 @@ public class RilevazioneGlicemia {
         this.note = note;
     }
 
-    //metodi get e set
+    // metodi getter e setter per i campi della classe
     public int getIdRilevazione() {
         return idRilevazione;
     }

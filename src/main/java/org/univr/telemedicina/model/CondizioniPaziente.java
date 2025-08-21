@@ -2,17 +2,25 @@ package org.univr.telemedicina.model;
 
 import java.time.LocalDate;
 
+// rappresenta le condizioni di un paziente
 public class CondizioniPaziente {
+    // identificativo univoco della condizione
     private int IDCondizione;
+    // identificativo del paziente a cui si riferisce la condizione
     private int IDPaziente;
+    // tipo di condizione
     private String Tipo;
+    // descrizione della condizione
     private String Descrizione;
+    // periodo della condizione
     private String Periodo;
-    private LocalDate DataRegistrazione;  //importante che sia di tipo java.sql.LocalDate per compatibilità con il database
+    // data di registrazione della condizione
+    private LocalDate DataRegistrazione;
 
-    public CondizioniPaziente() {} //costruttore vuoto per poter aggiungere un utente senza parametri
+    // costruttore vuoto per creare un oggetto senza parametri
+    public CondizioniPaziente() {}
 
-    // costruttori senza IDCondizione, gestitio da database con auto-increment
+    // costruttore per inserire una nuova condizione non serve idcondizione perché è auto-incrementato
     public CondizioniPaziente (int IDPaziente, String Tipo, String Descrizione, String Periodo, LocalDate DataRegistrazione) {
         this.IDPaziente = IDPaziente;
         this.Tipo = Tipo;
@@ -21,7 +29,7 @@ public class CondizioniPaziente {
         this.DataRegistrazione = DataRegistrazione;
     }
 
-    //metodi getter e setter
+    // metodi getter e setter per i campi della classe
     public int getIDCondizione() {
         return IDCondizione;
     }

@@ -8,21 +8,17 @@ import java.util.*;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 
-/**
- * Classe DAO per gestire le operazioni di accesso ai dati relativi alle assunzioni di farmaci.
- * Deve aggiungere una assunzione da parte di una paziente, e legge tutte assunzioni di farmaci per paziente,
- * e assunzioni di un determinato giorno.
- */
+// classe dao per gestire le operazioni di accesso ai dati relativi alle assunzioni di farmaci
+// deve aggiungere una assunzione da parte di una paziente e legge tutte assunzioni di farmaci per paziente
+// e assunzioni di un determinato giorno
 public class AssunzioneFarmaciDAO {
 
-    /**
-     * Legge tute le assunzioni di farmaci per un paziente specifico.
-     * @param IDPaziente L'ID del paziente
-     * @return Una List contenente le AssunzioniFarmaci per il paziente specificato.
-     */
+    // legge tute le assunzioni di farmaci per un paziente specifico
+    // @param idPaziente l'id del paziente
+    // @return una list contenente le assunzionifarmaci per il paziente specificato
     public List<AssunzioneFarmaci> leggiAssunzioniFarmaci(int IDPaziente) throws DataAccessException {
 
-        // Lista per memorizzare le assunzioni di farmaci
+        // lista per memorizzare le assunzioni di farmaci
         List<AssunzioneFarmaci> assunzioni = new ArrayList<>();
 
         String sql = "SELECT * FROM AssunzioniFarmaci WHERE IDPaziente = ?";
@@ -30,7 +26,7 @@ public class AssunzioneFarmaciDAO {
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)){
 
-            //imposto il parametro ? per evitare sql injection
+            // imposto il parametro per evitare sql injection
             pstmt.setInt(1, IDPaziente);
 
             try(ResultSet rs = pstmt.executeQuery()) {
@@ -47,35 +43,33 @@ public class AssunzioneFarmaciDAO {
                 }
             }
         } catch(SQLException e){
-            System.err.println("Errore durante la lettura dei farmaci assunti: " + e.getMessage());
-            throw new DataAccessException("Errore durante la ricerca delle assunzioni per il paziente con ID " + IDPaziente, e);
+            System.err.println("errore durante la lettura dei farmaci assunti " + e.getMessage());
+            throw new DataAccessException("errore durante la ricerca delle assunzioni per il paziente con id " + IDPaziente, e);
         }
-        // Se non viene trovata nessuna assunzione o si verifica un errore, ritorna una lista vuota
+        // se non viene trovata nessuna assunzione o si verifica un errore ritorna una lista vuota
         return assunzioni;
     }
 
-     /**
-      * Legge le assunzioni di farmaci in un giorno per un paziente specifico.
-      * @param IDPaziente L'ID del paziente
-      * @param data La data per cui si vogliono leggere le assunzioni
-      * @return Una List contenente le AssunzioniFarmaci per il paziente specificato.
-      */
+    // legge le assunzioni di farmaci in un giorno per un paziente specifico
+    // @param idPaziente l'id del paziente
+    // @param data la data per cui si vogliono leggere le assunzioni
+    // @return una list contenente le assunzionifarmaci per il paziente specificato
      public List<AssunzioneFarmaci> leggiAssunzioniGiorno(int IDPaziente, LocalDate data) throws DataAccessException {
          List<AssunzioneFarmaci> assunzioni = new ArrayList<>();
 
-         // Query SQL per leggere le assunzioni di farmaci in un giorno specifico
+         // query sql per leggere le assunzioni di farmaci in un giorno specifico
          String sql =   "SELECT * FROM AssunzioniFarmaci WHERE IDPaziente = ? " +
                         "AND TimestampAssunzione >= ?" +
                         " AND TimestampAssunzione < ?";
 
-         // Definisce l'intervallo di tempo per l'intera giornata
-         LocalDateTime inizioGiorno = data.atStartOfDay(); // Es. 2025-06-11T00:00:00
-         LocalDateTime inizioGiornoSuccessivo = data.plusDays(1).atStartOfDay(); // Es. 2025-06-12T00:00:00
+         // definisce l'intervallo di tempo per l'intera giornata
+         LocalDateTime inizioGiorno = data.atStartOfDay(); // es 2025-06-11t00:00:00
+         LocalDateTime inizioGiornoSuccessivo = data.plusDays(1).atStartOfDay(); // es 2025-06-12t00:00:00
 
          try (Connection conn = DatabaseManager.getConnection();
               PreparedStatement pstmt = conn.prepareStatement(sql)){
 
-             //imposto il parametro ? per evitare sql injection
+             // imposto il parametro per evitare sql injection
              pstmt.setInt(1, IDPaziente);
              pstmt.setObject(2, inizioGiorno);
                 pstmt.setObject(3, inizioGiornoSuccessivo);
@@ -93,23 +87,21 @@ public class AssunzioneFarmaciDAO {
                  }
              }
          } catch(SQLException e){
-             System.err.println("Errore durante la lettura dei farmaci assunti: " + e.getMessage());
-             //lancio l'eccezione personalizzata DataAccessException
-             throw new DataAccessException("Errore durante la ricerca delle assunzioni per il giorno " + data, e);
+             System.err.println("errore durante la lettura dei farmaci assunti " + e.getMessage());
+             // lancio l'eccezione personalizzata dataaccessexception
+             throw new DataAccessException("errore durante la ricerca delle assunzioni per il giorno " + data, e);
          }
-         // Se non viene trovata nessuna assunzione o si verifica un errore, ritorna una lista vuota
+         // se non viene trovata nessuna assunzione o si verifica un errore ritorna una lista vuota
          return assunzioni;
      }
 
 
-    /**
-     * Conta le assunzioni di farmaci effettuate in un dato giorno per una lista di pazienti con una singola query.
-     * Usato per checkFarmaciDaily
-     * @param patientIds La lista degli ID dei pazienti.
-     * @param data Il giorno da controllare.
-     * @return Una mappa dove la chiave è l'ID del paziente e il valore è il numero di assunzioni effettuate.
-     * @throws DataAccessException Se si verifica un errore di accesso ai dati.
-     */
+    // conta le assunzioni di farmaci effettuate in un dato giorno per una lista di pazienti con una singola query
+    // usato per checkfarmacidaily
+    // @param patientids la lista degli id dei pazienti
+    // @param data il giorno da controllare
+    // @return una mappa dove la chiave è l'id del paziente e il valore è il numero di assunzioni effettuate
+    // @throws dataaccessexception se si verifica un errore di accesso ai dati
     public Map<Integer, Integer> getConteggioAssunzioniGiornoPerPazienti(List<Integer> patientIds, LocalDate data) throws DataAccessException {
         if (patientIds == null || patientIds.isEmpty()) {
             return Collections.emptyMap(); // ritorna una mappa vuota se non ci sono pazienti
@@ -117,10 +109,10 @@ public class AssunzioneFarmaciDAO {
 
         // inizializza la mappa per memorizzare il conteggio delle assunzioni
         Map<Integer, Integer> mapConteggio = new HashMap<>();
-        //crea un placeholder per ogni ID paziente nella query
+        // crea un placeholder per ogni id paziente nella query
         String placeholders = String.join(",", Collections.nCopies(patientIds.size(), "?"));
 
-        //la query usa COUNT e GROUP BY
+        // la query usa count e group by
         String sql = "SELECT IDPaziente, COUNT(*) as ConteggioAssunzioni " +
                 "FROM AssunzioniFarmaci WHERE IDPaziente IN (" + placeholders + ") " +
                 "AND TimestampAssunzione >= ? AND TimestampAssunzione < ? " +
@@ -148,34 +140,32 @@ public class AssunzioneFarmaciDAO {
                 }
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Errore nel recupero del conteggio assunzioni.", e);
+            throw new DataAccessException("errore nel recupero del conteggio assunzioni", e);
         }
         return mapConteggio;
     }
 
 
-    /**
-     * Aggiunge una nuova assunzione di farmaci per un paziente.
-     * @param assunzione L'oggetto AssunzioneFarmaci da aggiungere
-     */
+    // aggiunge una nuova assunzione di farmaci per un paziente
+    // @param assunzione l'oggetto assunzionefarmaci da aggiungere
     public void aggiungiAssunzione(AssunzioneFarmaci assunzione) throws DataAccessException {
         String sql = "INSERT INTO AssunzioniFarmaci(IDTerapia, IDPaziente, TimestampAssunzione, QuantitaAssunta) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            // Imposta i parametri della query
+            // imposta i parametri della query
             pstmt.setInt(1, assunzione.getIDTerapia());
             pstmt.setInt(2, assunzione.getIDPaziente());
             pstmt.setObject(3, assunzione.getTimestampAssunzione());
             pstmt.setString(4, assunzione.getQuantitaAssunta());
 
-            // Esegue l'inserimento
+            // esegue l'inserimento
             pstmt.executeUpdate();
 
         } catch (SQLException e){
-            System.err.println("Errore durante l'aggiunta di assunzione di farmaci: " + e.getMessage());
-            throw new DataAccessException("Errore durante l'aggiunta dell'assunzione di farmaci per il paziente con ID " + assunzione.getIDPaziente(), e);
+            System.err.println("errore durante l'aggiunta di assunzione di farmaci " + e.getMessage());
+            throw new DataAccessException("errore durante l'aggiunta dell'assunzione di farmaci per il paziente con id " + assunzione.getIDPaziente(), e);
         }
     }
 }

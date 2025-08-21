@@ -149,12 +149,13 @@ public class DashboardPazienteController {
     }
 
 
+    // inizializza i dati del paziente loggato
     public void initData(Utente paziente){
         this.pazienteLoggato = paziente;
         nomeCognomeLabel.setText(paziente.getNome() + " " + paziente.getCognome());
         initializeNotifications();
 
-        // Recupera i dati del paziente per la dashboard
+        // recupera i dati del paziente per la dashboard
         try {
             pazienteDashboard = pazienteService.getDatiPazienteDasboard(pazienteLoggato);
         } catch (MedicoServiceException e) {
@@ -164,12 +165,12 @@ public class DashboardPazienteController {
         //riempie il campo farmaco con i farmaci associati al paziente
         terapiePaziente = pazienteDashboard.getElencoTerapie();
 
-        // Popola la ChoiceBox con gli OGGETTI, non con le stringhe
+        // popola la choicebox con gli oggetti non con le stringhe
         if (terapiePaziente != null) {
             farmacoChoiceBox.setItems(FXCollections.observableArrayList(terapiePaziente));
         }
 
-        // Crea e imposta un StringConverter per dire alla ChoiceBox cosa mostrare
+        // crea e imposta un stringconverter per dire alla choicebox cosa mostrare
         farmacoChoiceBox.setConverter(new StringConverter<Terapia>() {
             @Override
             public String toString(Terapia terapia) {
@@ -189,7 +190,7 @@ public class DashboardPazienteController {
         //riempie il boxchoice di sintomi
         updateSintomiChoiceBox();
 
-        // Inizializza i campi di testo per la terapia
+        // inizializza i campi di testo per la terapia
         profiloInfo = Arrays.asList("Sintomi", "Patologie", "Terapie Concomitanti");
         currentProfiloIndex = 0;
         updateProfiloView();

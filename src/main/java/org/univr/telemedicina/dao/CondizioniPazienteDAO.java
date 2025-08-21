@@ -11,29 +11,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CondizioniPazienteDAO {
-    /**
-     * Usato per trovare le condizioni di un paziente basandosi sul suo IDPaziente.
-     *
-     * @param IDPaziente L'IDPaziente da cercare.
-     * @return Una lista contenente le CondizioniPaziente se trovate, altrimenti una lista vuoto.
-     */
+    // usato per trovare le condizioni di un paziente basandosi sul suo idpaziente
+    // @param idpaziente l'idpaziente da cercare
+    // @return una lista contenente le condizionipaziente se trovate altrimenti una lista vuota
     public List<CondizioniPaziente> listByIDPatId(int IDPaziente) throws DataAccessException {
         List<CondizioniPaziente> condizioni = new ArrayList<>();
 
 
         String sql = "SELECT * FROM CondizioniPaziente WHERE IDPaziente = ?";
 
-        // try-with-resources per garantire la chiusura automatica delle risorse (Connection, PreparedStatement, ResultSet)
+        // try-with-resources per garantire la chiusura automatica delle risorse (connection preparedstatement resultset)
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            // Imposta il parametro della query (?) per evitare SQL Injection
+            // imposta il parametro della query (?) per evitare sql injection
             pstmt.setInt(1, IDPaziente);
 
             try (ResultSet rs = pstmt.executeQuery()) {
-                // Se c'è un risultato...
+                // se c'è un risultato...
                 while (rs.next()) {
-                    // ...crea un oggetto CondizioniPaziente e popola i suoi campi con i dati dal ResultSet
+                    // ...crea un oggetto condizionipaziente e popola i suoi campi con i dati dal resultset
                     CondizioniPaziente condizione = new CondizioniPaziente(
                             rs.getInt("IDPaziente"),
                             rs.getString("Tipo"),
@@ -43,24 +40,21 @@ public class CondizioniPazienteDAO {
                     );
                     condizione.setIDCondizione(rs.getInt("IDCondizione"));
 
-                    // Aggiungi la condiziona alla lista
+                    // aggiungi la condiziona alla lista
                     condizioni.add(condizione);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Errore durante la ricerca delle condizioni per IDPaziente: " + e.getMessage());
-            throw new DataAccessException("Errore durante la ricerca delle condizioni per il paziente con ID " + IDPaziente, e);
+            System.err.println("errore durante la ricerca delle condizioni per idpaziente " + e.getMessage());
+            throw new DataAccessException("errore durante la ricerca delle condizioni per il paziente con id " + IDPaziente, e);
         }
 
-        // Se non viene trovato nessuna condizione o si verifica un errore, ritorna una lista vuota
+        // se non viene trovato nessuna condizione o si verifica un errore ritorna una lista vuota
         return condizioni;
     }
 
-    /**
-     * Salva una nuova condizione nel database
-     *
-     * @param condizione L'oggetto CondizioniPaziente da salvare
-     */
+    // salva una nuova condizione nel database
+    // @param condizione l'oggetto condizionipaziente da salvare
     public void create(CondizioniPaziente condizione) throws DataAccessException {
         String sql = "INSERT INTO CondizioniPaziente(IDPaziente, Tipo, Descrizione, Periodo, DataRegistrazione) VALUES (?, ?, ?, ?, ?)";
 
@@ -76,16 +70,13 @@ public class CondizioniPazienteDAO {
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("Errore durante la creazione della condizione: " + e.getMessage());
-            throw new DataAccessException("Errore durante la creazione della condizione per il paziente con ID " + condizione.getIDPaziente(), e);
+            System.err.println("errore durante la creazione della condizione " + e.getMessage());
+            throw new DataAccessException("errore durante la creazione della condizione per il paziente con id " + condizione.getIDPaziente(), e);
         }
     }
 
-    /**
-     * Aggiorna una condizione esistente nel database
-     *
-     * @param condizione L'oggetto CondizioniPaziente da aggiornare
-     */
+    // aggiorna una condizione esistente nel database
+    // @param condizione l'oggetto condizionipaziente da aggiornare
     public void update(CondizioniPaziente condizione) throws DataAccessException {
         String sql = "UPDATE CondizioniPaziente SET Tipo = ?, Descrizione = ?, Periodo = ?, DataRegistrazione = ? WHERE IDCondizione = ?";
 
@@ -96,17 +87,17 @@ public class CondizioniPazienteDAO {
             pstmt.setString(2, condizione.getDescrizione());
             pstmt.setString(3, condizione.getPeriodo());
             pstmt.setObject(4, condizione.getDataRegistrazione());
-            pstmt.setInt(5, condizione.getIDCondizione()); // <-- La chiave per la clausola WHERE
+            pstmt.setInt(5, condizione.getIDCondizione()); // <-- la chiave per la clausola where
 
             int affectedRows = pstmt.executeUpdate();
 
             if (affectedRows == 0) {
-                // È buona norma gestire il caso in cui l'ID non esista
-                throw new DataAccessException("Nessuna condizione trovata con ID: " + condizione.getIDCondizione() + " per l'aggiornamento.");
+                // è buona norma gestire il caso in cui l'id non esista
+                throw new DataAccessException("nessuna condizione trovata con id " + condizione.getIDCondizione() + " per l'aggiornamento");
             }
 
         } catch (SQLException e) {
-            throw new DataAccessException("Errore durante l'aggiornamento della condizione nel database", e);
+            throw new DataAccessException("errore durante l'aggiornamento della condizione nel database", e);
         }
     }
 
@@ -121,12 +112,12 @@ public class CondizioniPazienteDAO {
             int affectedRows = pstmt.executeUpdate();
 
             if (affectedRows == 0) {
-                throw new DataAccessException("Eliminazione condizione fallita, non è stata trovata nessuna condizione con ID " + idCondizione, null);
+                throw new DataAccessException("eliminazione condizione fallita non è stata trovata nessuna condizione con id " + idCondizione, null);
             }
 
         } catch (SQLException e) {
-            System.err.println("Errore durante l'eliminazione della condizione: " + e.getMessage());
-            throw new DataAccessException("Errore durante l'eliminazione della condizione con ID " + idCondizione, e);
+            System.err.println("errore durante l'eliminazione della condizione " + e.getMessage());
+            throw new DataAccessException("errore durante l'eliminazione della condizione con id " + idCondizione, e);
         }
     }
 }

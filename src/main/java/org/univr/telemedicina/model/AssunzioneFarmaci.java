@@ -2,15 +2,21 @@ package org.univr.telemedicina.model;
 
 import java.time.LocalDateTime;
 
+// rappresenta l'assunzione di un farmaco da parte di un paziente
 public class AssunzioneFarmaci {
+    // identificativo univoco dell'assunzione
     private int IDAssunzione;
+    // identificativo della terapia a cui si riferisce l'assunzione
     private int IDTerapia;
+    // identificativo del paziente che ha assunto il farmaco
     private int IDPaziente;
+    // data e ora dell'assunzione
     private LocalDateTime TimestampAssunzione;
+    // quantità di farmaco assunta
     private String QuantitaAssunta;
 
 
-    //costruttore per quando si legge
+    // costruttore per leggere un'assunzione dal database
     public AssunzioneFarmaci(int IDAssunzione, int IDTerapia, int IDPaziente, LocalDateTime TimestampAssunzione, String QuantitaAssunta) {
         this.IDAssunzione = IDAssunzione;
         this.IDTerapia = IDTerapia;
@@ -19,7 +25,7 @@ public class AssunzioneFarmaci {
         this.QuantitaAssunta = QuantitaAssunta;
     }
 
-    //costruttore per quando si inserisce, non c'è IDAssunzione perché è auto-incrementato nel database
+    // costruttore per inserire una nuova assunzione non serve idassunzione perché è auto-incrementato
     public AssunzioneFarmaci(int IDTerapia, int IDPaziente, LocalDateTime TimestampAssunzione, String QuantitaAssunta) {
         this.IDTerapia = IDTerapia;
         this.IDPaziente = IDPaziente;
@@ -27,7 +33,7 @@ public class AssunzioneFarmaci {
         this.QuantitaAssunta = QuantitaAssunta;
     }
 
-    //metodi getter e setter
+    // metodi getter e setter per i campi della classe
     public int getIDAssunzione() {
         return IDAssunzione;
     }

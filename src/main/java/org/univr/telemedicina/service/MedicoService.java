@@ -9,11 +9,8 @@ import java.util.List;
 import java.time.LocalDateTime;
 import java.time.LocalDate;
 
-/**
- * Service layer che implementa tutte le funzionalità a disposizione del medico.
- * Permette di visualizzare le liste pazienti, i dati aggregati (dashboard) e aggiornare le condizioni cliniche.
- * */
-
+// service layer che implementa tutte le funzionalità a disposizione del medico
+// permette di visualizzare le liste pazienti i dati aggregati (dashboard) e aggiornare le condizioni cliniche
 public class MedicoService {
 
     private final PazientiDAO pazientiDAO;
@@ -33,43 +30,37 @@ public class MedicoService {
         this.assunzioneFarmaciDAO = assunzioneFarmaciDAO;
     }
 
-    /**
-     * elenco dei pazienti assegnati al medico
-     */
+    // elenco dei pazienti assegnati al medico
     public List<Utente> getPazientiAssegnati(int idMedico) throws MedicoServiceException {
         try {
             // recupera i pazienti assegnati al medico
             return pazientiDAO.findPazientiByMedId(idMedico);
         } catch (DataAccessException e) {
-            throw new MedicoServiceException("Errore durante il recupero dei pazienti assegnati: " + e.getMessage(), e);
+            throw new MedicoServiceException("errore durante il recupero dei pazienti assegnati " + e.getMessage(), e);
         }
     }
 
-    /**
-     * restituisce una lista di pazienti attivi, ovvero chi ha una terapia in corso
-     */
+    // restituisce una lista di pazienti attivi ovvero chi ha una terapia in corso
     public List<Utente> getPazientiAttivi(int idMedico) throws MedicoServiceException {
         try {
             List<Utente> pazientiAssegnati = getPazientiAssegnati(idMedico);
 
-            // Filtra i pazienti che hanno almeno una terapia attiva
+            // filtra i pazienti che hanno almeno una terapia attiva
             List<Integer> pazientiAttiviGlobal = terapiaDAO.getActivePatientIds();
             return pazientiAssegnati.stream()
                     .filter(paziente -> pazientiAttiviGlobal.contains(paziente.getIDUtente()))
                     .toList();
 
         } catch (DataAccessException e) {
-            throw new MedicoServiceException("Errore durante il recupero dei pazienti attivi: " + e.getMessage(), e);
+            throw new MedicoServiceException("errore durante il recupero dei pazienti attivi " + e.getMessage(), e);
         }
     }
 
-    /**
-     * raccoglie dati necessari per la dashboard del singolo paziente
-     */
+    // raccoglie dati necessari per la dashboard del singolo paziente
     public PazienteDashboard getDatiPazienteDasboard(Utente utente) throws MedicoServiceException{
         try{
 
-            //recupera liste di informazioni dai DAO
+            //recupera liste di informazioni dai dao
             List<RilevazioneGlicemia> elencoRilevazioni = rivelazioneGlicemiaDAO.getRilevazioniByPaziente(utente.getIDUtente());
             List<Terapia> elencoTerapie = terapiaDAO.listTherapiesByPatId(utente.getIDUtente());
             List<CondizioniPaziente> elencoCondizioni = condizioniPazienteDAO.listByIDPatId(utente.getIDUtente());
@@ -77,20 +68,17 @@ public class MedicoService {
 
             return new PazienteDashboard(utente, elencoRilevazioni, elencoTerapie, elencoCondizioni, elencoAssunzioni);
         }catch (DataAccessException e){
-            throw new MedicoServiceException("Errore durante il recupero dei dati del paziente: " + e.getMessage(), e);
+            throw new MedicoServiceException("errore durante il recupero dei dati del paziente " + e.getMessage(), e);
         }
 
     }
 
-    /**
-     * aggiunge una nuova condizione
-     */
-
+    // aggiunge una nuova condizione
     public void addCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDate dataRegistrazione) throws MedicoServiceException {
 
         // validazione dell'input
         if (!("patologia".equalsIgnoreCase(tipo) || "fattoriRischio".equalsIgnoreCase(tipo) || "comorbidita".equalsIgnoreCase(tipo))) {
-            throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'Patologia' o 'FattoreRischio' o 'Comorbidita'.");
+            throw new MedicoServiceException("tipo di condizione non valido deve essere 'patologia' o 'fattorerischio' o 'comorbidita'");
         }
 
         try {
@@ -99,61 +87,57 @@ public class MedicoService {
 
             condizioniPazienteDAO.create(condizione);
 
-            // LOGGING: Traccia l'aggiornamento delle condizioni del paziente
-            String descrizioneLog = "Aggiunta condizione " + condizione.getTipo() + ":" + condizione.getDescrizione();
+            // logging traccia l'aggiornamento delle condizioni del paziente
+            String descrizioneLog = "aggiunta condizione " + condizione.getTipo() + ":" + condizione.getDescrizione();
             logOperazione(idMedicoOperante, condizione.getIDPaziente(), "AGGIORNAMENTO_CONDIZIONI", descrizioneLog);
 
         } catch (DataAccessException e) {
-            throw new MedicoServiceException("Errore durante l'aggiornamento delle condizioni del paziente: " + e.getMessage(), e);
+            throw new MedicoServiceException("errore durante l'aggiornamento delle condizioni del paziente " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Aggiorna una condizione esistente di un paziente.
-     * @param idMedicoOperante L'ID del medico che esegue l'operazione.
-     * @param condizione L'oggetto CondizioniPaziente da aggiornare.
-     *                   DEVE contenere l'IDCondizione della riga da modificare.
-     * @throws MedicoServiceException se l'aggiornamento fallisce o i dati non sono validi.
-     */
+    // aggiorna una condizione esistente di un paziente
+    // @param idmedicooperante l'id del medico che esegue l'operazione
+    // @param condizione l'oggetto condizionipaziente da aggiornare
+    //                   deve contenere l'idcondizione della riga da modificare
+    // @throws medicoserviceexception se l'aggiornamento fallisce o i dati non sono validi
     public void updateCondizioniPaziente(int idMedicoOperante, CondizioniPaziente condizione) throws MedicoServiceException {
 
-        // 1. Validazione dell'input
+        // 1 validazione dell'input
         if (condizione == null || condizione.getIDCondizione() <= 0) {
-            throw new MedicoServiceException("ID della condizione non valido per l'aggiornamento.");
+            throw new MedicoServiceException("id della condizione non valido per l'aggiornamento");
         }
 
         if (!("patologia".equalsIgnoreCase(condizione.getTipo()) || "fattoriRischio".equalsIgnoreCase(condizione.getTipo()) || "comorbidita".equalsIgnoreCase(condizione.getTipo()))) {
-            throw new MedicoServiceException("Tipo di condizione non valido. Deve essere 'Patologia' o 'FattoreRischio' o 'Comorbidita'.");
+            throw new MedicoServiceException("tipo di condizione non valido deve essere 'patologia' o 'fattorerischio' o 'comorbidita'");
         }
 
         try {
-            // 2. Chiamata al DAO con l'oggetto completo
-            // Il DAO ora ha tutte le informazioni necessarie, incluso l'ID per la clausola WHERE.
+            // 2 chiamata al dao con l'oggetto completo
+            // il dao ora ha tutte le informazioni necessarie incluso l'id per la clausola where
             condizioniPazienteDAO.update(condizione);
 
-            // 3. Logging corretto, perché ora l'ID è presente
-            String descrizioneLog = "Aggiornata condizione ID " + condizione.getIDCondizione() + " con descrizione: " + condizione.getDescrizione();
+            // 3 logging corretto perché ora l'id è presente
+            String descrizioneLog = "aggiornata condizione id " + condizione.getIDCondizione() + " con descrizione " + condizione.getDescrizione();
             logOperazione(idMedicoOperante, condizione.getIDPaziente(), "AGGIORNAMENTO_CONDIZIONI", descrizioneLog);
 
         } catch (DataAccessException e) {
-            // Fornisce un messaggio di errore più specifico
-            throw new MedicoServiceException("Errore durante l'aggiornamento della condizione ID " + condizione.getIDCondizione(), e);
+            // fornisce un messaggio di errore più specifico
+            throw new MedicoServiceException("errore durante l'aggiornamento della condizione id " + condizione.getIDCondizione(), e);
         }
     }
 
     public void eliminaCondizione(int idCondizione, int idMedicoOperante, int idPaziente) throws MedicoServiceException {
         try {
             condizioniPazienteDAO.delete(idCondizione);
-            String descrizioneLog = "Eliminata condizione ID " + idCondizione;
+            String descrizioneLog = "eliminata condizione id " + idCondizione;
             logOperazione(idMedicoOperante, idPaziente, "AGGIORNAMENTO_CONDIZIONI", descrizioneLog);
         } catch (DataAccessException e) {
-            throw new MedicoServiceException("Errore durante l'eliminazione della condizione ID " + idCondizione, e);
+            throw new MedicoServiceException("errore durante l'eliminazione della condizione id " + idCondizione, e);
         }
     }
 
-    /**
-     * registra un'operazione effettuata da un medico su un paziente
-     */
+    // registra un'operazione effettuata da un medico su un paziente
     public void logOperazione(int idMedico, int idPaziente, String tipoOperazione, String descrizione) throws DataAccessException {
 
         LogOperazione log = new LogOperazione(idMedico, idPaziente, tipoOperazione, descrizione, LocalDateTime.now());
@@ -162,14 +146,11 @@ public class MedicoService {
     }
 
 
-    /**
-     * Calcola l'indice di aderenza globale dei pazienti assegnati al medico.
-     * L'aderenza è calcolata come la media delle aderenze individuali dei pazienti.
-     *
-     * @param pazienti Lista di pazienti da considerare per il calcolo dell'aderenza.
-     * @return L'indice di aderenza globale come valore compreso tra 0 e 1.
-     * @throws MedicoServiceException se si verifica un errore durante il calcolo.
-     */
+    // calcola l'indice di aderenza globale dei pazienti assegnati al medico
+    // l'aderenza è calcolata come la media delle aderenze individuali dei pazienti
+    // @param pazienti lista di pazienti da considerare per il calcolo dell'aderenza
+    // @return l'indice di aderenza globale come valore compreso tra 0 e 1
+    // @throws medicoserviceexception se si verifica un errore durante il calcolo
     public double calcolaAderenzaGlobale(List<Utente> pazienti) throws MedicoServiceException {
         double aderenzaMedia = 0;
         int pazientiConTerapia = 0;
@@ -185,7 +166,7 @@ public class MedicoService {
                 double aderenzaPaziente = calcolaAderenzaPaziente(paziente.getIDUtente(), terapie);
                 aderenzaMedia += aderenzaPaziente;
             } catch (DataAccessException e) {
-                throw new MedicoServiceException("Errore nel calcolo dell'aderenza per il paziente " + paziente.getIDUtente(), e);
+                throw new MedicoServiceException("errore nel calcolo dell'aderenza per il paziente " + paziente.getIDUtente(), e);
             }
         }
 
