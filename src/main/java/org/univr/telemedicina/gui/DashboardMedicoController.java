@@ -369,21 +369,33 @@ public class DashboardMedicoController {
     @FXML
     private void handleCreaModificaTerapiaButton(ActionEvent event) {
         formCorrente = "terapia";
-        creaModificaTerapiaButton.getStyleClass().remove("deactivated-button-graph");
-        creaModificaTerapiaButton.getStyleClass().add("activated-button-graph");
-        creaModificaCondizioniButton.getStyleClass().remove("activated-button-graph");
-        creaModificaCondizioniButton.getStyleClass().add("deactivated-button-graph");
+        // Update button styles - ensure only one button is activated
+        setButtonActivated(creaModificaTerapiaButton);
+        setButtonDeactivated(creaModificaCondizioniButton);
         formContainer.getChildren().setAll(formTerapia);
     }
 
     @FXML
     private void handleCreaModificaCondizioniButton(ActionEvent event) {
         formCorrente = "condizioni";
-        creaModificaCondizioniButton.getStyleClass().remove("deactivated-button-graph");
-        creaModificaCondizioniButton.getStyleClass().add("activated-button-graph");
-        creaModificaTerapiaButton.getStyleClass().remove("activated-button-graph");
-        creaModificaTerapiaButton.getStyleClass().add("deactivated-button-graph");
+        // Update button styles - ensure only one button is activated
+        setButtonActivated(creaModificaCondizioniButton);
+        setButtonDeactivated(creaModificaTerapiaButton);
         formContainer.getChildren().setAll(formCondizioni);
+    }
+    
+    private void setButtonActivated(Button button) {
+        button.getStyleClass().remove("deactivated-button-graph");
+        if (!button.getStyleClass().contains("activated-button-graph")) {
+            button.getStyleClass().add("activated-button-graph");
+        }
+    }
+    
+    private void setButtonDeactivated(Button button) {
+        button.getStyleClass().remove("activated-button-graph");
+        if (!button.getStyleClass().contains("deactivated-button-graph")) {
+            button.getStyleClass().add("deactivated-button-graph");
+        }
     }
 
     @FXML
