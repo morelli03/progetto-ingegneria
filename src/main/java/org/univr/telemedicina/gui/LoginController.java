@@ -26,8 +26,8 @@ import java.util.Optional;
 
 public class LoginController {
 
-    // Inietta gli elementi dall'FXML nel codice Java.
-    // Il nome della variabile DEVE corrispondere all'fx:id nel file FXML.
+    // inietta gli elementi dall'fxml nel codice java
+    // il nome della variabile deve corrispondere all'fx:id nel file fxml
     @FXML
     private TextField emailField;
 
@@ -37,112 +37,108 @@ public class LoginController {
     @FXML
     private Label errorLabel;
 
-    // Riferimenti ai servizi di backend
+    // riferimenti ai servizi di backend
     private AuthService authService;
 
-    // Il costruttore viene chiamato prima che la UI sia visibile
+    // il costruttore viene chiamato prima che la ui sia visibile
     public LoginController() {
-        // Inizializza i servizi necessari per l'autenticazione.
-        // Questa è la "Dependency Injection" manuale.
+        // inizializza i servizi necessari per l'autenticazione
+        // questa è la "dependency injection" manuale
         UtenteDAO utenteDao = new UtenteDAO();
-        // Nota: BCryptPasswordEncoder non ha stato, quindi è sicuro crearne uno nuovo.
+        // nota bscryptpasswordencoder non ha stato quindi è sicuro crearne uno nuovo
         this.authService = new AuthService(utenteDao, new BCryptPasswordEncoder());
     }
     
-    /**
-     * Questo metodo viene chiamato quando si preme il pulsante "Login".
-     * Il nome corrisponde a quello definito in onAction nell'FXML.
-     */
+    // questo metodo viene chiamato quando si preme il pulsante "login"
+    // il nome corrisponde a quello definito in onaction nell'fxml
     @FXML
     private void handleLoginButtonAction(ActionEvent event) {
         String email = emailField.getText();
         String password = passwordField.getText();
 
-        // 1. Validazione base dell'input
+        // 1 validazione base dell'input
         if (email.isEmpty() || password.isEmpty()) {
-            showError("Email e password non possono essere vuoti.");
+            showError("email e password non possono essere vuoti");
             return;
         }
 
         try {
-            // 2. Chiama il tuo AuthService per verificare le credenziali
+            // 2 chiama il tuo authservice per verificare le credenziali
             Optional<Utente> utenteAutenticato = authService.verificaPassword(email, password);
 
-            // 3. Controlla il risultato
+            // 3 controlla il risultato
             if (utenteAutenticato.isPresent()) {
-                // Login riuscito!
-                System.out.println("Login effettuato con successo per l'utente: " + utenteAutenticato.get().getEmail());
-                showError(""); // Pulisce eventuali errori precedenti
+                // login riuscito!
+                System.out.println("login effettuato con successo per l'utente " + utenteAutenticato.get().getEmail());
+                showError(""); // pulisce eventuali errori precedenti
 
-                // Ora, naviga alla dashboard
+                // ora naviga alla dashboard
                 navigateToDashboard(utenteAutenticato.get());
 
             } else {
-                // Credenziali non valide
-                showError("Email o password non corretti.");
+                // credenziali non valide
+                showError("email o password non corretti");
             }
 
         } catch (AuthServiceException e) {
-            // Errore del server/database
-            showError("Errore del server. Riprova più tardi.");
-            System.err.println("Errore di autenticazione: " + e.getMessage());
+            // errore del server/database
+            showError("errore del server riprova più tardi");
+            System.err.println("errore di autenticazione " + e.getMessage());
         }
     }
 
 
-    /**
-     * Naviga alla dashboard corretta in base al ruolo dell'utente.
-     * @param utente L'utente autenticato.
-     */
+    // naviga alla dashboard corretta in base al ruolo dell'utente
+    // @param utente l'utente autenticato
     private void navigateToDashboard(Utente utente) {
 
-        // Controlla il ruolo dell'utente e carica la dashboard appropriata
+        // controlla il ruolo dell'utente e carica la dashboard appropriata
         if(Objects.equals(utente.getRuolo(), "Medico")){
             try{
-                // **PASSO 1: Carica il nuovo FXML**
+                // **passo 1 carica il nuovo fxml**
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/univr/telemedicina/gui/fxml/dashboardmedico.fxml"));
                 Parent root = loader.load();
 
-                // **PASSO 2: Passa i dati al nuovo controller (FONDAMENTALE)**
-                // Prima ottieni il controller della dashboard
+                // **passo 2 passa i dati al nuovo controller (fondamentale)**
+                // prima ottieni il controller della dashboard
                 DashboardMedicoController dashboardController = loader.getController();
-                // Poi chiama un metodo per passare l'oggetto Utente
+                // poi chiama un metodo per passare l'oggetto utente
                 dashboardController.initData(utente);
 
-                // **PASSO 3: Ottieni la finestra e cambia scena**
-                // Ottieni la finestra (Stage) da un qualsiasi elemento della UI, come emailField
+                // **passo 3 ottieni la finestra e cambia scena**
+                // ottieni la finestra (stage) da un qualsiasi elemento della ui come emailfield
                 Stage stage = (Stage) emailField.getScene().getWindow();
 
                 Scene scene = new Scene(root);
                 stage.setScene(scene);
-                stage.setTitle("Dashboard");
+                stage.setTitle("dashboard");
                 stage.show();
             } catch (IOException e) {
-                showError("Errore critico: Impossibile caricare la dashboard.");
+                showError("errore critico impossibile caricare la dashboard");
                 e.printStackTrace();
             }
         } else if (Objects.equals(utente.getRuolo(), "Paziente")){
             try{
-                // **PASSO 1: Carica il nuovo FXML**
+                // **passo 1 carica il nuovo fxml**
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/org/univr/telemedicina/gui/fxml/dashboardpaziente.fxml"));
                 Parent root = loader.load();
 
-                // **PASSO 2: Passa i dati al nuovo controller (FONDAMENTALE)**
-                // Prima ottieni il controller della dashboard
+                // **passo 2 passa i dati al nuovo controller (fondamentale)**
+                // prima ottieni il controller della dashboard
                 DashboardPazienteController dashboardController = loader.getController();
-                // Poi chiama un metodo per passare l'oggetto Utente
+                // poi chiama un metodo per passare l'oggetto utente
                 dashboardController.initData(utente);
 
-                // **PASSO 3: Ottieni la finestra e cambia scena**
-                // Ottieni la finestra (Stage) da un qualsiasi elemento della UI, come emailField
+                // **passo 3 ottieni la finestra e cambia scena**
+                // ottieni la finestra (stage) da un qualsiasi elemento della ui come emailfield
                 Stage stage = (Stage) emailField.getScene().getWindow();
 
                 Scene scene = new Scene(root);
                 stage.setScene(scene);
-                stage.setTitle("Dashboard");
+                stage.setTitle("dashboard");
                 stage.show();
             } catch (IOException e) {
-                showError("Errore critico: Impossibile caricare la dashboard.");
+                showError("errore critico impossibile caricare la dashboard");
                 e.printStackTrace();
             }
         }
@@ -150,17 +146,15 @@ public class LoginController {
 
     }
 
-    /**
-     * Gestisce il click sul pulsante "Contatta amministrazione".
-     * Apre il client di posta predefinito su un thread separato per non bloccare la UI.
-     */
+    // gestisce il click sul pulsante "contatta amministrazione"
+    // apre il client di posta predefinito su un thread separato per non bloccare la ui
     @FXML
     private void contattaAmministrazione() {
-        // Eseguiamo tutta l'operazione in un nuovo thread.
+        // eseguiamo tutta l'operazione in un nuovo thread
         new Thread(() -> {
             String emailDestinatario = "amministrazione@telemedicina.it";
-            String oggetto = "Richiesta Assistenza Account";
-            String corpoMail = "Buongiorno,\n\nScrivo per richiedere assistenza riguardo il mio account.\n\nCordiali saluti,\n[Il tuo Nome]";
+            String oggetto = "richiesta assistenza account";
+            String corpoMail = "buongiorno,\n\nscrivo per richiedere assistenza riguardo il mio account.\n\ncordiali saluti,\n[il tuo nome]";
 
             if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.MAIL)) {
                 try {
@@ -175,19 +169,17 @@ public class LoginController {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    // Se si verifica un errore, aggiorna la UI nel thread corretto usando Platform.runLater
-                    Platform.runLater(() -> showError("Errore: Impossibile aprire il client di posta."));
+                    // se si verifica un errore aggiorna la ui nel thread corretto usando platform.runlater
+                    Platform.runLater(() -> showError("errore impossibile aprire il client di posta"));
                 }
             } else {
-                // Anche questo aggiornamento della UI deve usare Platform.runLater
-                Platform.runLater(() -> showError("Funzionalità non supportata su questo sistema."));
+                // anche questo aggiornamento della ui deve usare platform.runlater
+                Platform.runLater(() -> showError("funzionalità non supportata su questo sistema"));
             }
-        }).start(); // Avvia il thread
+        }).start(); // avvia il thread
     }
 
-    /**
-     * Metodo di utilità per mostrare un messaggio di errore all'utente.
-     */
+    // metodo di utilità per mostrare un messaggio di errore all'utente
     private void showError(String message) {
         if (message == null || message.isEmpty()) {
             errorLabel.setVisible(false);

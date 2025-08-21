@@ -21,25 +21,23 @@ public class AuthService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /**
-     * Verifica se una password in chiaro corrisponde a un hash salvato.
-     * @param emailUtente email che ha inserito
-     * @param passwordInChiaro La password fornita dall'utente al momento del login.
-     * @return Utente se le password corrispondono, altrimenti Optional.empty().
-     */
+    // verifica se una password in chiaro corrisponde a un hash salvato
+    // @param emailutente email che ha inserito
+    // @param passwordinchiaro la password fornita dall'utente al momento del login
+    // @return utente se le password corrispondono altrimenti optional.empty()
     public Optional<Utente> verificaPassword(String emailUtente, String passwordInChiaro) throws AuthServiceException {
-        // cerca nel database per quell'email, restituisce empty se non esiste la mail
+        // cerca nel database per quell'email restituisce empty se non esiste la mail
         Optional<Utente> utenteTrovato;
         try {
             utenteTrovato = utenteDao.findByEmail(emailUtente);
         } catch (DataAccessException e) {
-            System.err.println("Errore durante la ricerca dell'utente per email: " + e.getMessage());
+            System.err.println("errore durante la ricerca dell'utente per email " + e.getMessage());
             // qui devo lanciare un'eccezione personalizzata
-            throw new AuthServiceException("Impossibile completare l'autenticazione a causa di un errore del server.", e);
+            throw new AuthServiceException("impossibile completare l'autenticazione a causa di un errore del server", e);
         }
 
         if (utenteTrovato.isPresent()) {
-            Utente utente = utenteTrovato.get(); // prende l'utente dentro optional e lo fa diventare Utente
+            Utente utente = utenteTrovato.get(); // prende l'utente dentro optional e lo fa diventare utente
 
             // se la password è uguale alla password hashata ritorna utente
             if(passwordEncoder.matches(passwordInChiaro, utente.getHashedPassword())){

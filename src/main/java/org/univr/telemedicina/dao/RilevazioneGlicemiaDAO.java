@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RilevazioneGlicemiaDAO {
-    /**
-     * Salva nel database una rilevazione di glicemia.
-     */
+    // salva nel database una rilevazione di glicemia
     public void create(RilevazioneGlicemia rilevazione) throws DataAccessException {
         String sql = "INSERT INTO RilevazioniGlicemia (IDPaziente, Valore, Timestamp, Note) VALUES (?, ?, ?, ?)";
 
@@ -24,15 +22,13 @@ public class RilevazioneGlicemiaDAO {
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            System.err.println("Errore durante il salvataggio della rilevazione di glicemia: " + e.getMessage());
-            throw new DataAccessException("Errore durante il salvataggio della rilevazione di glicemia per il paziente con ID " + rilevazione.getIdPaziente(), e);
+            System.err.println("errore durante il salvataggio della rilevazione di glicemia " + e.getMessage());
+            throw new DataAccessException("errore durante il salvataggio della rilevazione di glicemia per il paziente con id " + rilevazione.getIdPaziente(), e);
         }
     }
 
-    /**
-     * trova tutte le rilevazioni di glicemia per un paziente specifico.
-     * fa in modo che le rilevazioni piu recenti siano prime nella lista
-     */
+    // trova tutte le rilevazioni di glicemia per un paziente specifico
+    // fa in modo che le rilevazioni piu recenti siano prime nella lista
     public List<RilevazioneGlicemia> getRilevazioniByPaziente(int idPaziente) throws DataAccessException {
         List<RilevazioneGlicemia> rilevazioni = new ArrayList<>();
         String sql = "SELECT * FROM RilevazioniGlicemia WHERE IDPaziente = ? ORDER BY Timestamp DESC";
@@ -54,8 +50,8 @@ public class RilevazioneGlicemiaDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Errore durante la ricerca delle rilevazioni di glicemia: " + e.getMessage());
-            throw new DataAccessException("Errore durante la ricerca delle rilevazioni di glicemia per il paziente con ID " + idPaziente, e);
+            System.err.println("errore durante la ricerca delle rilevazioni di glicemia " + e.getMessage());
+            throw new DataAccessException("errore durante la ricerca delle rilevazioni di glicemia per il paziente con id " + idPaziente, e);
         }
         return rilevazioni;
     }

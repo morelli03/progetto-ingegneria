@@ -106,10 +106,6 @@ public class DashboardPazienteController {
     private Text dateText;
 
     @FXML
-    private Button deleteButtonSintomo;
-    @FXML
-    private Button saveButtonSintomo;
-    @FXML
     private TextArea descrizioneSintomo;
     @FXML
     private TextArea periodoSintomo;
@@ -117,20 +113,12 @@ public class DashboardPazienteController {
     private ChoiceBox<CondizioniPaziente> sintomoChoiceBox;
 
     @FXML
-    private Button deleteButtonPatologia;
-    @FXML
-    private Button saveButtonPatologia;
-    @FXML
     private TextArea descrizionePatologia;
     @FXML
     private TextArea periodoPatologia;
     @FXML
     private ChoiceBox<CondizioniPaziente> patologiaChoiceBox;
-    
-    @FXML
-    private Button deleteButtonTerapiaCon;
-    @FXML
-    private Button saveButtonTerapiaCon;
+
     @FXML
     private TextArea descrizioneTerapiaCon;
     @FXML
@@ -149,12 +137,13 @@ public class DashboardPazienteController {
     }
 
 
+    // inizializza i dati del paziente loggato
     public void initData(Utente paziente){
         this.pazienteLoggato = paziente;
         nomeCognomeLabel.setText(paziente.getNome() + " " + paziente.getCognome());
         initializeNotifications();
 
-        // Recupera i dati del paziente per la dashboard
+        // recupera i dati del paziente per la dashboard
         try {
             pazienteDashboard = pazienteService.getDatiPazienteDasboard(pazienteLoggato);
         } catch (MedicoServiceException e) {
@@ -164,12 +153,12 @@ public class DashboardPazienteController {
         //riempie il campo farmaco con i farmaci associati al paziente
         terapiePaziente = pazienteDashboard.getElencoTerapie();
 
-        // Popola la ChoiceBox con gli OGGETTI, non con le stringhe
+        // popola la choicebox con gli oggetti non con le stringhe
         if (terapiePaziente != null) {
             farmacoChoiceBox.setItems(FXCollections.observableArrayList(terapiePaziente));
         }
 
-        // Crea e imposta un StringConverter per dire alla ChoiceBox cosa mostrare
+        // crea e imposta un stringconverter per dire alla choicebox cosa mostrare
         farmacoChoiceBox.setConverter(new StringConverter<Terapia>() {
             @Override
             public String toString(Terapia terapia) {
@@ -189,7 +178,7 @@ public class DashboardPazienteController {
         //riempie il boxchoice di sintomi
         updateSintomiChoiceBox();
 
-        // Inizializza i campi di testo per la terapia
+        // inizializza i campi di testo per la terapia
         profiloInfo = Arrays.asList("Sintomi", "Patologie", "Terapie Concomitanti");
         currentProfiloIndex = 0;
         updateProfiloView();
@@ -248,6 +237,7 @@ public class DashboardPazienteController {
         }
     }
 
+    @SuppressWarnings("D")
     private void updateSintomiChoiceBox() {
         if (condizioniPaziente != null) {
             // Filter only symptoms for this patient

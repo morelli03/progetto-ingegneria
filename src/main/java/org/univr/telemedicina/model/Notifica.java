@@ -2,29 +2,38 @@ package org.univr.telemedicina.model;
 
 import java.time.LocalDateTime;
 
+// rappresenta una notifica
 public class Notifica {
+    // identificativo univoco della notifica
     private int IdNotifica;
+    // identificativo del destinatario della notifica
     private int IdDestinatario;
+    // priorità della notifica
     private int Priorita;
+    // titolo della notifica
     private String Titolo;
+    // messaggio della notifica
     private String Messaggio;
+    // tipo di notifica
     private String Tipo;
+    // indica se la notifica è stata letta
     private int Letta;
+    // data e ora della notifica
     private LocalDateTime Timestamp;
 
 
-    // Costruttore per scrivere
+    // costruttore per inserire una nuova notifica
     public Notifica(int idDestinatario, int priorita, String titolo, String messaggio, String tipo, LocalDateTime timestamp) {
         this.IdDestinatario = idDestinatario;
         this.Priorita = priorita;
         this.Titolo = titolo;
         this.Messaggio = messaggio;
         this.Tipo = tipo;
-        this.Letta = 0; // Default: notifica non letta
+        this.Letta = 0; // 0 non letta 1 letta
         this.Timestamp = timestamp;
     }
 
-    // Costruttore per leggere
+    // costruttore per leggere una notifica dal database
     public Notifica(int IDNotifica ,int idDestinatario, int priorita, String titolo, String messaggio, String tipo, int letta, LocalDateTime timestamp) {
         this.IdNotifica = IDNotifica;
         this.IdDestinatario = idDestinatario;
@@ -32,11 +41,11 @@ public class Notifica {
         this.Titolo = titolo;
         this.Messaggio = messaggio;
         this.Tipo = tipo;
-        this.Letta = letta; // Default: notifica non letta
+        this.Letta = letta;
         this.Timestamp = timestamp;
     }
 
-    // metodi getter e setter
+    // metodi getter e setter per i campi della classe
     public int getIdNotifica() {
         return IdNotifica;
     }

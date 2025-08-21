@@ -7,16 +7,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Classe per la gestione delle operazioni di accesso al database relative alle notifiche.
- * Questa classe contiene metodi per inserire e recuperare notifiche.
- */
+// classe per la gestione delle operazioni di accesso al database relative alle notifiche
+// questa classe contiene metodi per inserire e recuperare notifiche
 public class NotificheDAO {
 
-    /**
-     * Inserisce una nuova notifica nel database.
-     * @param notifica L'oggetto Notifiche da inserire.
-     */
+    // inserisce una nuova notifica nel database
+    // @param notifica l'oggetto notifiche da inserire
     public void inserisciNotifica(Notifica notifica) throws DataAccessException {
         String sql = "INSERT INTO Notifiche (IDDestinatario, Priorita, Titolo, Messaggio, Tipo, Letta, Timestamp) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
@@ -33,35 +29,33 @@ public class NotificheDAO {
 
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException("Errore durante l'inserimento della notifica: " + e.getMessage(), e);
+            throw new DataAccessException("errore durante l'inserimento della notifica " + e.getMessage(), e);
         }
     }
 
-    /**
-     * Legge le notifiche per un determinato destinatario.
-     * Le ordina per priorità e timestamp in ordine decrescente.
-     * @param idDestinatario L'ID del destinatario per cui leggere le notifiche.
-     * @return Una lista di notifiche non lette per il destinatario specificato.
-     */
+    // legge le notifiche per un determinato destinatario
+    // le ordina per priorità e timestamp in ordine decrescente
+    // @param iddestinatario l'id del destinatario per cui leggere le notifiche
+    // @return una lista di notifiche non lette per il destinatario specificato
     public List<Notifica> leggiNotifichePerId(int idDestinatario) throws DataAccessException {
         List<Notifica> notifiche = new ArrayList<>();
 
-        // La query SQL per recuperare le notifiche non lette per un determinato destinatario.
+        // la query sql per recuperare le notifiche non lette per un determinato destinatario
         String sql = "SELECT * FROM Notifiche " +
                 "WHERE IDDestinatario = ?" +
                 "ORDER BY Letta ASC, Timestamp DESC";
 
 
 
-        // Utilizza un PreparedStatement per la sicurezza e la corretta gestione dei parametri.
+        // utilizza un preparedstatement per la sicurezza e la corretta gestione dei parametri
         try (Connection conn = DatabaseManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            // Imposta il valore del parametro (?) nella query.
-            // Il primo parametro ha indice 1.
+            // imposta il valore del parametro (?) nella query
+            // il primo parametro ha indice 1
             pstmt.setInt(1, idDestinatario);
 
-            // Esegui la query e ottieni i risultati.
+            // esegui la query e ottieni i risultati
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Notifica notifica = new Notifica(
@@ -78,16 +72,14 @@ public class NotificheDAO {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Errore durante il recupero delle notifiche per IDDestinatario: " + e.getMessage());
-            throw new DataAccessException("Errore durante il recupero delle notifiche per il destinatario con ID " + idDestinatario, e);
+            System.err.println("errore durante il recupero delle notifiche per iddestinatario " + e.getMessage());
+            throw new DataAccessException("errore durante il recupero delle notifiche per il destinatario con id " + idDestinatario, e);
         }
         return notifiche;
     }
 
-    /**
-     * Segna una notifica come letta.
-     * @param idNotifica L'ID della notifica da segnare come letta.
-     */
+    // segna una notifica come letta
+    // @param idnotifica l'id della notifica da segnare come letta
     public void setNotificaLetta(int idNotifica) throws DataAccessException {
         String sql = "UPDATE Notifiche SET Letta = 1 WHERE IDNotifica = ?";
 
@@ -97,7 +89,7 @@ public class NotificheDAO {
             pstmt.setInt(1, idNotifica);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException("Errore durante l'aggiornamento della lettura della notifica: " + e.getMessage(), e);
+            throw new DataAccessException("errore durante l'aggiornamento della lettura della notifica " + e.getMessage(), e);
         }
     }
 

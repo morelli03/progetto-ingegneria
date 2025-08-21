@@ -2,15 +2,22 @@ package org.univr.telemedicina.model;
 
 import java.time.LocalDateTime;
 
+// rappresenta un'operazione di log
 public class LogOperazione {
+    // identificativo univoco del log
     private int IDLog;
+    // identificativo del medico che ha eseguito l'operazione
     private int IDMedicoOperante;
+    // identificativo del paziente interessato dall'operazione
     private int IDPazienteInteressato;
+    // tipo di operazione
     private String TipoOperazione;
+    // descrizione dell'operazione
     private String DescrizioneOperazione;
+    // data e ora dell'operazione
     private LocalDateTime Timestamp;
 
-    //costruttore per lettura
+    // costruttore per leggere un log dal database
     public LogOperazione(int IDLog, int IDMedicoOperante, int IDPazienteInteressato, String TipoOperazione, String DescrizioneOperazione, LocalDateTime Timestamp) {
         this.IDLog = IDLog;
         this.IDMedicoOperante = IDMedicoOperante;
@@ -20,7 +27,7 @@ public class LogOperazione {
         this.Timestamp = Timestamp;
     }
 
-    //costruttore per inserimento, non c'è IDLog perché è auto-incrementato nel database
+    // costruttore per inserire un nuovo log non serve idlog perché è auto-incrementato
     public LogOperazione(int IDMedicoOperante, int IDPazienteInteressato, String TipoOperazione, String DescrizioneOperazione, LocalDateTime Timestamp) {
         this.IDMedicoOperante = IDMedicoOperante;
         this.IDPazienteInteressato = IDPazienteInteressato;
@@ -29,10 +36,10 @@ public class LogOperazione {
         this.Timestamp = Timestamp;
     }
 
-    //costruttore vuoto
+    // costruttore vuoto per creare un oggetto senza parametri
     public LogOperazione(){}
 
-    //metodi getter e setter
+    // metodi getter e setter per i campi della classe
     public int getIDLog() {
         return IDLog;
     }

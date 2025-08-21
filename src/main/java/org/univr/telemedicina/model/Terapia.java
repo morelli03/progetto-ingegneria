@@ -2,18 +2,29 @@ package org.univr.telemedicina.model;
 
 import java.time.LocalDate;
 
+// rappresenta una terapia
 public class Terapia {
+    // identificativo univoco della terapia
     private int IDTerapia;
+    // identificativo del paziente a cui è prescritta la terapia
     private int IDPaziente;
+    // identificativo del medico che ha prescritto la terapia
     private int IDMedico;
+    // nome del farmaco
     private String NomeFarmaco;
+    // quantità del farmaco
     private String Quantita;
+    // frequenza giornaliera di assunzione
     private int FrequenzaGiornaliera;
+    // indicazioni per l'assunzione
     private String Indicazioni;
+    // data di inizio della terapia
     private LocalDate DataInizio;
+    // data di fine della terapia
     private LocalDate DataFine;
 
 
+    // costruttore per leggere una terapia dal database
     public Terapia(int IDTerapia, int IDPaziente, int IDMedico, String NomeFarmaco, String Quantita, int FrequenzaGiornaliera, String Indicazioni, LocalDate DataInizio, LocalDate DataFine) {
         this.IDTerapia = IDTerapia;
         this.IDPaziente = IDPaziente;
@@ -26,6 +37,7 @@ public class Terapia {
         this.DataFine = DataFine;
     }
 
+    // costruttore per inserire una nuova terapia non serve idterapia perché è auto-incrementato
     public Terapia(int IDPaziente, int IDMedico, String NomeFarmaco, String Quantita, int FrequenzaGiornaliera, String Indicazioni, LocalDate DataInizio, LocalDate DataFine) {
         this.IDPaziente = IDPaziente;
         this.IDMedico = IDMedico;
@@ -38,7 +50,7 @@ public class Terapia {
     }
 
 
-    //metodi getter e setter
+    // metodi getter e setter per i campi della classe
     public int getIDTerapia() {
         return IDTerapia;
     }

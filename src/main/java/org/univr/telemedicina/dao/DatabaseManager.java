@@ -6,17 +6,15 @@ import java.sql.SQLException;
 
 public class DatabaseManager {
 
-    // URL di connessione al database SQLite.
-    // "main.sqlite" deve trovarsi nella cartella radice del progetto.  jdbc:sqlite:main.sqlite_journal_mode=WAL
+    // url di connessione al database sqlite
+    // "main.sqlite" deve trovarsi nella cartella radice del progetto jdbc:sqlite:main.sqlite_journal_mode=wal
     private static String URL = "jdbc:sqlite:main.sqlite";
 
-    /**
-     * Restituisce una nuova connessione al database.
-     * @return un oggetto Connection
-     * @throws SQLException se la connessione fallisce
-     */
+    // restituisce una nuova connessione al database
+    // @return un oggetto connection
+    // @throws sqlexception se la connessione fallisce
     public static Connection getConnection() throws SQLException {
-        // Non è più necessario Class.forName() con i driver JDBC moderni
+        // non è più necessario class.forname() con i driver jdbc moderni
         return DriverManager.getConnection(URL);
     }
 }
