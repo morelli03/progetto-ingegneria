@@ -133,7 +133,7 @@ public class MonitorService {
             }
         } else {
             //entra se è due ore dopo i pasti
-            if(rilevazione.getValore() >= 180 || rilevazione.getValore() <= 80){
+            if(rilevazione.getValore() >= 180 || rilevazione.getValore() <= 79){
                 //system.out.println("notifica a paziente id " + rilevazione.getidpaziente() + " valore glicemico anormale dopo i pasti " + rilevazione.getvalore() + " mg/dl controlla la tua dieta");
                 notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(rilevazione.getIdPaziente()).orElseThrow(), 3, "glicemia anormale", "il paziente " + pazientiDAO.findNameById(rilevazione.getIdPaziente()) + " ha registrato un valore glicemico anormale dopo i pasti " + rilevazione.getValore() + " mg/dl", "glicemia");
             }

@@ -38,8 +38,10 @@ public class ApplicationScheduler {
                 }
             };
 
-            // lo scheduliamo per partire subito (initialdelay 0) e ripetersi ogni 10 minuti
-            scheduler.scheduleAtFixedRate(checkAdherenceTask, 0, 10, TimeUnit.MINUTES);
+
+            //MODIFICA - LO RUNNO OGNI 1 ORE
+            // lo scheduliamo per partire subito (initialdelay 0) e ripetersi ogni 1 ore
+            scheduler.scheduleAtFixedRate(checkAdherenceTask, 0, 1, TimeUnit.HOURS);
             System.out.println("task 'checkfarmacidaily' schedulato ogni 10 minuti");
 
 

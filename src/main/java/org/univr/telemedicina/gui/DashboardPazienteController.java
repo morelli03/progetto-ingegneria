@@ -728,7 +728,7 @@ public class DashboardPazienteController {
             clearAssunzioneFarmaciFields();
 
         } catch (WrongAssumptionException e) {
-            showAlert("Errore", "La quantità assunta non è coerente con la terapia prescritta. Assunzione salvata lo stesso, medico notificato.");
+            showAlert("Avviso", "La quantità assunta non è coerente con la terapia prescritta. Assunzione salvata lo stesso, medico notificato.");
         } catch (DataAccessException e) {
             showAlert("Errore", "Errore durante il salvataggio della misurazione nel database.");
             e.printStackTrace();
