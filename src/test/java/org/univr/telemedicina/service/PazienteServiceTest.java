@@ -39,6 +39,9 @@ class PazienteServiceTest {
     @Mock
     private PazientiDAO pazientiDAO;
 
+    @Mock
+    private NotificheService notificheService;
+
     @InjectMocks
     private PazienteService pazienteService;
 
@@ -72,17 +75,26 @@ class PazienteServiceTest {
     }
 
     @Test
-    void registraAssunzioneFarmaci_QuantitaErrata_LanciaEccezione() {
+    void registraAssunzioneFarmaci_QuantitaErrata() throws DataAccessException {
         // ARRANGE
         Terapia terapia = new Terapia(1, 1, 1, "Farmaco", "10mg", 1, "Indicazioni", LocalDate.now(), LocalDate.now().plusDays(1));
         String quantitaAssunta = "20mg";
+        LocalDateTime timestamp = LocalDateTime.now();
+        when(pazientiDAO.findNameById(terapia.getIDPaziente())).thenReturn("NomePaziente");
 
         // ACT & ASSERT
         assertThrows(WrongAssumptionException.class, () -> {
-            pazienteService.registraAssunzioneFarmaci(terapia, quantitaAssunta, LocalDateTime.now());
+            pazienteService.registraAssunzioneFarmaci(terapia, quantitaAssunta, timestamp);
         });
 
-        verifyNoInteractions(assunzioneFarmaciDAO);
+        verify(assunzioneFarmaciDAO, times(1)).aggiungiAssunzione(any());
+        verify(notificheService, times(1)).send(
+                eq(terapia.getIDMedico()),
+                eq(2),
+                eq("assunzione di farmaci non corretta"),
+                anyString(),
+                eq("assunzione farmaci")
+        );
     }
 
     @Test
@@ -122,7 +134,7 @@ class PazienteServiceTest {
             pazienteService.segnalaCondizionePaziente(idPaziente, "Sintomo", "Descrizione", "Periodo");
         });
 
-        assertTrue(exception.getMessage().contains("Errore durante la registrazione della condizione del paziente"));
+        assertTrue(exception.getMessage().contains("errore durante la registrazione della condizione del paziente"));
     }
 
     // --- TEST PER inviaEmailMedicoRiferimento ---
@@ -142,6 +154,6 @@ class PazienteServiceTest {
             pazienteService.inviaEmailMedicoRiferimento(idPaziente, "Subject", "Body");
         });
 
-        assertTrue(exception.getMessage().contains("Nessun medico di riferimento trovato"));
+        assertTrue(exception.getMessage().contains("nessun medico di riferimento trovato"));
     }
 }

@@ -103,7 +103,7 @@ class TerapiaServiceTest {
         });
 
         // Controlla il messaggio dell'eccezione
-        assertTrue(exception.getMessage().contains("Errore durante la modifica della terapia"));
+        assertTrue(exception.getMessage().contains("errore durante la modifica della terapia"));
 
         // Assicurati che, in caso di fallimento, non venga creato nessun log
         verify(logOperazioniDAO, never()).createLog(any(LogOperazione.class));

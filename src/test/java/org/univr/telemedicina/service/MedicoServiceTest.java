@@ -59,7 +59,7 @@ class MedicoServiceTest {
         // ARRANGE
         int idMedico = 1;
         int idPaziente = 2;
-        String tipo = "Anamnestiche";
+        String tipo = "patologia";
         String descrizione = "Allergia alle arachidi";
 
         // ACT
@@ -83,7 +83,7 @@ class MedicoServiceTest {
             medicoService.addCondizioniPaziente(idMedico, idPaziente, tipoInvalido, "desc", "periodo", LocalDate.now());
         });
 
-        assertTrue(exception.getMessage().contains("Tipo di condizione non valido"));
+        assertTrue(exception.getMessage().contains("tipo di condizione non valido"));
         verifyNoInteractions(condizioniPazienteDAO); // Nessuna interazione con i DAO se la validazione fallisce
         verifyNoInteractions(logOperazioniDAO);
     }
@@ -96,7 +96,7 @@ class MedicoServiceTest {
         CondizioniPaziente condizioneDaAggiornare = new CondizioniPaziente();
         condizioneDaAggiornare.setIDCondizione(100); // ID esistente
         condizioneDaAggiornare.setIDPaziente(2);
-        condizioneDaAggiornare.setTipo("fattoreRischio");
+        condizioneDaAggiornare.setTipo("fattoriRischio");
         condizioneDaAggiornare.setDescrizione("Descrizione aggiornata");
 
         // ACT
@@ -116,14 +116,14 @@ class MedicoServiceTest {
         int idMedicoOperante = 1;
         CondizioniPaziente condizioneSenzaId = new CondizioniPaziente();
         condizioneSenzaId.setIDCondizione(0); // ID non valido
-        condizioneSenzaId.setTipo("anamnestiche");
+        condizioneSenzaId.setTipo("patologia");
 
         // ACT & ASSERT
         MedicoServiceException exception = assertThrows(MedicoServiceException.class, () -> {
             medicoService.updateCondizioniPaziente(idMedicoOperante, condizioneSenzaId);
         });
 
-        assertTrue(exception.getMessage().contains("ID della condizione non valido"));
+        assertTrue(exception.getMessage().contains("id della condizione non valido"));
         verifyNoInteractions(condizioniPazienteDAO, logOperazioniDAO);
     }
 
