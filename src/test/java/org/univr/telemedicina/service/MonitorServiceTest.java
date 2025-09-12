@@ -52,7 +52,7 @@ class MonitorServiceTest {
 
         // ASSERT
         // Verifica che venga inviata una notifica al medico con priorità 3
-        verify(notificheService, times(1)).send(eq(10), eq(3), contains("Glicemia Anormale"), contains("dopo i pasti"), eq("Glicemia"));
+        verify(notificheService, times(1)).send(eq(10), eq(3), contains("glicemia anormale"), contains("dopo i pasti"), eq("glicemia"));
     }
 
     @Test
@@ -68,7 +68,7 @@ class MonitorServiceTest {
         monitorService.checkGlicemia(rilevazione);
 
         // ASSERT
-        verify(notificheService, times(1)).send(eq(10), eq(3), contains("Glicemia Anormale"), contains("prima dei pasti"), eq("Glicemia"));
+        verify(notificheService, times(1)).send(eq(10), eq(3), contains("glicemia anormale"), contains("prima dei pasti"), eq("glicemia"));
     }
 
     @Test
@@ -120,7 +120,7 @@ class MonitorServiceTest {
         monitorService.checkFarmaciDaily();
 
         // ASSERT
-        verify(notificheService, times(1)).send(eq(idPaziente), eq(1), contains("Assunzioni Farmaci Incompleta"), contains("dimenticato"), eq("Assunzioni Farmaci"));
+        verify(notificheService, times(1)).send(eq(idPaziente), eq(1), contains("assunzioni farmaci incompleta"), contains("dimenticato"), eq("assunzioni farmaci"));
     }
 
     @Test
@@ -140,7 +140,7 @@ class MonitorServiceTest {
         monitorService.checkFarmaciDaily();
 
         // ASSERT
-        verify(notificheService, times(1)).send(eq(idPaziente), eq(1), contains("Assunzioni Farmaci Incompleta"), contains("completare la terapia"), eq("Assunzioni Farmaci"));
+        verify(notificheService, times(1)).send(eq(idPaziente), eq(1), contains("assunzioni farmaci incompleta"), contains("completare la terapia"), eq("assunzioni farmaci"));
     }
 
     @Test
@@ -195,7 +195,7 @@ class MonitorServiceTest {
 
         // ASSERT
         // Verifica che sia stata inviata una notifica al MEDICO (ID 10)
-        verify(notificheService, times(1)).send(eq(idMedico), eq(2), contains("Mancata aderenza alla terapia"), anyString(), eq("Assunzioni Farmaci"));
+        verify(notificheService, times(1)).send(eq(idMedico), eq(2), contains("mancata aderenza alla terapia"), anyString(), eq("assunzioni farmaci"));
         // Verifica che il DAO delle assunzioni sia stato chiamato 3 volte (una per ogni giorno nel ciclo)
         verify(assunzioneFarmaciDAO, times(3)).getConteggioAssunzioniGiornoPerPazienti(anyList(), any(LocalDate.class));
     }
