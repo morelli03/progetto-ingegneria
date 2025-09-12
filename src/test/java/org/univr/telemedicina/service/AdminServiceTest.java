@@ -7,7 +7,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.univr.telemedicina.dao.PazientiDAO;
 import org.univr.telemedicina.dao.UtenteDAO;
 import org.univr.telemedicina.exception.DataAccessException;
@@ -104,8 +103,8 @@ class AdminServiceTest {
         // --- ASSERT ---
         // 3. Verifica i risultati
         String output = outContent.toString();
-        assertTrue(output.contains("Utente creato con successo. ID Utente: 1"));
-        assertTrue(output.contains("Associazione medico-paziente creata con successo."));
+        assertTrue(output.contains("utente creato con successo id utente 1"));
+        assertTrue(output.contains("associazione medico-paziente creata con successo"));
 
         // Verifica che i metodi dei DAO siano stati chiamati correttamente
         verify(utenteDAO, times(1)).create(any(Utente.class));
@@ -133,9 +132,9 @@ class AdminServiceTest {
 
         // --- ASSERT ---
         String output = outContent.toString();
-        assertTrue(output.contains("Utente creato con successo. ID Utente: 2"));
+        assertTrue(output.contains("utente creato con successo id utente 2"));
         // L'altro messaggio non deve esserci perché non è un paziente
-        assertTrue(!output.contains("Associazione medico-paziente creata con successo."));
+        assertTrue(!output.contains("associazione medico-paziente creata con successo"));
 
         // Il DAO dei pazienti non deve essere MAI chiamato se il ruolo è Medico
         verify(pazientiDAO, never()).create(any(Paziente.class));
@@ -161,7 +160,7 @@ class AdminServiceTest {
 
         // --- ASSERT ---
         String output = errContent.toString();
-        assertTrue(output.contains("Si è verificato un errore inaspettato: "));
+        assertTrue(output.contains("si è verificato un errore inaspettato"));
 
         // Nessuna interazione successiva con i DAO
         verify(utenteDAO, times(1)).create(any(Utente.class));
@@ -192,7 +191,7 @@ class AdminServiceTest {
 
         // --- ASSERT ---
         String output = errContent.toString();
-        assertTrue(output.contains("Si è verificato un errore inaspettato: "));
+        assertTrue(output.contains("si è verificato un errore inaspettato"));
 
         // Nessuna interazione successiva con i DAO
         verify(utenteDAO, times(1)).create(any(Utente.class));
@@ -228,14 +227,8 @@ class AdminServiceTest {
 
         String output = errContent.toString();
 
-        // Verifica che l'utente sia stato creato prima del fallimento
-        //assertTrue(output.contains("Utente creato con successo. ID Utente: 1"));
         // Verifica che sia stato stampato il messaggio di errore proveniente dall'eccezione
-
-        //stampa l'output per debug
-        System.out.println(output);
-
-        assertTrue(output.contains("Nessun medico trovato con l'email: "));
+        assertTrue(output.contains("errore nessun medico trovato con l'email"));
         // Verifica che l'associazione paziente-medico NON sia stata creata
         verify(pazientiDAO, never()).create(any(Paziente.class));
         // Verifica che la ricerca del medico sia stata tentata
