@@ -49,7 +49,7 @@ class NotificheDAOTest {
      * 1. Creazione di notifiche per utenti diversi.
      * 2. Lettura delle notifiche per un utente specifico.
      * 3. Aggiornamento dello stato a "letta".
-     * 4. Verifica che le notifiche lette non vengano più recuperate.
+     * 4. Verifica che le notifiche siano state marcate come lette.
      */
     @Test
     void testLeggiEImpostaComeLette() throws DataAccessException {
@@ -73,9 +73,12 @@ class NotificheDAOTest {
             notificheDAO.setNotificaLetta(n.getIdNotifica());
         }
 
-        // --- ASSERT 2: Verifica che utente1 non abbia più notifiche da leggere ---
+        // --- ASSERT 2: Verifica che le notifiche di utente1 siano state segnate come lette ---
         List<Notifica> notificheLetteUtente1 = notificheDAO.leggiNotifichePerId(utente1.getIDUtente());
-        assertTrue(notificheLetteUtente1.isEmpty(), "Utente1 non dovrebbe più avere notifiche non lette.");
+        assertEquals(2, notificheLetteUtente1.size(), "Dovrebbero esserci ancora 2 notifiche per utente1, ma segnate come lette.");
+        for (Notifica n : notificheLetteUtente1) {
+            assertEquals(1, n.getLetta(), "La notifica con ID " + n.getIdNotifica() + " dovrebbe essere segnata come letta.");
+        }
 
         // --- ASSERT 3: Verifica che le notifiche di utente2 siano ancora presenti ---
         List<Notifica> notificheUtente2 = notificheDAO.leggiNotifichePerId(utente2.getIDUtente());
