@@ -92,9 +92,6 @@ public class PazienteService {
                 throw new WrongAssumptionException("quantita' assunta non corrisponde con quantita' da assumere assunzione registrata comunque");
             }
 
-        } catch (WrongAssumptionException e) {
-            System.err.println("quantita' assunta non corrisponde con quantita' da assumere " + e.getMessage());
-            throw new WrongAssumptionException("quantita' assunta non corrisponde con quantita' da assumere ");
         } catch (DataAccessException e) {
             throw new DataAccessException("errore durante la registrazione dell'assunzione di farmaci ", e);
         }
