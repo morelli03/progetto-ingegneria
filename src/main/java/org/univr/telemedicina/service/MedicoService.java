@@ -77,7 +77,7 @@ public class MedicoService {
     public void addCondizioniPaziente(int idMedicoOperante, int IDPaziente, String tipo, String descrizione, String periodo, LocalDate dataRegistrazione) throws MedicoServiceException {
 
         // validazione dell'input
-        if (!("patologia".equalsIgnoreCase(tipo) || "fattoriRischio".equalsIgnoreCase(tipo) || "comorbidita".equalsIgnoreCase(tipo))) {
+        if (!("patologia".equalsIgnoreCase(tipo) || "fattoreRischio".equalsIgnoreCase(tipo) || "comorbidita".equalsIgnoreCase(tipo))) {
             throw new MedicoServiceException("tipo di condizione non valido deve essere 'patologia' o 'fattorerischio' o 'comorbidita'");
         }
 
