@@ -473,7 +473,12 @@ public class DashboardMedicoController {
         condizioneComboBox.getItems().clear();
         condizioneComboBox.getItems().add("Nuova condizione");
         if (datiPazienteCorrente != null) {
-            condizioneComboBox.getItems().addAll(datiPazienteCorrente.getElencoCondizioni());
+            List<CondizioniPaziente> condizioniFiltrate = datiPazienteCorrente.getElencoCondizioni().stream()
+                    .filter(c -> "FattoreRischio".equals(c.getTipo()) ||
+                            "Patologia".equals(c.getTipo()) ||
+                            "Comorbidita".equals(c.getTipo()))
+                    .collect(Collectors.toList());
+            condizioneComboBox.getItems().addAll(condizioniFiltrate);
         }
         condizioneComboBox.setCellFactory(param -> new ListCell<Object>() {
             @Override
