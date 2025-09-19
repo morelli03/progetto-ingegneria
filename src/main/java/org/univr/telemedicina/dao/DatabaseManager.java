@@ -17,4 +17,8 @@ public class DatabaseManager {
         // non è più necessario class.forname() con i driver jdbc moderni
         return DriverManager.getConnection(URL);
     }
+
+    public static void setURL(String url) {
+        URL = url;
+    }
 }
