@@ -187,7 +187,7 @@ public class DashboardMedicoController {
             dataFinePicker.setDisable(true);
             deleteButton.setDisable(true);
 
-            tipoCondizioneComboBox.setItems(FXCollections.observableArrayList("FattoriRischio", "Patologia", "Comorbidita"));
+            tipoCondizioneComboBox.setItems(FXCollections.observableArrayList("FattoreRischio", "Patologia", "Comorbidita"));
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -250,7 +250,7 @@ public class DashboardMedicoController {
             VBox condizioniBox = new VBox(5);
             for (CondizioniPaziente condizione : datiPazienteCorrente.getElencoCondizioni()) {
 
-                if(Objects.equals(condizione.getTipo(), "FattoriRischio")) {
+                if(Objects.equals(condizione.getTipo(), "FattoreRischio")) {
                     Label label = new Label("Fattore di rischio: " + condizione.getDescrizione());
                     label.getStyleClass().add("black-text");
                     condizioniBox.getChildren().add(label);
@@ -260,6 +260,14 @@ public class DashboardMedicoController {
                     condizioniBox.getChildren().add(label);
                 } else if(Objects.equals(condizione.getTipo(), "Comorbidita")) {
                     Label label = new Label("Comorbidità: " + condizione.getDescrizione());
+                    label.getStyleClass().add("black-text");
+                    condizioniBox.getChildren().add(label);
+                } else if(Objects.equals(condizione.getTipo(), "Sintomo")) {
+                    Label label = new Label("Sintomo: " + condizione.getDescrizione());
+                    label.getStyleClass().add("black-text");
+                    condizioniBox.getChildren().add(label);
+                } else if(Objects.equals(condizione.getTipo(), "TerapiaConcomitante")) {
+                    Label label = new Label("Terapia concomitante: " + condizione.getDescrizione());
                     label.getStyleClass().add("black-text");
                     condizioniBox.getChildren().add(label);
                 }
@@ -465,7 +473,12 @@ public class DashboardMedicoController {
         condizioneComboBox.getItems().clear();
         condizioneComboBox.getItems().add("Nuova condizione");
         if (datiPazienteCorrente != null) {
-            condizioneComboBox.getItems().addAll(datiPazienteCorrente.getElencoCondizioni());
+            List<CondizioniPaziente> condizioniFiltrate = datiPazienteCorrente.getElencoCondizioni().stream()
+                    .filter(c -> "FattoreRischio".equals(c.getTipo()) ||
+                            "Patologia".equals(c.getTipo()) ||
+                            "Comorbidita".equals(c.getTipo()))
+                    .collect(Collectors.toList());
+            condizioneComboBox.getItems().addAll(condizioniFiltrate);
         }
         condizioneComboBox.setCellFactory(param -> new ListCell<Object>() {
             @Override
