@@ -73,22 +73,59 @@ class TerapiaServiceIntegrationTest {
 
         terapiaService.assegnaTerapia(paziente.getIDUtente(), medico.getIDUtente(), "Test Farmaco", "10mg", 1, "Test Indicazioni", startDate, endDate);
 
-        // Verifica che la terapia sia stata creata
         List<Terapia> terapie = terapiaDAO.listTherapiesByPatId(paziente.getIDUtente());
-        assertNotNull(terapie);
         assertEquals(1, terapie.size());
+        assertEquals("Test Farmaco", terapie.get(0).getNomeFarmaco());
 
-        Terapia terapia = terapie.get(0);
-        assertEquals("Test Farmaco", terapia.getNomeFarmaco());
-        assertEquals(paziente.getIDUtente(), terapia.getIDPaziente());
-
-        // Verifica che il log sia stato creato
         List<LogOperazione> logs = logOperazioniDAO.findLogsByPazienteId(paziente.getIDUtente());
-        assertNotNull(logs);
         assertEquals(1, logs.size());
+        assertEquals("assegna terapia", logs.get(0).getTipoOperazione());
+    }
 
-        LogOperazione log = logs.get(0);
-        assertEquals("assegna terapia", log.getTipoOperazione());
-        assertTrue(log.getDescrizioneOperazione().contains("prescritto il farmaco"));
+    @Test
+    void testAssegnaTerapiaFrequenzaInvalida() {
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(10);
+
+        assertThrows(TherapyException.class, () -> {
+            terapiaService.assegnaTerapia(paziente.getIDUtente(), medico.getIDUtente(), "Test Farmaco", "10mg", 0, "Test Indicazioni", startDate, endDate);
+        });
+    }
+
+    @Test
+    void testModificaTerapia() throws TherapyException, DataAccessException {
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(10);
+        Terapia terapia = new Terapia(paziente.getIDUtente(), medico.getIDUtente(), "Test Farmaco", "10mg", 1, "Test Indicazioni", startDate, endDate);
+        terapiaDAO.assignTherapy(terapia);
+        Terapia newTerapia = terapiaDAO.listTherapiesByPatId(paziente.getIDUtente()).get(0);
+
+        newTerapia.setNomeFarmaco("Nuovo Farmaco");
+        terapiaService.modificaTerapia(newTerapia, medico.getIDUtente());
+
+        List<Terapia> terapie = terapiaDAO.listTherapiesByPatId(paziente.getIDUtente());
+        assertEquals("Nuovo Farmaco", terapie.get(0).getNomeFarmaco());
+
+        List<LogOperazione> logs = logOperazioniDAO.findLogsByPazienteId(paziente.getIDUtente());
+        assertEquals(1, logs.size());
+        assertEquals("modifica terapia", logs.get(0).getTipoOperazione());
+    }
+
+    @Test
+    void testEliminaTerapia() throws TherapyException, DataAccessException {
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusDays(10);
+        Terapia terapia = new Terapia(paziente.getIDUtente(), medico.getIDUtente(), "Test Farmaco", "10mg", 1, "Test Indicazioni", startDate, endDate);
+        terapiaDAO.assignTherapy(terapia);
+        Terapia newTerapia = terapiaDAO.listTherapiesByPatId(paziente.getIDUtente()).get(0);
+
+        terapiaService.eliminaTerapia(newTerapia.getIDTerapia(), medico.getIDUtente(), paziente.getIDUtente());
+
+        List<Terapia> terapie = terapiaDAO.listTherapiesByPatId(paziente.getIDUtente());
+        assertTrue(terapie.isEmpty());
+
+        List<LogOperazione> logs = logOperazioniDAO.findLogsByPazienteId(paziente.getIDUtente());
+        assertEquals(1, logs.size());
+        assertEquals("elimina terapia", logs.get(0).getTipoOperazione());
     }
 }

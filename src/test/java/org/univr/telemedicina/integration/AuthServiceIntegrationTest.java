@@ -64,4 +64,29 @@ class AuthServiceIntegrationTest {
         Optional<Utente> result = authService.verificaPassword("nonexistent@example.com", "password123");
         assertFalse(result.isPresent());
     }
+
+    @Test
+    void testVerificaPasswordConEmailNull() throws AuthServiceException {
+        Optional<Utente> result = authService.verificaPassword(null, "password123");
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    void testVerificaPasswordConEmailVuota() throws AuthServiceException {
+        Optional<Utente> result = authService.verificaPassword("", "password123");
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    void testVerificaPasswordConPasswordNull() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            authService.verificaPassword("test@example.com", null);
+        });
+    }
+
+    @Test
+    void testVerificaPasswordConPasswordVuota() throws AuthServiceException {
+        Optional<Utente> result = authService.verificaPassword("test@example.com", "");
+        assertFalse(result.isPresent());
+    }
 }

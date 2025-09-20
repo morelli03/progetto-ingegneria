@@ -5,10 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.univr.telemedicina.dao.*;
 import org.univr.telemedicina.exception.DataAccessException;
-import org.univr.telemedicina.model.Notifica;
-import org.univr.telemedicina.model.Paziente;
-import org.univr.telemedicina.model.RilevazioneGlicemia;
-import org.univr.telemedicina.model.Utente;
+import org.univr.telemedicina.model.*;
 import org.univr.telemedicina.service.MonitorService;
 import org.univr.telemedicina.service.NotificheService;
 
@@ -27,13 +24,14 @@ class MonitorServiceIntegrationTest {
     private NotificheDAO notificheDAO;
     private UtenteDAO utenteDAO;
     private PazientiDAO pazientiDAO;
+    private TerapiaDAO terapiaDAO;
     private Utente medico;
     private Utente paziente;
 
     @BeforeEach
     void setUp() throws DataAccessException {
         DatabaseManager.setURL("jdbc:sqlite:test.sqlite");
-        TerapiaDAO terapiaDAO = new TerapiaDAO();
+        terapiaDAO = new TerapiaDAO();
         AssunzioneFarmaciDAO assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
         notificheDAO = new NotificheDAO();
         pazientiDAO = new PazientiDAO();
@@ -61,23 +59,48 @@ class MonitorServiceIntegrationTest {
             stmt.executeUpdate("DELETE FROM Utenti");
             stmt.executeUpdate("DELETE FROM Pazienti");
             stmt.executeUpdate("DELETE FROM Notifiche");
+            stmt.executeUpdate("DELETE FROM Terapie");
+            stmt.executeUpdate("DELETE FROM AssunzioniFarmaci");
         }
     }
 
     @Test
-    void testCheckGlicemiaAnormale() throws DataAccessException {
+    void testCheckGlicemiaAnormaleDopoPasti() throws DataAccessException {
         RilevazioneGlicemia rilevazione = new RilevazioneGlicemia(paziente.getIDUtente(), 200, LocalDateTime.now(), "Dopo cena");
-
         monitorService.checkGlicemia(rilevazione);
+        List<Notifica> notifiche = notificheDAO.leggiNotifichePerId(medico.getIDUtente());
+        assertEquals(1, notifiche.size());
+        assertTrue(notifiche.get(0).getMessaggio().contains("valore glicemico anormale dopo i pasti"));
+    }
+
+    @Test
+    void testCheckGlicemiaAnormalePrimaPasti() throws DataAccessException {
+        RilevazioneGlicemia rilevazione = new RilevazioneGlicemia(paziente.getIDUtente(), 70, LocalDateTime.now(), "Prima pranzo");
+        monitorService.checkGlicemia(rilevazione);
+        List<Notifica> notifiche = notificheDAO.leggiNotifichePerId(medico.getIDUtente());
+        assertEquals(1, notifiche.size());
+        assertTrue(notifiche.get(0).getMessaggio().contains("valore glicemico anormale prima dei pasti"));
+    }
+
+    @Test
+    void testCheckGlicemiaNormale() throws DataAccessException {
+        RilevazioneGlicemia rilevazione = new RilevazioneGlicemia(paziente.getIDUtente(), 100, LocalDateTime.now(), "Prima pranzo");
+        monitorService.checkGlicemia(rilevazione);
+        List<Notifica> notifiche = notificheDAO.leggiNotifichePerId(medico.getIDUtente());
+        assertTrue(notifiche.isEmpty());
+    }
+
+    @Test
+    void testCheckFarmaci3DailyNotificaMedico() throws DataAccessException {
+        // Crea una terapia per il paziente
+        Terapia terapia = new Terapia(paziente.getIDUtente(), medico.getIDUtente(), "Test Farmaco", "10mg", 1, "Test Indicazioni", LocalDate.now().minusDays(5), LocalDate.now().plusDays(5));
+        terapiaDAO.assignTherapy(terapia);
+
+        // Nessuna assunzione farmaci per 3 giorni
+        monitorService.checkFarmaci3Daily();
 
         List<Notifica> notifiche = notificheDAO.leggiNotifichePerId(medico.getIDUtente());
-
-        assertNotNull(notifiche);
         assertEquals(1, notifiche.size());
-
-        Notifica notifica = notifiche.get(0);
-        assertEquals(medico.getIDUtente(), notifica.getIdDestinatario());
-        assertEquals("glicemia anormale", notifica.getTitolo());
-        assertTrue(notifica.getMessaggio().contains("valore glicemico anormale dopo i pasti"));
+        assertTrue(notifiche.get(0).getMessaggio().contains("non ha seguito la terapia per più di 3 giorni"));
     }
 }

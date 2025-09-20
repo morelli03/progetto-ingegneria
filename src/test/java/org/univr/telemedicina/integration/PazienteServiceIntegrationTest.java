@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.univr.telemedicina.dao.*;
 import org.univr.telemedicina.exception.DataAccessException;
+import org.univr.telemedicina.exception.WrongAssumptionException;
 import org.univr.telemedicina.model.*;
 import org.univr.telemedicina.service.MonitorService;
 import org.univr.telemedicina.service.NotificheService;
@@ -26,6 +27,9 @@ class PazienteServiceIntegrationTest {
     private NotificheDAO notificheDAO;
     private UtenteDAO utenteDAO;
     private PazientiDAO pazientiDAO;
+    private TerapiaDAO terapiaDAO;
+    private CondizioniPazienteDAO condizioniPazienteDAO;
+    private AssunzioneFarmaciDAO assunzioneFarmaciDAO;
     private Utente medico;
     private Utente paziente;
 
@@ -35,11 +39,11 @@ class PazienteServiceIntegrationTest {
 
         // DAOs
         rilevazioneGlicemiaDAO = new RilevazioneGlicemiaDAO();
-        CondizioniPazienteDAO condizioniPazienteDAO = new CondizioniPazienteDAO();
+        condizioniPazienteDAO = new CondizioniPazienteDAO();
         utenteDAO = new UtenteDAO();
         pazientiDAO = new PazientiDAO();
-        AssunzioneFarmaciDAO assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
-        TerapiaDAO terapiaDAO = new TerapiaDAO();
+        assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
+        terapiaDAO = new TerapiaDAO();
         notificheDAO = new NotificheDAO();
 
         // Services
@@ -67,6 +71,9 @@ class PazienteServiceIntegrationTest {
             stmt.executeUpdate("DELETE FROM Pazienti");
             stmt.executeUpdate("DELETE FROM RilevazioniGlicemia");
             stmt.executeUpdate("DELETE FROM Notifiche");
+            stmt.executeUpdate("DELETE FROM Terapie");
+            stmt.executeUpdate("DELETE FROM CondizioniPaziente");
+            stmt.executeUpdate("DELETE FROM AssunzioniFarmaci");
         }
     }
 
@@ -75,16 +82,90 @@ class PazienteServiceIntegrationTest {
         LocalDateTime timestamp = LocalDateTime.now();
         pazienteService.registraRilevazioneGlicemia(paziente.getIDUtente(), 250, timestamp, "Dopo pranzo");
 
-        // Verifica che la rilevazione sia stata salvata
         List<RilevazioneGlicemia> rilevazioni = rilevazioneGlicemiaDAO.getRilevazioniByPaziente(paziente.getIDUtente());
-        assertNotNull(rilevazioni);
         assertEquals(1, rilevazioni.size());
         assertEquals(250, rilevazioni.get(0).getValore());
 
-        // Verifica che sia stata inviata una notifica al medico
         List<Notifica> notifiche = notificheDAO.leggiNotifichePerId(medico.getIDUtente());
-        assertNotNull(notifiche);
         assertEquals(1, notifiche.size());
         assertEquals("glicemia anormale", notifiche.get(0).getTitolo());
+    }
+
+    @Test
+    void testRegistraRilevazioneGlicemiaNormale() throws DataAccessException {
+        LocalDateTime timestamp = LocalDateTime.now();
+        pazienteService.registraRilevazioneGlicemia(paziente.getIDUtente(), 100, timestamp, "Dopo pranzo");
+
+        List<RilevazioneGlicemia> rilevazioni = rilevazioneGlicemiaDAO.getRilevazioniByPaziente(paziente.getIDUtente());
+        assertEquals(1, rilevazioni.size());
+        assertEquals(100, rilevazioni.get(0).getValore());
+
+        List<Notifica> notifiche = notificheDAO.leggiNotifichePerId(medico.getIDUtente());
+        assertTrue(notifiche.isEmpty());
+    }
+
+    @Test
+    void testRegistraAssunzioneFarmaciCorretta() throws DataAccessException, WrongAssumptionException {
+        Terapia terapia = new Terapia(paziente.getIDUtente(), medico.getIDUtente(), "Test Farmaco", "10mg", 1, "Test Indicazioni", LocalDate.now(), LocalDate.now().plusDays(10));
+        terapiaDAO.assignTherapy(terapia);
+        Terapia newTerapia = terapiaDAO.listTherapiesByPatId(paziente.getIDUtente()).get(0);
+
+        pazienteService.registraAssunzioneFarmaci(newTerapia, "10mg", LocalDateTime.now());
+
+        List<AssunzioneFarmaci> assunzioni = assunzioneFarmaciDAO.leggiAssunzioniFarmaci(paziente.getIDUtente());
+        assertEquals(1, assunzioni.size());
+        assertEquals("10mg", assunzioni.get(0).getQuantitaAssunta());
+    }
+
+    @Test
+    void testRegistraAssunzioneFarmaciSbagliata() throws DataAccessException {
+        Terapia terapia = new Terapia(paziente.getIDUtente(), medico.getIDUtente(), "Test Farmaco", "10mg", 1, "Test Indicazioni", LocalDate.now(), LocalDate.now().plusDays(10));
+        terapia.setIDMedico(medico.getIDUtente());
+        terapiaDAO.assignTherapy(terapia);
+        Terapia newTerapia = terapiaDAO.listTherapiesByPatId(paziente.getIDUtente()).get(0);
+
+        assertThrows(WrongAssumptionException.class, () -> {
+            pazienteService.registraAssunzioneFarmaci(newTerapia, "20mg", LocalDateTime.now());
+        });
+
+        List<Notifica> notifiche = notificheDAO.leggiNotifichePerId(medico.getIDUtente());
+        assertEquals(1, notifiche.size());
+        assertEquals("assunzione di farmaci non corretta", notifiche.get(0).getTitolo());
+    }
+
+    @Test
+    void testSegnalaCondizionePaziente() throws DataAccessException {
+        pazienteService.segnalaCondizionePaziente(paziente.getIDUtente(), "Sintomo", "Mal di testa", "occasionale");
+
+        List<CondizioniPaziente> condizioni = condizioniPazienteDAO.listByIDPatId(paziente.getIDUtente());
+        assertEquals(1, condizioni.size());
+        assertEquals("Mal di testa", condizioni.get(0).getDescrizione());
+    }
+
+    @Test
+    void testModificaCondizione() throws DataAccessException {
+        CondizioniPaziente condizione = new CondizioniPaziente(paziente.getIDUtente(), "Sintomo", "Mal di testa", "occasionale", LocalDate.now());
+        condizioniPazienteDAO.create(condizione);
+        List<CondizioniPaziente> condizioni = condizioniPazienteDAO.listByIDPatId(paziente.getIDUtente());
+        CondizioniPaziente daModificare = condizioni.get(0);
+        daModificare.setDescrizione("Emicrania");
+
+        pazienteService.modificaCondizione(daModificare);
+
+        List<CondizioniPaziente> updatedCondizioni = condizioniPazienteDAO.listByIDPatId(paziente.getIDUtente());
+        assertEquals("Emicrania", updatedCondizioni.get(0).getDescrizione());
+    }
+
+    @Test
+    void testEliminaCondizione() throws DataAccessException {
+        CondizioniPaziente condizione = new CondizioniPaziente(paziente.getIDUtente(), "Sintomo", "Mal di testa", "occasionale", LocalDate.now());
+        condizioniPazienteDAO.create(condizione);
+        List<CondizioniPaziente> condizioni = condizioniPazienteDAO.listByIDPatId(paziente.getIDUtente());
+        CondizioniPaziente daEliminare = condizioni.get(0);
+
+        pazienteService.eliminaCondizione(daEliminare.getIDCondizione());
+
+        List<CondizioniPaziente> remainingCondizioni = condizioniPazienteDAO.listByIDPatId(paziente.getIDUtente());
+        assertTrue(remainingCondizioni.isEmpty());
     }
 }

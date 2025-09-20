@@ -76,4 +76,11 @@ class NotificheServiceIntegrationTest {
 
         assertTrue(updatedNotifica.getLetta() == 1);
     }
+
+    @Test
+    void testReadNessunaNotifica() throws DataAccessException {
+        List<Notifica> notifiche = notificheService.read(999); // ID utente non esistente
+        assertNotNull(notifiche);
+        assertTrue(notifiche.isEmpty());
+    }
 }
