@@ -109,7 +109,7 @@ public class AdminService {
     private String leggiRuoloValido(Scanner sc) {
         String ruolo;
         while (true) {
-            System.out.println("inserisci il ruolo dell'utente (medico/paziente) ():");
+            System.out.println("inserisci il ruolo dell'utente (Medico/Paziente) ():");
             ruolo = sc.nextLine();
             if (ruolo.equals("Medico") || ruolo.equals("Paziente")) {
                 return ruolo;
