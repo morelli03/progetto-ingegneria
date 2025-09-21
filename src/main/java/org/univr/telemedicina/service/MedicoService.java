@@ -108,7 +108,7 @@ public class MedicoService {
             throw new MedicoServiceException("id della condizione non valido per l'aggiornamento");
         }
 
-        if (!("patologia".equalsIgnoreCase(condizione.getTipo()) || "fattoriRischio".equalsIgnoreCase(condizione.getTipo()) || "comorbidita".equalsIgnoreCase(condizione.getTipo()))) {
+        if (!("patologia".equalsIgnoreCase(condizione.getTipo()) || "fattoreRischio".equalsIgnoreCase(condizione.getTipo()) || "comorbidita".equalsIgnoreCase(condizione.getTipo()))) {
             throw new MedicoServiceException("tipo di condizione non valido deve essere 'patologia' o 'fattorerischio' o 'comorbidita'");
         }
 
