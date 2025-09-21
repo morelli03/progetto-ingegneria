@@ -467,6 +467,7 @@ public class DashboardPazienteController {
         }
         try {
             List<Notifica> newNotifications = notificheService.read(pazienteLoggato.getIDUtente());
+            //Mette l'esecuzione dell'update nella UI thread
             Platform.runLater(() -> updateNotificationBell(newNotifications));
         } catch (DataAccessException e) {
             e.printStackTrace();

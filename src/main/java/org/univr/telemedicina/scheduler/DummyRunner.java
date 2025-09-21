@@ -8,7 +8,7 @@ import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.service.MonitorService;
 import org.univr.telemedicina.service.NotificheService;
 
-// Classe di utilità per eseguire i metodi di monitoraggio senza scheduler
+// Classe di utilità per eseguire i metodi di monitoraggio durante l'esame
 public class DummyRunner {
     public static void main(String[] args) {
         MonitorService monitorService = new MonitorService(new TerapiaDAO(), new AssunzioneFarmaciDAO(), new NotificheService(new NotificheDAO()), new PazientiDAO());
