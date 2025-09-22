@@ -2,6 +2,7 @@
 package org.univr.telemedicina.dao;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.Utente;
@@ -15,6 +16,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UtenteDAOTest {
 
+    @BeforeEach
+    void setUp() {
+        DatabaseManager.setURL("jdbc:sqlite:test.sqlite");
+    }
 
     // Questo metodo verrà eseguito DOPO ogni test
     @AfterEach

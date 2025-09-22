@@ -24,6 +24,7 @@ class NotificheDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        DatabaseManager.setURL("jdbc:sqlite:test.sqlite");
         notificheDAO = new NotificheDAO();
         utenteDAO = new UtenteDAO();
 

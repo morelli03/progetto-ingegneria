@@ -22,6 +22,7 @@ class CondizioniPazienteDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        DatabaseManager.setURL("jdbc:sqlite:test.sqlite");
         condizioniPazienteDAO = new CondizioniPazienteDAO();
         utenteDAO = new UtenteDAO();
         LocalDate dataNascita = LocalDate.of(1990, 5, 15);

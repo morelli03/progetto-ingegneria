@@ -24,6 +24,7 @@ class LogOperazioniDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        DatabaseManager.setURL("jdbc:sqlite:test.sqlite");
         logOperazioniDAO = new LogOperazioniDAO();
         utenteDAO = new UtenteDAO();
         LocalDate dataNascita = LocalDate.of(1975, 10, 20);

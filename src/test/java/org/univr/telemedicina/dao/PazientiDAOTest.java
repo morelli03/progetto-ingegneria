@@ -45,6 +45,7 @@ class PazientiDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        DatabaseManager.setURL("jdbc:sqlite:test.sqlite");
         pazientiDAO = new PazientiDAO();
         utenteDAO = new UtenteDAO();
         medico = utenteDAO.create(new Utente(0, "medico.pazienti@email.com", "pass", "Medico", "Pazienti", "Medico", LocalDate.now()));

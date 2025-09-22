@@ -28,6 +28,7 @@ class AssunzioneFarmaciDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        DatabaseManager.setURL("jdbc:sqlite:test.sqlite");
         assunzioneFarmaciDAO = new AssunzioneFarmaciDAO();
         utenteDAO = new UtenteDAO();
         terapiaDAO = new TerapiaDAO();

@@ -22,6 +22,7 @@ class RilevazioneGlicemiaDAOTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        DatabaseManager.setURL("jdbc:sqlite:test.sqlite");
         rilevazioneGlicemiaDAO = new RilevazioneGlicemiaDAO();
         utenteDAO = new UtenteDAO();
         LocalDate dataNascita = LocalDate.of(1995, 8, 25);
