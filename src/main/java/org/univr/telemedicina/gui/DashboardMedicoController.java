@@ -249,29 +249,32 @@ public class DashboardMedicoController {
             datiPazienteCorrente = medicoService.getDatiPazienteDasboard(paziente);
 
             VBox condizioniBox = new VBox(5);
+            condizioniBox.prefWidthProperty().bind(informazioniPazienteContainer.widthProperty());
             for (CondizioniPaziente condizione : datiPazienteCorrente.getElencoCondizioni()) {
+                String labelText = "";
+                String tipoLabel = "";
 
                 if(Objects.equals(condizione.getTipo(), "FattoreRischio")) {
-                    Label label = new Label("Fattore di rischio: " + condizione.getDescrizione());
-                    label.getStyleClass().add("black-text");
-                    condizioniBox.getChildren().add(label);
+                    tipoLabel = "Fattore di rischio: ";
                 } else if(Objects.equals(condizione.getTipo(), "Patologia")) {
-                    Label label = new Label("Patologia: " + condizione.getDescrizione());
-                    label.getStyleClass().add("black-text");
-                    condizioniBox.getChildren().add(label);
+                    tipoLabel = "Patologia: ";
                 } else if(Objects.equals(condizione.getTipo(), "Comorbidita")) {
-                    Label label = new Label("Comorbidità: " + condizione.getDescrizione());
-                    label.getStyleClass().add("black-text");
-                    condizioniBox.getChildren().add(label);
+                    tipoLabel = "Comorbidità: ";
                 } else if(Objects.equals(condizione.getTipo(), "Sintomo")) {
-                    Label label = new Label("Sintomo: " + condizione.getDescrizione());
-                    label.getStyleClass().add("black-text");
-                    condizioniBox.getChildren().add(label);
+                    tipoLabel = "Sintomo: ";
                 } else if(Objects.equals(condizione.getTipo(), "TerapiaConcomitante")) {
-                    Label label = new Label("Terapia concomitante: " + condizione.getDescrizione());
-                    label.getStyleClass().add("black-text");
-                    condizioniBox.getChildren().add(label);
+                    tipoLabel = "Terapia concomitante: ";
                 }
+
+                labelText = tipoLabel + condizione.getDescrizione();
+                if (condizione.getPeriodo() != null && !condizione.getPeriodo().isEmpty()) {
+                    labelText += "   |   Periodo: " + condizione.getPeriodo();
+                }
+
+                Label label = new Label(labelText);
+                label.setWrapText(true);
+                label.getStyleClass().add("black-text");
+                condizioniBox.getChildren().add(label);
             }
             informazioniPazienteContainer.getChildren().add(condizioniBox);
 
