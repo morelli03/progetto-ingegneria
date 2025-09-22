@@ -10,6 +10,7 @@ import org.univr.telemedicina.dao.PazientiDAO;
 import org.univr.telemedicina.dao.TerapiaDAO;
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.RilevazioneGlicemia;
+import org.univr.telemedicina.model.Terapia;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -180,8 +181,9 @@ class MonitorServiceTest {
         int idMedico = 10;
 
         // Setup dei DAO
+        Terapia terapiaTest = new Terapia(1, idPaziente, idMedico, "FarmacoTest", "1 compressa", 2, "Test", LocalDate.now().minusDays(5), null);
         when(terapiaDAO.getActivePatientIds()).thenReturn(Collections.singletonList(idPaziente));
-        when(terapiaDAO.getFrequenzeGiornalierePerPazienti(anyList())).thenReturn(Map.of(idPaziente, 2)); // 2 al giorno richieste (tot 6 in 3gg)
+        when(terapiaDAO.listTherapiesByPatId(idPaziente)).thenReturn(Collections.singletonList(terapiaTest));
         when(pazientiDAO.getMedicoRiferimentoByPazienteId(idPaziente)).thenReturn(Optional.of(idMedico));
         when(pazientiDAO.findNameById(idPaziente)).thenReturn("Mario Rossi");
 
