@@ -5,6 +5,7 @@ import org.univr.telemedicina.dao.PazientiDAO;
 import org.univr.telemedicina.dao.TerapiaDAO;
 import org.univr.telemedicina.exception.DataAccessException;
 import org.univr.telemedicina.model.RilevazioneGlicemia;
+import org.univr.telemedicina.model.Terapia;
 
 
 import java.time.LocalDate;
@@ -89,36 +90,52 @@ public class MonitorService {
     // @throws dataaccessexception se si verifica un errore durante l'accesso ai dati
     public void checkFarmaci3Daily() throws DataAccessException {
 
-        // prende gli id di tutti i pazienti con una terapia in corso
+        // 1. Prende gli ID di tutti i pazienti con almeno una terapia in corso
         List<Integer> pazientiAttivi = terapiaDAO.getActivePatientIds();
 
-        // se non ci sono pazienti attivi esce
         if (pazientiAttivi.isEmpty()) {
             System.out.println("nessun paziente con terapie attive trovato controllo terminato");
             return;
         }
-        // motliplico per 3 perche pèer tre giorni, mappa dove c'è l'id del paziente e la sua frequenza totale, cumulativa di più terapie se necessario
-        Map<Integer, Integer> frequenzeRichieste = terapiaDAO.getFrequenzeGiornalierePerPazienti(pazientiAttivi);
-
+        LocalDate oggi = LocalDate.now();
 
         for (Integer idPaziente : pazientiAttivi) {
-            int numeroAssunzioni = 0;
-            int frequenzaRichiesta3Giorni = frequenzeRichieste.getOrDefault(idPaziente, 0) * 3;
 
-            // somma tutte le assunzioni degli ultimi 3 giorni
-            for(int i =0; i < 3; i++) {
-                //prende dalla mappa il conteggio per il paziente
+            // 2. Per ogni paziente, otteniamo la lista completa delle sue terapie
+            List<Terapia> terapieDelPaziente = terapiaDAO.listTherapiesByPatId(idPaziente);
+            int frequenzaRichiestaValida = 0;
+
+            // 3. Calcoliamo la frequenza giornaliera richiesta sommando solo quella delle terapie
+            //    che sono attive da almeno 3 giorni.
+            for (Terapia terapia : terapieDelPaziente) {
+                boolean isIniziataDaAlmeno3Giorni = !terapia.getDataInizio().isAfter(oggi.minusDays(3));
+                boolean isAttualmenteAttiva = (terapia.getDataFine() == null || terapia.getDataFine().isAfter(oggi));
+
+                if (isIniziataDaAlmeno3Giorni && isAttualmenteAttiva) {
+                    frequenzaRichiestaValida += terapia.getFrequenzaGiornaliera();
+                }
+            }
+
+            // 4. Calcoliamo la frequenza totale per i 3 giorni basandoci solo sulle terapie valide
+            int frequenzaRichiesta3Giorni = frequenzaRichiestaValida * 3;
+
+            // Se il paziente non ha terapie che rispettano i criteri, passiamo al successivo
+            if (frequenzaRichiesta3Giorni == 0) {
+                continue;
+            }
+
+
+            // 5. Otteniamo il conteggio totale delle assunzioni negli ultimi 3 giorni
+            int numeroAssunzioni = 0;
+            for(int i = 0; i < 3; i++) {
                 numeroAssunzioni += assunzioneFarmaciDAO.getConteggioAssunzioniGiornoPerPazienti(List.of(idPaziente), LocalDate.now().minusDays(i)).getOrDefault(idPaziente, 0);
             }
 
-            // se il numero di assunzioni effettuate negli ultimi 3 giorni è inferiore alla frequenza richiesta e sono passati almeno 3 giorni dall'inizio della terapia
+            // 6. Se il numero di assunzioni è inferiore alla frequenza richiesta per 3 giorni, inviamo una notifica
             if(numeroAssunzioni < frequenzaRichiesta3Giorni){
-                //system.out.println("notifica a paziente id " + idpaziente + " non hai registrato le assunzioni dei farmaci per tre giorni consecutivi controlla la tua terapia");
-                notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(idPaziente).orElseThrow(), 2, "mancata aderenza alla terapia", "l'utente " + pazientiDAO.findNameById(idPaziente) + " non ha seguito la terapia per più di 3 giorni", "assunzioni farmaci");
+                notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(idPaziente).orElseThrow(), 2, "mancata aderenza alla terapia", "l'utente " + pazientiDAO.findNameById(idPaziente) + " non è stato costante nella terapia per 3 giorni.", "assunzioni farmaci");
             }
         }
-
-
     }
 
     // controlla il valore della glicemia registrato da un paziente
