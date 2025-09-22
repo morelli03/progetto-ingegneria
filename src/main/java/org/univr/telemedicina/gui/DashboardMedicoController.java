@@ -875,14 +875,16 @@ public class DashboardMedicoController {
         public NotificationListCell() {
             titleLabel.getStyleClass().add("notification-title");
             messageLabel.getStyleClass().add("notification-message");
-            messageLabel.setWrapText(true); // Assicura che il testo lungo vada a capo
             timestampLabel.getStyleClass().add("notification-timestamp");
+
+            messageLabel.setWrapText(true);
+            contentVBox.maxWidthProperty().bind(widthProperty().subtract(15));
 
             topHBox.setAlignment(Pos.CENTER_LEFT);
             topHBox.getChildren().addAll(priorityCircle, titleLabel);
 
-            VBox messageContainer = new VBox(messageLabel, timestampLabel); // Raggruppa messaggio e data
-            VBox.setMargin(timestampLabel, new Insets(4, 0, 0, 0)); // Aggiunge un po' di spazio sopra la data
+            VBox messageContainer = new VBox(messageLabel, timestampLabel);
+            VBox.setMargin(timestampLabel, new Insets(4, 0, 0, 0));
 
             contentVBox.getChildren().addAll(topHBox, messageContainer);
             contentVBox.setPadding(new Insets(5));
@@ -892,8 +894,9 @@ public class DashboardMedicoController {
         protected void updateItem(Notifica item, boolean empty) {
             super.updateItem(item, empty);
 
-            // Rimuove la classe di bordo per evitare che venga applicata a celle riciclate
+            // Pulisce sempre la cella prima di riutilizzarla
             getStyleClass().remove("notification-cell-with-border");
+            setText(null);
 
             if (empty || item == null) {
                 setGraphic(null);
@@ -915,10 +918,9 @@ public class DashboardMedicoController {
                     priorityCircle.setVisible(false);
                 }
 
-                // --- Logica Chiave ---
-                // Se la cella non è la prima della lista (indice > 0),
-                // aggiungi la classe CSS per il bordo.
-                if (getIndex() > 0) {
+                // --- MODIFICA CHIAVE ---
+                // Applica la classe per il bordo a tutte le celle tranne la prima (indice 0)
+                if (getIndex() >= 0) {
                     getStyleClass().add("notification-cell-with-border");
                 }
 
