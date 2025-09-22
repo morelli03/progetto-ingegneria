@@ -97,7 +97,7 @@ public class MonitorService {
             System.out.println("nessun paziente con terapie attive trovato controllo terminato");
             return;
         }
-        // motliplico per 3 perche pèer tre giorni
+        // motliplico per 3 perche pèer tre giorni, mappa dove c'è l'id del paziente e la sua frequenza totale, cumulativa di più terapie se necessario
         Map<Integer, Integer> frequenzeRichieste = terapiaDAO.getFrequenzeGiornalierePerPazienti(pazientiAttivi);
 
 
@@ -111,7 +111,7 @@ public class MonitorService {
                 numeroAssunzioni += assunzioneFarmaciDAO.getConteggioAssunzioniGiornoPerPazienti(List.of(idPaziente), LocalDate.now().minusDays(i)).getOrDefault(idPaziente, 0);
             }
 
-            // se il numero di assunzioni effettuate negli ultimi 3 giorni è inferiore alla frequenza richiesta
+            // se il numero di assunzioni effettuate negli ultimi 3 giorni è inferiore alla frequenza richiesta e sono passati almeno 3 giorni dall'inizio della terapia
             if(numeroAssunzioni < frequenzaRichiesta3Giorni){
                 //system.out.println("notifica a paziente id " + idpaziente + " non hai registrato le assunzioni dei farmaci per tre giorni consecutivi controlla la tua terapia");
                 notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(idPaziente).orElseThrow(), 2, "mancata aderenza alla terapia", "l'utente " + pazientiDAO.findNameById(idPaziente) + " non ha seguito la terapia per più di 3 giorni", "assunzioni farmaci");
