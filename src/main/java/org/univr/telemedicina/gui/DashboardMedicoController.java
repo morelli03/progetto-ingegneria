@@ -801,7 +801,7 @@ public class DashboardMedicoController {
 
         Popup popup = createNotificationsPopup();
         Point2D buttonPos = notificationButton.localToScreen(0, notificationButton.getHeight());
-        popup.show(notificationButton.getScene().getWindow(), buttonPos.getX()-150, buttonPos.getY());
+        popup.show(notificationButton.getScene().getWindow(), buttonPos.getX() - 330, buttonPos.getY());
 
         markNotificationsAsRead(allNotifications);
     }
@@ -810,12 +810,36 @@ public class DashboardMedicoController {
         Popup popup = new Popup();
         popup.setAutoHide(true);
 
+        // 1. Contenitore principale con lo stile del popup
+        VBox popupContent = new VBox();
+        popupContent.getStyleClass().add("notification-popup");
+        popupContent.getStylesheets().add(getClass().getResource("/org/univr/telemedicina/gui/css/style.css").toExternalForm());
+
+
+        // 2. Aggiungi un'intestazione
+        Label headerLabel = new Label("Notifiche");
+        headerLabel.getStyleClass().add("notification-header-label");
+
+        // 3. Crea la ListView per le notifiche
         ListView<Notifica> listView = new ListView<>();
         listView.setItems(FXCollections.observableArrayList(allNotifications));
-        listView.setCellFactory(param -> new NotificationListCell());
+        listView.setCellFactory(param -> new DashboardMedicoController.NotificationListCell());
+        listView.getStyleClass().add("notification-list-view");
 
-        VBox popupContent = new VBox(listView);
-        popupContent.getStyleClass().add("notification-popup");
+        // Imposta un'altezza massima per evitare popup troppo grandi
+        listView.setPrefHeight(400);
+
+        // 4. Aggiungi i componenti al contenitore
+        popupContent.getChildren().addAll(headerLabel, listView);
+
+        // Se non ci sono notifiche, mostra un messaggio
+        if (allNotifications == null || allNotifications.isEmpty()) {
+            popupContent.getChildren().remove(listView);
+            Label noNotificationsLabel = new Label("Nessuna notifica presente.");
+            noNotificationsLabel.setPadding(new Insets(20));
+            popupContent.getChildren().add(noNotificationsLabel);
+        }
+
         popup.getContent().add(popupContent);
 
         return popup;
@@ -851,18 +875,29 @@ public class DashboardMedicoController {
         public NotificationListCell() {
             titleLabel.getStyleClass().add("notification-title");
             messageLabel.getStyleClass().add("notification-message");
-            messageLabel.setWrapText(true);
             timestampLabel.getStyleClass().add("notification-timestamp");
+
+            messageLabel.setWrapText(true);
+            contentVBox.maxWidthProperty().bind(widthProperty().subtract(15));
 
             topHBox.setAlignment(Pos.CENTER_LEFT);
             topHBox.getChildren().addAll(priorityCircle, titleLabel);
-            contentVBox.getChildren().addAll(topHBox, messageLabel, timestampLabel);
+
+            VBox messageContainer = new VBox(messageLabel, timestampLabel);
+            VBox.setMargin(timestampLabel, new Insets(4, 0, 0, 0));
+
+            contentVBox.getChildren().addAll(topHBox, messageContainer);
             contentVBox.setPadding(new Insets(5));
         }
 
         @Override
         protected void updateItem(Notifica item, boolean empty) {
             super.updateItem(item, empty);
+
+            // Pulisce sempre la cella prima di riutilizzarla
+            getStyleClass().remove("notification-cell-with-border");
+            setText(null);
+
             if (empty || item == null) {
                 setGraphic(null);
             } else {
@@ -882,6 +917,13 @@ public class DashboardMedicoController {
                 } else {
                     priorityCircle.setVisible(false);
                 }
+
+                // --- MODIFICA CHIAVE ---
+                // Applica la classe per il bordo a tutte le celle tranne la prima (indice 0)
+                if (getIndex() >= 0) {
+                    getStyleClass().add("notification-cell-with-border");
+                }
+
                 setGraphic(contentVBox);
             }
         }
