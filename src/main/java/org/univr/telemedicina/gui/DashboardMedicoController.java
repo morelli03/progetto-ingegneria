@@ -29,6 +29,7 @@ import org.univr.telemedicina.model.*;
 import org.univr.telemedicina.service.MedicoService;
 import org.univr.telemedicina.service.NotificheService;
 import org.univr.telemedicina.service.TerapiaService;
+import javafx.scene.control.Tooltip;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -325,13 +326,51 @@ public class DashboardMedicoController {
         for (RilevazioneGlicemia rilevazione : rilevazioni) {
             LocalDate dataRilevazione = rilevazione.getTimestamp().toLocalDate();
             if (!dataRilevazione.isBefore(inizioPeriodo) && !dataRilevazione.isAfter(finePeriodo)) {
-                dataPoints.add(new XYChart.Data<>(rilevazione.getTimestamp().format(formatter), rilevazione.getValore()));
+                dataPoints.add(new XYChart.Data<>(rilevazione.getTimestamp().format(formatter), rilevazione.getValore(), rilevazione));
             }
         }
 
         java.util.Collections.reverse(dataPoints);
         series.getData().addAll(dataPoints);
         glicemiaChart.getData().add(series);
+
+        final Tooltip tooltip = new Tooltip();
+        tooltip.setStyle("-fx-font-size: 14px;");
+
+        for (XYChart.Data<String, Number> data : series.getData()) {
+
+            data.getNode().setStyle("-fx-background-color: #454545;");
+
+            // ingrandisco leggermente il punto per renderlo più facile da selezionare
+            data.getNode().setScaleX(1.2);
+            data.getNode().setScaleY(1.2);
+
+            data.getNode().setOnMouseEntered(event -> {
+                RilevazioneGlicemia rilevazione = (RilevazioneGlicemia) data.getExtraValue();
+                DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+                String tooltipText = String.format(
+                        "Valore: %d mg/dL\nOra: %s\n%s",
+                        rilevazione.getValore(),
+                        rilevazione.getTimestamp().format(timeFormatter),
+                        rilevazione.getNote() != null && !rilevazione.getNote().isEmpty() ? rilevazione.getNote() : "Nessuna nota"
+                );
+
+                tooltip.setText(tooltipText);
+                tooltip.show(data.getNode().getScene().getWindow(), event.getScreenX() + 15, event.getScreenY() + 15);
+
+                // quando il mouse è sopra
+                data.getNode().setScaleX(1.5);
+                data.getNode().setScaleY(1.5);
+            });
+
+            data.getNode().setOnMouseExited(event -> {
+                tooltip.hide();
+                data.getNode().setStyle("-fx-background-color: #454545;");
+                data.getNode().setScaleX(1.2);
+                data.getNode().setScaleY(1.2);
+            });
+        }
     }
 
     @FXML

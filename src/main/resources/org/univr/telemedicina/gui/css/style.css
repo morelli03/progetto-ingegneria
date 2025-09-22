@@ -254,3 +254,8 @@
 .terapia-details-text {
     -fx-font-size: 16px;
 }
+
+.chart-series-line {
+    -fx-stroke: #838383;
+    -fx-stroke-width: 2px;
+}
