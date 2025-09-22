@@ -101,6 +101,6 @@ class MonitorServiceIntegrationTest {
 
         List<Notifica> notifiche = notificheDAO.leggiNotifichePerId(medico.getIDUtente());
         assertEquals(1, notifiche.size());
-        assertTrue(notifiche.get(0).getMessaggio().contains("non ha seguito la terapia per più di 3 giorni"));
+        assertTrue(notifiche.get(0).getMessaggio().contains("non è stato costante nella terapia per 3 giorni."));
     }
 }
