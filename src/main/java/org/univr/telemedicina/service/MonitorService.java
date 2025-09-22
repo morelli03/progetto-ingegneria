@@ -108,7 +108,7 @@ public class MonitorService {
             // 3. Calcoliamo la frequenza giornaliera richiesta sommando solo quella delle terapie
             //    che sono attive da almeno 3 giorni.
             for (Terapia terapia : terapieDelPaziente) {
-                boolean isIniziataDaAlmeno3Giorni = !terapia.getDataInizio().isAfter(oggi.minusDays(3));
+                boolean isIniziataDaAlmeno3Giorni = terapia.getDataInizio().isBefore(oggi.minusDays(3));
                 boolean isAttualmenteAttiva = (terapia.getDataFine() == null || terapia.getDataFine().isAfter(oggi));
 
                 if (isIniziataDaAlmeno3Giorni && isAttualmenteAttiva) {

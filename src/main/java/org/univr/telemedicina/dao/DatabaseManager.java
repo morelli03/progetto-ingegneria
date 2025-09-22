@@ -18,6 +18,7 @@ public class DatabaseManager {
         return DriverManager.getConnection(URL);
     }
 
+    //viene chiamato solo nei test per impostare test.sqlite
     public static void setURL(String url) {
         URL = url;
     }
