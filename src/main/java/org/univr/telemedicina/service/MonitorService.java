@@ -127,13 +127,13 @@ public class MonitorService {
     public void checkGlicemia(RilevazioneGlicemia rilevazione) throws DataAccessException {
         if(rilevazione.getNote().equals("Prima colazione") || rilevazione.getNote().equals("Prima pranzo") || rilevazione.getNote().equals("Prima cena")){
             //entra se è prima dei pasti
-            if(rilevazione.getValore() <= 80 || rilevazione.getValore() >= 130){
+            if(rilevazione.getValore() < 80 || rilevazione.getValore() > 130){
                 //system.out.println("notifica a paziente id " + rilevazione.getidpaziente() + " valore glicemico anormale prima dei pasti " + rilevazione.getvalore() + " mg/dl controlla la tua dieta");
                 notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(rilevazione.getIdPaziente()).orElseThrow(), 3, "glicemia anormale", "il paziente " + pazientiDAO.findNameById(rilevazione.getIdPaziente()) + " ha registrato un valore glicemico anormale prima dei pasti " + rilevazione.getValore() + " mg/dl", "glicemia");
             }
         } else {
             //entra se è due ore dopo i pasti
-            if(rilevazione.getValore() >= 180 || rilevazione.getValore() <= 79){
+            if(rilevazione.getValore() > 180 || rilevazione.getValore() < 80){
                 //system.out.println("notifica a paziente id " + rilevazione.getidpaziente() + " valore glicemico anormale dopo i pasti " + rilevazione.getvalore() + " mg/dl controlla la tua dieta");
                 notificheService.send(pazientiDAO.getMedicoRiferimentoByPazienteId(rilevazione.getIdPaziente()).orElseThrow(), 3, "glicemia anormale", "il paziente " + pazientiDAO.findNameById(rilevazione.getIdPaziente()) + " ha registrato un valore glicemico anormale dopo i pasti " + rilevazione.getValore() + " mg/dl", "glicemia");
             }
